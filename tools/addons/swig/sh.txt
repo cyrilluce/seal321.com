@@ -1,0 +1,7 @@
+swig -c++ -javascript -node -DV8_VERSION=0x032873 SealUtil.i
+cat SealUtil_wrap.cxx|grep decrypt
+
+
+node-gyp rebuild
+
+
