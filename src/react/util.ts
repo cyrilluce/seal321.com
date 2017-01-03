@@ -18,9 +18,10 @@ export function getIconStyle(iconIndex: number): React.CSSProperties{
     const imageIndex = rest;
 
     return {
-        width: "16px",
-        height: "16px",
-        backgroundImage: `/images/itemicon${imageIndex}.png`,
+        width: "32px",
+        height: "32px",
+        display: "inline-block",
+        backgroundImage: `url(/images/items/itemicon${imageIndex+1}.png)`,
         backgroundPosition: `${-x*iconWidth}px ${-y*iconHeight}px`
     };
 }

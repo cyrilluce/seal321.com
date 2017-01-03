@@ -3,9 +3,12 @@
  */
 import * as mysql from 'mysql';
 import {mysql as mysqlConfig} from '../config';
-var pool  = mysql.createPool(Object.assign({
+import promisify from '../util/promisify';
+const pool  = mysql.createPool(Object.assign({
     connectionLimit : 10,
     // debug : true
 }, mysqlConfig));
 
 export default pool;
+
+export const getConnectionAsync = promisify<mysql.IConnection>(pool.getConnection, pool);

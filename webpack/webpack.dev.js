@@ -22,13 +22,13 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
-                include: path.join(__dirname, '../src'),
+                //include: path.join(__dirname, '../src'),
                 loaders: ['react-hot', 'babel']
             },
             {
                 test : /\.tsx?$/,
                 exclude: /node_modules/,
-                include: path.join(__dirname, '../src'),
+                //include: path.join(__dirname, '../src'),
                 loaders : ['react-hot', 'babel', 'ts']
             }
         ]

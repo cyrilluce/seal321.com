@@ -8,11 +8,11 @@ let router = express.Router();
 
 // 统一校验，服务器、db
 router.use(function(req, res, next){
-    const loc:ServerId = req.query.loc || mainDb;
+    const loc:ServerId = req.body.loc || mainDb;
     if(!(loc in dbs)){
         return res.json(failure('无此主数据库'));
     }
-    req.query.loc = loc;
+    req.body.loc = loc;
     next();
 });
 

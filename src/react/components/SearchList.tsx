@@ -15,7 +15,13 @@ interface Props{
 }
 
 export default class SearchList extends Component<Props, {}> {
+    onItemClick(index: number){
+        if(this.props.onItemClick){
+            this.props.onItemClick(index);
+        }
+    }
     render() {
+        const {onItemClick} = this.props;
         let content;
         if(this.props.searching){
             content = '搜索中...';
@@ -23,7 +29,7 @@ export default class SearchList extends Component<Props, {}> {
             content = this.props.list.map((data, index) =>
                 <SearchItem data={data}
                             key={index}
-                            onClick={() => this.props.onItemClick(index)} />
+                            onClick={this.onItemClick.bind(this)} />
             );
         }
         return (

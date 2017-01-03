@@ -1,7 +1,7 @@
 /**
  * Created by cyrilluce on 2016/8/7.
  */
-export interface Seal321Config{
+interface Seal321Config{
     localHotLoadPort: number;
     deployServer: string;
     deployPort: number;

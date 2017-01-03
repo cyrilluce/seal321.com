@@ -126,11 +126,11 @@ class ItemDb extends Component<Props, {}> {
         let props = this.props;
         const {page, size, result} = props;
         const list = result.data && result.data.list || [];
-        const count = list.length;
+        const count = result.data && result.data.count || 0;
         const pageCount = Math.ceil(count/size) || 1;
         return <div>
             <SearchBar keyword={props.keyword} onSearch={keyword=>dispatch(search(keyword))} />
-            <SearchList searching={props.result.loading} list={props.result.data.list || []} />
+            <SearchList searching={props.result.loading} list={list} />
             <ReactPaginateFix previousLabel={"«"}
                     nextLabel={"»"}
                     breakLabel={<a href="">...</a>}

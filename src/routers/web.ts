@@ -53,9 +53,9 @@ app.enable('trust proxy');
 
 
 // // ------------ 数据库后台 TODO 低优先吧。。。 预备全新改写
-// nodeRouter.use(cookieParser());
-// nodeRouter.use(bodyParser.urlencoded({ extended: true, limit: '20mb' }));
-// nodeRouter.use(bodyParser.json({limit: '20mb'}));
+nodeRouter.use(cookieParser());
+nodeRouter.use(bodyParser.urlencoded({ extended: true, limit: '20mb' }));
+nodeRouter.use(bodyParser.json({limit: '20mb'}));
 //
 // const ENCRYPT_A = 12345;
 // const ENCRYPT_B = 15881;
@@ -105,7 +105,7 @@ app.use('/node', nodeRouter);
 
 // 静态文件
 // if(process.env.NODE_ENV === 'production'){
-    app.use('/static', express['static'](path.join(__dirname, '../www/static')));
+    app.use('/', express['static'](path.join(__dirname, '../../www')));
 // }
 
 // 单页应用，只有一个入口....

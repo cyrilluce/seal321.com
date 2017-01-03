@@ -1,8 +1,9 @@
 import * as mysql from 'mysql';
-import mysqlPool from '../../lib/mysql';
+import {getConnectionAsync} from '../../lib/mysql';
 import {ServerId, Table, dbs} from '../../config';
 import logger from '../../logger';
 import {success, failure} from '../util';
+import promisify from '../../util/promisify';
 import {waterfall} from 'async';
 
 interface Query{
@@ -19,8 +20,8 @@ function constrain(v:number, min:number, max:number): number{
     return v;
 }
 
-export default function(req, res){
-    const query: Query = req.query;
+export default async function(req, res){
+    const query: Query = req.body;
     const table: Table = "item";
     const {
         loc : db,
@@ -28,20 +29,31 @@ export default function(req, res){
         offset = 0,
         limit = 20
     } = query;
+    // 模糊搜索
+    const keywordSearch = '%' + keyword.replace(/(%_)/g, '\\$1') + '%'
 
     const tableName = `seal_${db}_${table}`;
-    mysqlPool.getConnection((err, conn)=>{
-        if(err){
-            logger.error('query/list', err);
-            return res.json(failure(err.message));
+    let conn: mysql.IConnection;
+    try{
+        conn = await getConnectionAsync();
+        const queryAsync = promisify<any[]>(conn.query, conn);
+
+        const [data, countData] = await Promise.all([
+            queryAsync(`SELECT * FROM ${tableName} WHERE name like ? limit ?,?`,
+                [keywordSearch, constrain(offset, 0, 1000000), constrain(limit, 0, 100)]),
+            queryAsync(`SELECT count(*) as count FROM ${tableName} WHERE name like ?`, [keywordSearch])
+        ]);
+
+        res.json(success({
+            list : data,
+            count : countData[0] && countData[0].count || 0
+        }));
+    }catch(err){
+        logger.error('query/list', err);
+        res.json(failure(err.message));
+    }finally{
+        if(conn){
+            conn.release();
         }
-        conn.query(`SELECT * FROM ${tableName} WHERE name like ? limit ?,?`,
-            [keyword, constrain(offset, 0, 1000000), constrain(limit, 0, 100)],
-            (err, data)=>{
-                if(err){
-                    return res.json(failure('查询数据库失败：'+err.message));
-                }
-                res.json(success(data));
-            });
-    });
+    }
 }
