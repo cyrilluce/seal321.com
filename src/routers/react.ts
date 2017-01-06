@@ -2,18 +2,25 @@
  * Created by cyrilluce on 2016/8/14.
  */
 import React from 'react';
-import getStore from "../redux/getStore";
 import { renderToString } from 'react-dom/server';
+import { useStaticRendering } from 'mobx-react';
 import getRoot from '../react/getRoot';
 import * as config from '../config';
+import ItemDbStore from '../stores/db';
 import {Request, Response} from 'express';
+
+// 防止mobx内存泄漏
+useStaticRendering(true);
 
 // 接下来会补充这部分代码
 export default function handleRender(req: Request, res: Response) {
     // 创建新的 Redux store 实例
-    const store = getStore({
-        path: req.path,
-        keyword : req.query.keyword
+    // const store = getStore({
+    //     path: req.path,
+    //     keyword : req.query.keyword
+    // });
+    const store = new ItemDbStore({
+      keyword : req.query.keyword
     });
 
     // 如果store加载完成（服务端加载），则渲染之

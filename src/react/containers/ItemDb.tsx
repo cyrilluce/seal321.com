@@ -3,15 +3,15 @@
  */
 import * as React from 'react';
 import { Component, PropTypes, ComponentClass } from 'react'
-import { connect } from 'react-redux'
+import { observer, inject } from 'mobx-react';
 import SearchBar from '../components/SearchBar';
 import SearchList from '../components/SearchList';
 import * as ReactPaginate from 'react-paginate';
+import ItemDbStore from '../../stores/db';
 // import {ReactPaginateProps} from 'react-paginate';
-import {search, paging} from '../../redux/actions';
 
-interface Props extends State{
-    dispatch: (action: {})=>void;
+interface Props{
+    store?: ItemDbStore;
 }
 
 // paginate组件的types定义未更新
@@ -116,21 +116,19 @@ interface PaginateProps{
 
 let ReactPaginateFix: React.ComponentClass<PaginateProps> = ReactPaginate as any;
 
-class ItemDb extends Component<Props, {}> {
+@inject('store')
+@observer
+export default class ItemDb extends Component<Props, {}> {
     handlePageClick(){
         
     }
     render() {
         // Injected by connect() call:
-        const { dispatch } = this.props;
-        let props = this.props;
-        const {page, size, result} = props;
-        const list = result.data && result.data.list || [];
-        const count = result.data && result.data.count || 0;
-        const pageCount = Math.ceil(count/size) || 1;
+        const { store } = this.props;
+        const { keyword, page, pageSize, list, totalCount, pageCount, searching} = store;
         return <div>
-            <SearchBar keyword={props.keyword} onSearch={keyword=>dispatch(search(keyword))} />
-            <SearchList searching={props.result.loading} list={list} />
+            <SearchBar keyword={keyword} onSearch={keyword=>store.search(keyword)} />
+            <SearchList searching={searching} list={list} />
             <ReactPaginateFix previousLabel={"«"}
                     nextLabel={"»"}
                     breakLabel={<a href="">...</a>}
@@ -145,6 +143,3 @@ class ItemDb extends Component<Props, {}> {
         </div>
     }
 }
-
-// 包装 component ，注入 dispatch 和 state 到其默认的 connect(select)(App) 中；
-export default connect(state=>state)(ItemDb)
