@@ -1,6 +1,7 @@
 // 物品数据库store
 // TODO 如何解决reaction进行中的判断？用于服务端判断是否加载完成
 import { observable, computed, action, reaction, useStrict, IObservableArray } from 'mobx';
+import {Item} from '../types';
 import * as query from './query';
 import delay from '../util/delay';
 
@@ -11,10 +12,12 @@ interface InitableProperties{
 }
 
 export default class ItemDbStore{
-    constructor(options: InitableProperties = {}){
-        this.reactionSearch();
+    constructor(options: InitableProperties = {}, skipReaction: boolean = false){
+        if(!skipReaction){
+            this.initReactions();
+        }
         
-        const {keyword="", page=1, pageSize=20} = options;
+        const {keyword="", page, pageSize} = options;
         if(keyword){
             this.search(keyword);
         }
@@ -23,10 +26,22 @@ export default class ItemDbStore{
         }
     }
     /**
+     * 初始化Reactions
+     */
+    initReactions(){
+        this.reactionSearch();
+    }
+    /**
      * 用于前端进行store复原
      */
-    static fromJs(): ItemDbStore{
-        const store = new ItemDbStore();
+    static fromJS(data): ItemDbStore{
+        const store = new ItemDbStore(undefined, true);
+        Object.keys(data).forEach(key=>{
+            if(key in store){
+                store[key] = data[key];
+            }
+        });
+        store.initReactions();
         return store;
     }
     // ------------------- 原始属性 --------------------
@@ -41,7 +56,7 @@ export default class ItemDbStore{
     /**
      * 搜索出的物品列表
      */
-    @observable list: Item[];
+    @observable list: Item[] = [];
     /**
      * 搜索出的物品总数
      */
@@ -57,7 +72,7 @@ export default class ItemDbStore{
     /**
      * 当前页面大小
      */
-    @observable pageSize: number = 20;
+    @observable pageSize: number = 15;
 
     // ------------------- 高级属性 ----------------
     /**
@@ -72,7 +87,18 @@ export default class ItemDbStore{
     @computed get pageCount(): number{
         return Math.ceil(this.totalCount/this.pageSize) || 1;
     }
-
+    /**
+     * 起始位置
+     */
+    @computed get offset(): number{
+        return (this.page - 1) * this.pageSize;
+    }
+    /**
+     * 拉取数量
+     */
+    @computed get limit(): number{
+        return this.pageSize;
+    }
     // ------------------- 动作 --------------------
     /**
      * 搜索
@@ -100,8 +126,8 @@ export default class ItemDbStore{
             '搜索',
             ()=>({
                 keyword: this.keyword,
-                page: this.page,
-                size: this.pageSize
+                offset: this.offset,
+                limit: this.limit
             }),
             async params => {
                 let list: Item[], totalCount: number;
@@ -121,12 +147,15 @@ export default class ItemDbStore{
                     }
                     try{
                         let data = await query.list(params);
+                        if(myToken !== token){
+                            return;
+                        }
                         list = data.list;
                         totalCount = data.count;
                     }catch(err){
                         list = [];
                         totalCount = 0;
-                        this.message = err.message;
+                        this.message = err.message || JSON.stringify(err);
                     }
                     
                 }else{ // 空关键字，清空列表

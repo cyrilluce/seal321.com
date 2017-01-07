@@ -6,6 +6,8 @@
 import * as React from 'react';
 import {Component, PropTypes} from 'react'
 import {getIconStyle} from '../util';
+import {Item} from '../../types';
+import * as lang from '../../lang';
 
 interface Props{
     data: Item,
@@ -21,11 +23,18 @@ export default class SearchItem extends Component<Props, {}> {
     }
     render() {
         const {data} = this.props;
-        return (
-            <li onClick={this.onClick.bind(this)}>
-                <div style={getIconStyle(data.displayid)} />
-                {data.name}
-            </li>
-        )
+        return <tr title="点击查看详细信息">
+            <td><div className="noselect" style={getIconStyle(data.displayid)}></div></td>
+            <td>{data.name}</td>
+            <td>{lang.ItemTypeNames[data.type]}</td>
+            <td>{data.level || '-'}</td>
+            <td>{data.description}</td>
+        </tr>
+        // return (
+        //     <li onClick={this.onClick.bind(this)}>
+        //         <div style={getIconStyle(data.displayid)} />
+        //         {data.name}
+        //     </li>
+        // )
     }
 }

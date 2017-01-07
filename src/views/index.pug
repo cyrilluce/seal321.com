@@ -2,15 +2,11 @@ doctype html
 html
     head
         title 希尔特国家地理
-        link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u", crossorigin="anonymous")
     body
         #root !{html}
         script.
-            window.__INITIAL_STATE__ = !{JSON.stringify(store.getState())}
-        script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery"+(development ? '' : '.min')+".js")
-        script(src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.13.0/polyfill"+(development ? '' : '.min')+".js")
+            window.__INITIAL_STATE__ = !{JSON.stringify(state)}
+        //- script(src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.13.0/polyfill"+(development ? '' : '.min')+".js")
         script(src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react"+(development ? '' : '.min')+".js")
-        script(src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.6.0/redux"+(development ? '' : '.min')+".js")
-        script(src="https://cdnjs.cloudflare.com/ajax/libs/react-redux/4.4.5/react-redux"+(development ? '' : '.min')+".js")
-        script(src="https://cdnjs.cloudflare.com/ajax/libs/redux-saga/0.12.1/redux-saga"+(development ? '' : '.min')+".js")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/mobx/2.7.0/mobx.umd"+(development ? '' : '.min')+".js")
         script(src="/static/index.js")

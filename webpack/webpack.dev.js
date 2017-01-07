@@ -10,11 +10,10 @@ var externals = require('./externals'),
     webpackCommonConfig = require('./config');
 
 var publicPath = webpackCommonConfig.publicPath;
-var config = require('../config');
 
 module.exports = {
     devtool: 'inline-source-map',
-    // debug: true,
+    debug: true,
     resolve : webpackCommonConfig.resolve,
     module : {
         loaders : [
@@ -46,7 +45,7 @@ module.exports = {
         publicPath: publicPath
     },
     plugins : [
-        new webpack.optimize.OccurenceOrderPlugin(),
+        //new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin(),
        // new webpack.optimize.DedupePlugin(),

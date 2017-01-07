@@ -10,6 +10,7 @@ import * as config from './config';
 
 process.on('unhandledrejection', (reason, p)=>{
     logger.error("Unhandled Rejection at: Promise ", p, " reason: ", reason);
+    throw reason;
 });
 
 // process.on('uncaughtException', function(e){

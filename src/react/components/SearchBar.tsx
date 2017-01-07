@@ -17,16 +17,22 @@ export default class SearchBar extends Component<Props, {}> {
         return (
             <div>
                 <input ref="input" type="text" size={50} placeholder="输入物品名称回车搜索" defaultValue={this.props.keyword}
-                    onChange={()=>{}}
+                    onChange={()=>{}} onKeyUp={this.handleEnter.bind(this)}
                 />
-                <button className="btn_ok" onClick={(e) => this.handleClick(e)}>
+                <button className="btn_ok" onClick={this.doSearch.bind(this)}>
                     搜索
                 </button>
             </div>
         )
     }
 
-    handleClick(e) {
+    handleEnter(e: KeyboardEvent){
+        if(e.which === 13){
+            this.doSearch();
+        }
+    }
+
+    doSearch() {
         const refs = this.refs;
         const node = findDOMNode<HTMLInputElement>(refs['input']);
         const text = node.value.trim();

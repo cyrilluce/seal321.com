@@ -10,7 +10,6 @@ var externals = require('./externals'),
     webpackCommonConfig = require('./config');
 
 var publicPath = webpackCommonConfig.publicPath;
-var config = require('../config');
 
 module.exports = {
     resolve : webpackCommonConfig.resolve,
@@ -20,13 +19,11 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
-                include: path.join(__dirname, '../src'),
                 loaders: ['babel']
             },
             {
                 test : /\.tsx?$/,
                 exclude: /node_modules/,
-                include: path.join(__dirname, '../src'),
                 loaders : ['babel', 'ts']
             }
         ]

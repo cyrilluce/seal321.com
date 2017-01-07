@@ -8,6 +8,9 @@ import SearchBar from '../components/SearchBar';
 import SearchList from '../components/SearchList';
 import * as ReactPaginate from 'react-paginate';
 import ItemDbStore from '../../stores/db';
+
+import './ItemDb.css';
+
 // import {ReactPaginateProps} from 'react-paginate';
 
 interface Props{
@@ -114,32 +117,39 @@ interface PaginateProps{
     onPageChange: (...any)=>void
 }
 
+interface State{
+    paginationExpanded?: boolean;
+}
+
 let ReactPaginateFix: React.ComponentClass<PaginateProps> = ReactPaginate as any;
 
 @inject('store')
 @observer
-export default class ItemDb extends Component<Props, {}> {
-    handlePageClick(){
-        
+export default class ItemDb extends Component<Props, State> {
+    handlePageClick(page){
+        // react-paginate的page对象selected属性是0-base
+        this.props.store.paginate(page.selected+1);
     }
     render() {
         // Injected by connect() call:
         const { store } = this.props;
+        const state = this.state || {};
+        const {paginationExpanded} = state;
         const { keyword, page, pageSize, list, totalCount, pageCount, searching} = store;
         return <div>
             <SearchBar keyword={keyword} onSearch={keyword=>store.search(keyword)} />
-            <SearchList searching={searching} list={list} />
             <ReactPaginateFix previousLabel={"«"}
                     nextLabel={"»"}
-                    breakLabel={<a href="">...</a>}
+                    breakLabel={<a href="#" onClick={()=>{this.setState({paginationExpanded: true})}}>...</a>}
                     breakClassName={"break-me"}
                     pageNum={page}
                     pageCount={pageCount}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={5}
-                    onPageChange={this.handlePageClick}
+                    marginPagesDisplayed={paginationExpanded ? 999: 2}
+                    pageRangeDisplayed={paginationExpanded ? 999: 5}
+                    onPageChange={this.handlePageClick.bind(this)}
                     containerClassName={"pages pagination"}
                     activeClassName={"active"} />
+            <SearchList />
         </div>
     }
 }

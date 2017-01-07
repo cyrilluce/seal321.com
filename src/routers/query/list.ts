@@ -25,12 +25,14 @@ export default async function(req, res){
     const table: Table = "item";
     const {
         loc : db,
-        keyword,
+        keyword = "",
         offset = 0,
         limit = 20
     } = query;
     // 模糊搜索
-    const keywordSearch = '%' + keyword.replace(/(%_)/g, '\\$1') + '%'
+    const keywordSearch = '%' + keyword.replace(/(%_)/g, '\\$1') + '%';
+
+    logger.info('搜索', keyword, offset, limit);
 
     const tableName = `seal_${db}_${table}`;
     let conn: mysql.IConnection;

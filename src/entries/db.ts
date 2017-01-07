@@ -4,11 +4,11 @@
 ///<reference path="../types/window.d.ts" />
 import React from 'react';
 import { render } from 'react-dom'
-import getStore from "../redux/getStore";
+import ItemDbStore from '../stores/db';
 import getRoot from '../react/getRoot';
 
 // 创建新的 Redux store 实例
-const store = getStore(window.__INITIAL_STATE__);
+const store = ItemDbStore.fromJS(window.__INITIAL_STATE__);
 
 let rootInstance = render(getRoot(store), document.getElementById('root'));
 
