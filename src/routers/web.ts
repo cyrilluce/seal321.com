@@ -46,7 +46,7 @@ if(process.env.NODE_ENV === 'development'){
 
 
 app.set('view engine', 'pug');
-app.set('views', __dirname+'/../views');
+app.set('views', __dirname+'/../../views');
 
 app.use(compression());
 app.enable('trust proxy');

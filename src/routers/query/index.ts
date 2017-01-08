@@ -1,5 +1,5 @@
 import * as express from 'express';
-import {dbs, ServerId, mainDb} from '../../../config';
+import {dbs, ServerId, mainDb} from '../../config';
 import {success, failure} from '../util';
 
 import list from './list';

@@ -8,6 +8,7 @@
     "experimentalDecorators": true,
     "noImplicitAny": false,
     "sourceMap": false,
+    "rootDir": "src",
     "outDir": "ts-build",
     "jsx": "react",
     "typeRoots": [

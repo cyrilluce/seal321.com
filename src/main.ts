@@ -13,10 +13,10 @@ process.on('unhandledrejection', (reason, p)=>{
     throw reason;
 });
 
-// process.on('uncaughtException', function(e){
-//     logger.error(e);
-//     logger.error(e.stack);
-// });
+process.on('uncaughtException', function(e){
+    logger.error(e);
+    logger.error(e.stack);
+});
 // 发布工具
 let deployRouter = require('./routers/deploy');
 
