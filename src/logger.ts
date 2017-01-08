@@ -69,7 +69,7 @@ var makeTransport = function(conf) {
         var levelIndex = levelIndexMap[level] || 0;
         for(i=0; i<targets.length; i++){
             // 在info下，不输出debug文件
-            if(levelIndexMap[targets[i]] < levelIndex){
+            if(levelIndexMap[targets[i]] < levelIndexMap['info']){
                 continue;
             }
             _push2File(data.output, targets[i]);

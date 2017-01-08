@@ -5,13 +5,15 @@
  * 3. 重启后台
  * Created by cyrilluce on 2016/8/6.
  */
-"use strict";
+
 var http = require('http');
 var path = require('path');
-var async = require('async');
+var asyncLib = require('async');
 var fs = require('fs');
-var config = require('./config');
+var config = require('./src/config');
 var deployUtil = require('./src/util/deploy');
+var recursive = require('recursive-readdir');
+import promisify from './src/util/promisify';
 
 var deployer = module.exports = {
     deploy : function(data, cb){
@@ -43,6 +45,28 @@ var deployer = module.exports = {
 // node deploy db tw2 item 0.654
 var type = process.argv[2];
 
+let recursiveDir = promisify(recursive);
+
+async function resolveFile(file){
+    if(/\/\*$/.test(file)){
+        let path = file.split('/*')[0];
+        let files = await recursiveDir(path);
+        return files.map(file => {
+            return file.replace(/\\/g, '/');
+        })
+    }
+    return [file];
+}
+
+async function resolveAll(files){
+    let results = await Promise.all(files.map(file=>resolveFile(file)));
+    let fileList = [];
+    results.forEach(file=>{
+         fileList = fileList.concat(file);
+    });
+    return fileList;
+}
+
 var types = {
     // 文件发布
     file : function(files, callback){
@@ -51,21 +75,23 @@ var types = {
             'localConfig.js' : 1,
             'deploy.js' : 1
         };
-        var tasks = files.filter(file=>!(file in blackLists)).map(file=>{
-            return (callback)=>{
-                fs.readFile(path.resolve(__dirname, file), (err, data)=>{
-                    callback(err, data && {
-                        title : '文件 '+file,
-                        data : {
-                            type: 'file',
-                            filePath: file,
-                            content: data.toString('hex')
-                        }
+        resolveAll(files).then(fileList=>{
+            var tasks = fileList.filter(file=>!(file in blackLists)).map(file=>{
+                return (callback)=>{
+                    fs.readFile(path.resolve(__dirname, file), (err, data)=>{
+                        callback(err, data && {
+                            title : '文件 '+file,
+                            data : {
+                                type: 'file',
+                                filePath: file,
+                                content: data.toString('hex')
+                            }
+                        });
                     });
-                });
-            };
-        });
-        async.parallel(tasks, callback);
+                };
+            });
+            asyncLib.parallel(tasks, callback);
+        })
     },
     // 重启
     restart : function(argv, cb){
@@ -131,7 +157,7 @@ types[type](process.argv.slice(3), (err, deployMetas)=>{
         return;
     }
     var done = 0;
-    async.parallelLimit(deployMetas.map(deployMeta=>{
+    asyncLib.parallelLimit(deployMetas.map(deployMeta=>{
         return cb=>deployer.deploy(deployMeta.data, err=>{
             done++;
             console.log(err ? 'X ' : 'OK', deployMeta.title, ''+done+'/'+deployMetas.length, err || '');

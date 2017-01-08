@@ -61,6 +61,7 @@ module.exports = function(req, res){
             case 'db':{
                 if(!(data.db in config.dbs) || !data.table || data.table === 'base' || !/^[a-z]+$/.test(data.table)){
                     res.end('error');
+                    logger.error('发布工具', '错误', '没有数据或类型不在白名单内');
                     break;
                 }
 
@@ -72,7 +73,8 @@ module.exports = function(req, res){
                 }
 
                 if(!model){
-                    res.end('error');
+                    res.end('error no model');
+                    logger.error('发布工具', '错误', '没有找到对应数据类型', data.table);
                     break;
                 }
 
@@ -94,7 +96,7 @@ module.exports = function(req, res){
                     // 创建表
                     (conn: mysql.IConnection, cb)=>{
                         let fieldsSql = model.getFieldsSql();
-                        conn.query(`CREATE TABLE ${tmpTableName} ( ${fieldsSql} ) ENGINE=MyISAM`,
+                        conn.query(`CREATE TABLE ${tmpTableName} ( ${fieldsSql} ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci`,
                             err=>cb(err, conn));
                     },
                     // 写入数据
