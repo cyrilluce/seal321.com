@@ -20,7 +20,7 @@ export function getIconStyle(iconIndex: number): React.CSSProperties{
     return {
         width: "32px",
         height: "32px",
-        display: "inline-block",
+        // display: "inline-block",
         backgroundImage: `url(/images/items/itemicon${imageIndex+1}.png)`,
         backgroundPosition: `${-x*iconWidth}px ${-y*iconHeight}px`
     };

@@ -18,7 +18,7 @@ useStaticRendering(true);
 export default function handleRender(req: Request, res: Response) {
     const store = new ItemDbStore({
       keyword : req.query.keyword,
-      page: req.query.page
+      page: +req.query.page
     });
 
     // 如果store加载完成（服务端加载），则渲染之

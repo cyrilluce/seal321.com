@@ -66,7 +66,7 @@ module.exports = function(req, res){
 
                 let model;
                 try{
-                    model = require('../models/'+data.table);
+                    model = require('../dbs/'+data.table);
                 }catch(e){
                     model=null;
                 }

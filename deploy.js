@@ -91,7 +91,7 @@ var types = {
         // TODO 可以不传version，自动识别
         // TODO 发布成功后，删除文件
         let name = `${db}_${table}_${version}`;
-        fs.readFile(path.join('D:\\seal-samples', `${name}.json`), (err, buff)=>{
+        fs.readFile(path.join('F:\\seal-samples', `${name}.json`), (err, buff)=>{
             if(err){
                 return cb(err);
             }

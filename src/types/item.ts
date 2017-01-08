@@ -4,7 +4,9 @@ export enum ItemType {
     NORMAL = 0,
     /** 恢复药品 */
     FOOD = 1,
-    /** 特殊物品 */
+    /** 无数据 */
+    UNKNOW2 = 2,
+    /** 特殊物品（药水、经验+） */
     SPECIAL = 3,
     /** 单手剑 */
     WEAPON_KNIGHT = 4,
@@ -20,8 +22,10 @@ export enum ItemType {
     WEAPON_PRIEST = 9,
     /** 法杖 */
     WEAPON_MAGE = 11,
-    /** 道具套装 */
-    ITEM_VIP = 13,
+    /** 商城装备 */
+    CASH_EQUIPMENT = 12,
+    /** 商城套装 */
+    CASH_SET = 13,
     /** 盾 */
     ITEM_SHEILD = 14,
     /** 上衣 */
@@ -30,16 +34,18 @@ export enum ItemType {
     ITEM_CLOTH = 16,
     /** 帽子 */
     ITEM_HAT = 17,
+    /** 也是帽子 */
+    ITEM_HAT_2 = 18,
     /** 鞋子 */
     ITEM_SHOES_KNIGHT = 19,
     /** 鞋子 */
     ITEM_SHOES = 20,
     /** 饰品类 */
-    ITEM_SPECIL = 21,
+    ITEM_ACCESSORY = 21,
     /** 宠物 */
     ITEM_PET = 22,
     /** 宝石类 */
-    PRE_PRECIOUS = 23,
+    GEM = 23,
     /** 任务物品 */
     TASK = 24,
     /** 骑士裤子 */
@@ -48,6 +54,8 @@ export enum ItemType {
     ITEM_TROUSERS = 26,
     /** 合成/制作书 */
     BOOK = 27,
+    /** 无数据 */
+    UNKNOW28 = 28,
     /** *魔剑士武器 */
     WEAPON_BERSERKER = 29,
     /** *狂剑士武器 */
@@ -79,7 +87,7 @@ export enum ItemType {
     /** 魔法锁 */
     CHEST_VIP = 43,
     /** 绑定饰品 */
-    SPECIAL_BIND = 44,
+    ACCESSORY_BIND = 44,
     /** 一次性投掷物 */
     THROWABLE = 45,
     /** 猎人武器 */
@@ -92,11 +100,46 @@ export enum ItemType {
     BATTLE_PET = 49,
     /** 战宠装备 */
     BATTLE_PET_EQUIPMENT = 50,
+    /** 饕客武器 */
+    WEAPON_COOK = 51,
+    /** 食神武器 */
+    WEAPON_CHEF = 52,
+    /** 美食家武器 */
+    WEAPON_FOOD_FIGHTER = 53,
 }
 
 /** G化类型 */
 export enum GType {
-
+    /** 其它物品 */
+    NORMAL = 0,
+    /** 武器制作书 */
+    WEAPON_BOOK = 1,
+    /** 武器 */
+    WEAPON = 2, 
+    /** 防具制作书 */
+    ARMOUR_BOOK = 3,
+    /** 防具 */
+    ARMOUR = 4,
+    /** 饰品制作书 */
+    ACCESSORY_BOOK = 5,
+    /** 饰品 */
+    ACCESSORY = 6,
+    /** 未知7 */
+    UNKNOW7 = 7,
+    /** 未知8 */
+    UNKNOW8 = 8,
+    /** 炼金（炸弹、车）制作书 */
+    ALCHEMY_BOOK = 9,
+    /** 未知10 */
+    UNKNOW10 = 10,
+    /** 战宠、其它特殊装备制作书 */
+    BATTLE_PET_EQUIPMENT_BOOK = 11,
+    /** 伦石制作书 */
+    RUNE_STONE_BOOK = 12,
+    /** 未知13 */
+    UNKNOW13 = 13,
+    /** 自然石制作书 */
+    NATURAL_STONE_BOOK = 14,
 }
 
 /** 装备位置 */
@@ -116,7 +159,35 @@ export enum EquipPosition {
     /** 饰品 */
     APPEND=6,
     /** 宠物 */
-    PET=7
+    PET=7,
+    /** 耳环 */
+    EARRING = 8,
+    /** 项链 */
+    NECKLACE = 9,
+    /** 手镯 */
+    BRACELET = 10,
+    /** 戒指 */
+    RING = 11,
+    /** 战宠 */
+    BATTLE_PET = 12,
+    /** 无法装备 */
+    NONE = 100,
+}
+
+/** 未知类型1 */
+export enum TypeRes1{
+    /** 未知（普通物品、装备、车等） */
+    UNKNOW0 = 0,
+    /** 饰品头、配件、手镯、戒指等，无法作为G辅 */
+    ACCESSORY = 1,
+    /** 未知（各种装备） */
+    UNKNOW2 = 2,
+    /** 宠物、各种特殊武器 */
+    SPECIAL_UNKNOW3 = 3,
+    /** 未知 几件套装上衣 */
+    SPECIAL_SET = 4,
+    /** 未知 西斯帽 */
+    SPECIAL_PUI_HAT = 5,
 }
 
 /** 职业 */
@@ -168,7 +239,26 @@ export enum Job {
     /** 弓箭手 */
     ARCHER=22,
     /** 槍手 */
-    GUNNER=23
+    GUNNER=23,
+    /** 饕客 */
+    COOK=24,
+    /** 食神 */
+    CHEF=25,
+    /** 美食家 */
+    FOOD_FIGHTER=26
+}
+
+export enum BattlePetJob{
+    /** 无 */
+    NONE = 0,
+    /** 光精灵 */
+    LIGHT = 1,
+    /** 暗精灵 */
+    DARK = 2,
+    /** 火精灵 */
+    FIRE = 3,
+    /** 水精灵 */
+    WATER = 4,
 }
 
 /** 属性 */
@@ -225,7 +315,7 @@ export interface Item {
     pet_res1: number;
     /** 魔法 */
     magic: number;
-    /** 未知-任务相关2 */
+    /** 任务奖励金钱 */
     task_res2: number;
     /** 魔法增长系统 */
     magic_step: number;

@@ -23,7 +23,7 @@ export default class SearchItem extends Component<Props, {}> {
     }
     render() {
         const {data} = this.props;
-        return <tr title="点击查看详细信息">
+        return <tr className="item" onClick={this.onClick.bind(this)}>
             <td><div className="noselect" style={getIconStyle(data.displayid)}></div></td>
             <td>{data.name}</td>
             <td>{lang.ItemTypeNames[data.type]}</td>

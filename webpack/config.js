@@ -7,6 +7,7 @@ module.exports = {
             '',
             '.js',
             '.jsx',
+            '.es6',
             '.ts',
             '.tsx',
             '.json'

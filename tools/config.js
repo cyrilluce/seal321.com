@@ -46,7 +46,7 @@ Object.keys(servers).forEach(serverId=>{
 });
 
 var config = module.exports = {
-    samplesDir : 'D:\\seal-samples',
+    samplesDir : 'F:\\seal-samples',
     servers : servers,
     getResourcePath : (serverId, version, type, file)=>
         path.join(config.samplesDir, serverId, 'source', type, file+'.'+version),

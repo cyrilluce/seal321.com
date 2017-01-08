@@ -12,6 +12,10 @@ var FilePacker = require('../filePackers/'+table);
 var filePacker = new FilePacker(serverId, version);
 
 filePacker.unpackFromFile((err, elements)=>{
+    if(err){
+        logger.error(err);
+        return;
+    }
     var server = filePacker.server;
     require('fs').writeFile(
         path.join(config.samplesDir, `${server.id}_${filePacker.table}_${filePacker.version}.json`),

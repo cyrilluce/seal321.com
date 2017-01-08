@@ -6,23 +6,21 @@ import { Component, PropTypes, ComponentClass } from 'react'
 import { observer, inject } from 'mobx-react';
 import SearchBar from '../components/SearchBar';
 import SearchList from '../components/SearchList';
+import ItemDetail from '../components/ItemDetail';
 import * as ReactPaginate from 'react-paginate';
 import ItemDbStore from '../../stores/db';
-
-import './ItemDb.css';
-
 // import {ReactPaginateProps} from 'react-paginate';
 
-interface Props{
+interface Props {
     store?: ItemDbStore;
 }
 
 // paginate组件的types定义未更新
-interface PaginateProps{
+interface PaginateProps {
     /**
      * The total number of pages.
      */
-    pageNum: number;
+    pageCount: number;
 
     /**
      * The range of pages displayed.
@@ -113,11 +111,11 @@ interface PaginateProps{
      * The classname for disabled `previous` and `next` buttons.
      */
     disabledClassName?: string;
-    pageCount?: number;
-    onPageChange: (...any)=>void
+    forcePage?: number;
+    onPageChange: (...any) => void
 }
 
-interface State{
+interface State {
     paginationExpanded?: boolean;
 }
 
@@ -126,9 +124,9 @@ let ReactPaginateFix: React.ComponentClass<PaginateProps> = ReactPaginate as any
 @inject('store')
 @observer
 export default class ItemDb extends Component<Props, State> {
-    handlePageClick(page){
+    handlePageClick(page) {
         // react-paginate的page对象selected属性是0-base
-        this.props.store.paginate(page.selected+1);
+        this.props.store.paginate(page.selected + 1);
     }
     render() {
         // Injected by connect() call:
@@ -136,20 +134,41 @@ export default class ItemDb extends Component<Props, State> {
         const state = this.state || {};
         const {paginationExpanded} = state;
         const { keyword, page, pageSize, list, totalCount, pageCount, searching} = store;
-        return <div>
-            <SearchBar keyword={keyword} onSearch={keyword=>store.search(keyword)} />
+        return <div className="container-fluid">
+            {
+                // <div className="row logo">
+                //     <img src="/images/logo.jpg" />
+                // </div>
+            }
+            <h1>物品数据库 v2.0 Beta</h1>
+            <SearchBar keyword={keyword} onSearch={keyword => store.search(keyword)} />
             <ReactPaginateFix previousLabel={"«"}
-                    nextLabel={"»"}
-                    breakLabel={<a href="#" onClick={()=>{this.setState({paginationExpanded: true})}}>...</a>}
-                    breakClassName={"break-me"}
-                    pageNum={page}
-                    pageCount={pageCount}
-                    marginPagesDisplayed={paginationExpanded ? 999: 2}
-                    pageRangeDisplayed={paginationExpanded ? 999: 5}
-                    onPageChange={this.handlePageClick.bind(this)}
-                    containerClassName={"pages pagination"}
-                    activeClassName={"active"} />
-            <SearchList />
+                nextLabel={"»"}
+                breakLabel={<a href="#" onClick={() => { this.setState({ paginationExpanded: true }) } }>...</a>}
+                // breakLabel="..."
+                breakClassName={"break"}
+                forcePage={page-1}
+                pageCount={pageCount}
+                marginPagesDisplayed={paginationExpanded ? 999 : 2}
+                pageRangeDisplayed={paginationExpanded ? 999 : 5}
+                onPageChange={this.handlePageClick.bind(this)}
+                containerClassName={"pagination"}
+                activeClassName={"active"} />
+            <SearchList onItemClick={item=>{store.viewItem(item)}}/>
+            <ReactPaginateFix previousLabel={"«"}
+                nextLabel={"»"}
+                breakLabel={<a href="#" onClick={() => { this.setState({ paginationExpanded: true }) } }>...</a>}
+                // breakLabel="..."
+                breakClassName={"break"}
+                forcePage={page-1}
+                pageCount={pageCount}
+                marginPagesDisplayed={paginationExpanded ? 999 : 2}
+                pageRangeDisplayed={paginationExpanded ? 999 : 5}
+                onPageChange={this.handlePageClick.bind(this)}
+                containerClassName={"pagination"}
+                activeClassName={"active"} />
+            {totalCount>0 && <p>共{totalCount}条记录</p>}
+            <ItemDetail />
         </div>
     }
 }

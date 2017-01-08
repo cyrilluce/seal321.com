@@ -22,7 +22,7 @@ export default class ItemDbStore{
             this.search(keyword);
         }
         if(page){
-            this.paginate(page, pageSize);
+            this.paginate(+page, +pageSize);
         }
     }
     /**
@@ -73,6 +73,12 @@ export default class ItemDbStore{
      * 当前页面大小
      */
     @observable pageSize: number = 15;
+    /**
+     * 当前查看的物品
+     */
+    @observable item: Item;
+    /** 当前查看的物品的模拟等级 */
+    @observable itemLevel: number = 0;
 
     // ------------------- 高级属性 ----------------
     /**
@@ -105,6 +111,7 @@ export default class ItemDbStore{
      */
     @action search(keyword: string){
         this.keyword = keyword;
+        this.page=1; // 搜索时，重置页码
     }
     /**
      * 翻页
@@ -114,6 +121,20 @@ export default class ItemDbStore{
         if(pageSize){
             this.pageSize = pageSize;
         }
+    }
+    /**
+     * 查看物品
+     */
+    @action viewItem(item?: Item, level: number = 0){
+        this.item = item;
+        this.itemLevel = level;
+    }
+    /** 设置精炼等级 */
+    @action setItemLevel(level: number){
+        // 装备、宠物才可以精练
+        level = Math.max(0, level);
+        level = Math.min(12, level);
+        this.itemLevel = level;
     }
 
     // ------------------ 响应 Reactions ---------------------

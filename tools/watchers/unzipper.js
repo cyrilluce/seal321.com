@@ -19,7 +19,10 @@ watchingServers.forEach(server=>{
                 "monster.edt":1,
                 "set_opt.edt":1,
                 "craft.edt":1,
-                "mix.edt":1
+                "mix.edt":1,
+                "usa.edt":1,
+                "taiwan.edt":1,
+                "china.edt":1
             },
             root : {
                 "sealres.dll":1

@@ -19,37 +19,47 @@ interface Props {
 @observer
 export default class SearchList extends Component<Props, {}> {
     onItemClick(index: number) {
-        if (this.props.onItemClick) {
-            this.props.onItemClick(index);
+        const {onItemClick, store} = this.props;
+        if (onItemClick) {
+            onItemClick(store.list[index]);
         }
     }
     render() {
         const {onItemClick, store} = this.props;
-        let content, message;
+        let content, message: string, cls: string;
         if (store.searching) {
-            message = '搜索中...';
-        } else if (!store.list.length) {
+            //message = '搜索中...';
+        } else if (!store.totalCount) {
             message = store.keyword ? `未查到匹配“${store.keyword}”的物品` : '请输入关键字开始搜索物品';
-        } else {
-            content = store.list.map((data, index) =>
-                <SearchItem data={data}
-                    key={index}
-                    onClick={this.onItemClick.bind(this)} />
-            );
+        } else if(!store.list.length) {
+            message = '此页无数据'
         }
+        content = store.list.map((data, index) =>
+            <SearchItem data={data}
+                key={index}
+                onClick={this.onItemClick.bind(this, index)} />
+        );
+
         return (
-            <table>
+            <table className="item-list table table-striped table-condensed table-hover">
+                <colgroup>
+                    <col style={{minWidth:"40px", width:"5%"}} />
+                    <col style={{minWidth:"260px", width:"20%"}} />
+                    <col style={{minWidth:"100px", width:"15%"}} />
+                    <col style={{minWidth:"100px", width:"10%"}} />
+                    <col style={{maxWidth:"300px", width:"50%"}} />
+                </colgroup>
                 <thead>
                     <tr>
-                        <th width="40"></th>
-                        <th width="200">名称</th>
-                        <th width="100">类别</th>
-                        <th width="100">等级</th>
+                        <th></th>
+                        <th>名称</th>
+                        <th>类别</th>
+                        <th>等级</th>
                         <th>描述</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {message && <tr><td colSpan={5}>{message}</td></tr>}
+                    {message && <tr className="active"><td colSpan={5}><p className="text-center">{message}</p></td></tr>}
                     {content}
                 </tbody>
             </table>
