@@ -128,6 +128,8 @@ const loadingSvg = `<?xml version="1.0" encoding="utf-8"?><svg width='34px' heig
 @observer
 export default class ItemDb extends Component<Props, State> {
     handlePageClick(page) {
+        // 翻页后，重置展开的状态
+        this.setState({paginationExpanded: false});
         // react-paginate的page对象selected属性是0-base
         this.props.store.paginate(page.selected + 1);
     }
