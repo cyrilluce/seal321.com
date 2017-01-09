@@ -45,7 +45,7 @@ var deployer = module.exports = {
 // node deploy db tw2 item 0.654
 var type = process.argv[2];
 
-let recursiveDir = promisify(recursive);
+let recursiveDir = promisify<string[]>(recursive);
 
 async function resolveFile(file){
     if(/\/\*$/.test(file)){

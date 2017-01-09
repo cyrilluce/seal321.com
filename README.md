@@ -4,6 +4,9 @@ cnpm i
 cnpm run dev 运行
 浏览器访问 http://localhost 
 
+0. 环境搭建
+
+
 1. 更新包下载解压器
 node tools/watch
 
