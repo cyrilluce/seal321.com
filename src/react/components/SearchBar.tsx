@@ -5,21 +5,26 @@
 "use strict";
 import * as React from 'react';
 import { Component, PropTypes } from 'react'
+import { inject, observer } from 'mobx-react';
+import { ItemDbStore } from '../../stores';
 import { findDOMNode } from 'react-dom';
 
 interface Props {
-    keyword?: string;
-    onSearch?: (keyword: string) => void;
+    store?: ItemDbStore;
 }
 
+@inject('store')
+@observer
 export default class SearchBar extends Component<Props, {}> {
     render() {
+        const {store} = this.props;
+        const { keyword, searching } = store;
         return (
             <div className="row">
                 <div className="col-lg-6 col-md-6 col-sm-9 col-xs-12">
                     <div className="input-group">
                         <span className="input-group-addon">物品名称：</span>
-                        <input ref="input" type="text" className="form-control" size={50} placeholder="输入物品名称后回车搜索" defaultValue={this.props.keyword} aria-describedby="basic-addon1"
+                        <input ref="input" type="text" className="form-control" size={50} placeholder="输入物品名称后回车搜索" defaultValue={keyword} aria-describedby="basic-addon1"
                             onChange={() => { } } onKeyUp={this.handleEnter.bind(this)}
                             />
                         <span className="input-group-btn">
@@ -29,6 +34,7 @@ export default class SearchBar extends Component<Props, {}> {
                         </span>
                     </div>
                 </div>
+                
             </div>
         )
     }
@@ -43,6 +49,6 @@ export default class SearchBar extends Component<Props, {}> {
         const refs = this.refs;
         const node = findDOMNode<HTMLInputElement>(refs['input']);
         const text = node.value.trim();
-        this.props.onSearch(text);
+        this.props.store.search(text);
     }
 }

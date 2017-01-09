@@ -22,6 +22,15 @@
 .pagination li a{
     cursor: pointer;
 }
+.pagination{
+  vertical-align: middle;
+}
+.db-loading{
+  margin-left: 10px;
+  display: inline-block;
+  /* line-height: 34px; */
+  vertical-align: middle;
+}
 /*.pagination{
     padding-left: 0;
 }
