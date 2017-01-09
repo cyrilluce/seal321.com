@@ -1,7 +1,5 @@
 ## 基本功能&改进（工具&环境&底层）
 dev将server与webpack server分开（webpack太慢了），或者实现express hot reload
-sagas typescript引入
-reducer、sagas hot reload
 server端hot reload？
 deploy自动化？或自动更新版本？
 deploy配置共同化，添加--debug参数？

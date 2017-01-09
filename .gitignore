@@ -46,3 +46,6 @@ jspm_packages
 .svn
 build
 ts-build
+
+# 本地配置，包含各服务器特有配置及密钥等
+localConfig.ts
