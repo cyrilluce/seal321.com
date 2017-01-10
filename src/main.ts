@@ -5,7 +5,9 @@ import logger from './logger';
 import * as http from 'http';
 import * as net from 'net';
 import * as fs from 'fs';
-import app from './routers/web';
+import * as Koa from 'koa';
+import web from './routers/web';
+import deploy from './routers/deploy';
 import * as config from './config';
 
 process.on('unhandledrejection', (reason, p)=>{
@@ -18,14 +20,11 @@ process.on('uncaughtException', function(e){
     logger.error(e.stack);
 });
 // 发布工具
-let deployRouter = require('./routers/deploy');
-
-http.createServer(deployRouter).listen(config.deployPort, '0.0.0.0', function(){
+new Koa().use(deploy).listen(config.deployPort, '0.0.0.0', function(){
     logger.info('远程发布服务监听于 ', config.deployPort);
 });
 
-app.listen(config.nginxWebPort, '0.0.0.0', ()=>{
+// web服务
+new Koa().use(web).listen(config.nginxWebPort, '0.0.0.0', ()=>{
     logger.info('Web服务监听于', config.nginxWebPort);
 });
-
-export default app;

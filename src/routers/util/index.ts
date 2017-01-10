@@ -17,3 +17,6 @@ export function failure(msg:string="请求出错"): Response{
         msg
     }
 }
+
+export * from './koa-logger';
+export * from './koa-connect';

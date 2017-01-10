@@ -1,21 +1,36 @@
-import * as express from 'express';
 import {dbs, ServerId, mainDb} from '../../config';
-import {success, failure} from '../util';
-
+import * as Router from "koa-router";
+import * as compose from "koa-compose";
 import list from './list';
 
-let router = express.Router();
+let router = new Router();
+// success与failure方法
+async function shortcutResponse(ctx, next){
+    ctx.success = function(data){
+        ctx.body = {
+            success : true,
+            data : data
+        }
+    };
+    ctx.failure = function(msg){
+        ctx.body = {
+            success : false,
+            message : msg
+        }
+    };
+    return next();
+}
 
 // 统一校验，服务器、db
-router.use(function(req, res, next){
-    const loc:ServerId = req.body.loc || mainDb;
+async function ensureDb(ctx, next){
+    const loc:ServerId = ctx.request.body.loc || mainDb;
     if(!(loc in dbs)){
-        return res.json(failure('无此主数据库'));
+        return ctx.failure('无此主数据库');
     }
-    req.body.loc = loc;
-    next();
-});
+    ctx.request.body.loc = loc;
+    return next();
+};
 
-router.use('/list', list);
-
-export default router;
+router.use(shortcutResponse).use(ensureDb);
+router.post('/list', list);
+export default router.routes();

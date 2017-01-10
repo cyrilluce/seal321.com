@@ -8,28 +8,41 @@ import { when, toJS } from 'mobx';
 import getRoot from '../react/getRoot';
 import * as config from '../config';
 import ItemDbStore from '../stores/db';
-import {Request, Response} from 'express';
 import logger from '../logger';
+import { join } from 'path';
+
+import * as compose from "koa-compose";
+import * as views from "koa-views";
 
 // 防止mobx内存泄漏
 useStaticRendering(true);
 
 // 接下来会补充这部分代码
-export default function handleRender(req: Request, res: Response) {
+export default compose([
+  views(join(__dirname, '../../views'), {
+    extension: 'pug',
+    map: {
+      pug: 'pug'
+    }
+  }),
+  async (ctx, next) => {
     const store = new ItemDbStore({
-      keyword : req.query.keyword,
-      page: +req.query.page
+      keyword: ctx.request.query.keyword,
+      page: +ctx.request.query.page
     });
 
     // 如果store加载完成（服务端加载），则渲染之
-    when('加载完成', ()=>store.initialized, ()=>{
-      const state = toJS(store);
-      res.render("index", {
-        // 把组件渲染成字符串
-        html: renderToString(getRoot(store)),
-        development : process.env.NODE_ENV === 'development',
-        state,
-        staticPath : process.env.NODE_ENV === 'development' ? `http://127.0.0.1:${config.localHotLoadPort}` : ''
-      });
+    await new Promise(resolve => {
+      when('加载完成', () => store.initialized, resolve);
     })
-}
+
+    const state = toJS(store);
+    await ctx.render("index", {
+      // 把组件渲染成字符串
+      html: renderToString(getRoot(store)),
+      development: process.env.NODE_ENV === 'development',
+      state,
+      staticPath: process.env.NODE_ENV === 'development' ? `http://127.0.0.1:${config.localHotLoadPort}` : ''
+    });
+  }
+]);

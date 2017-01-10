@@ -10,6 +10,7 @@
 import { createCipher, createDecipher } from 'crypto';
 import * as zlib from 'zlib';
 import * as config from '../config';
+import promisify from "./promisify";
 const key = config.deployKey;
 const alg = 'aes256';
 
@@ -52,3 +53,5 @@ export function unpack(stream: NodeJS.ReadableStream, callback:(err: Error|null,
     });
     zipper.on('error', callback);
 }
+
+export const unpackAsync = promisify<any>(unpack);

@@ -20,8 +20,8 @@ function constrain(v:number, min:number, max:number): number{
     return v;
 }
 
-export default async function(req, res){
-    const query: Query = req.body;
+export default async function(ctx, next){
+    const query: Query = ctx.request.body;
     const table: Table = "item";
     const {
         loc : db,
@@ -46,13 +46,13 @@ export default async function(req, res){
             queryAsync(`SELECT count(*) as count FROM ${tableName} WHERE name like ?`, [keywordSearch])
         ]);
 
-        res.json(success({
+        ctx.success({
             list : data,
             count : countData[0] && countData[0].count || 0
-        }));
+        });
     }catch(err){
         logger.error('query/list', err);
-        res.json(failure(err.message));
+        ctx.failure(err.message);
     }finally{
         if(conn){
             conn.release();
