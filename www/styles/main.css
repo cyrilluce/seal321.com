@@ -61,6 +61,9 @@
 }*/
 
 /* 物品数据库 */
+.item-list{
+    margin-bottom: 0;
+}
 .item-list tr.item td{
     cursor: pointer;
     height: 50px;

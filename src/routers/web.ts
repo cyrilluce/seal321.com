@@ -30,9 +30,9 @@ if(process.env.NODE_ENV === 'development'){
 }
 
 let debug = (str)=> async (ctx, next)=>{
-    console.log(str, 'start');
+    console.log(str, 'start', ctx.respond);
     await next();
-    console.log(str, 'end');
+    console.log(str, 'end', ctx.respond);
 }
 
 router.use(bodyParser());

@@ -8,11 +8,15 @@ let compiler = webpack(webpackConfig);
 
 logger.info('热替换功能启用');
 
+let devMiddleware = require("webpack-dev-middleware")(compiler, {
+    //noInfo: true,
+    publicPath: webpackConfig.output.publicPath,
+    //quite : true
+});
+
+let hmrMiddleware = require("webpack-hot-middleware")(compiler);
+
 export default compose([
-    koaConnect(require("webpack-dev-middleware")(compiler, {
-        //noInfo: true,
-        publicPath: webpackConfig.output.publicPath,
-        //quite : true
-    })),
-    koaConnect(require("webpack-hot-middleware")(compiler))
+    koaConnect(devMiddleware),
+    koaConnect(hmrMiddleware)
 ]);

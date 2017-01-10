@@ -59,6 +59,7 @@
     "eslint-plugin-babel": "^4.0.0",
     "eslint-plugin-react": "^6.8.0",
     "iconv": "^2.2.1",
+    "koa-webpack-hot-middleware": "^1.0.3",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "mt-downloader": "1.4.1",
