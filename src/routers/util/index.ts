@@ -19,4 +19,3 @@ export function failure(msg:string="请求出错"): Response{
 }
 
 export * from './koa-logger';
-export const koaConnect = require('./koa-connect');
