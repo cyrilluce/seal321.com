@@ -4,7 +4,7 @@
 //     setTimeout(cb, delay);
 // });
 
-export default function delay(ms: number = 0){
+export function delay(ms: number = 0){
     return new Promise(resolve=>{
         setTimeout(resolve, ms);
     })

@@ -13,7 +13,7 @@ var fs = require('mz/fs');
 var config = require('./src/config');
 var deployUtil = require('./src/util/deploy');
 var recursive = require('recursive-readdir');
-import promisify from './src/util/promisify';
+import {promisify} from './src/util';
 
 const args = require('minimist')(process.argv.slice(2));
 

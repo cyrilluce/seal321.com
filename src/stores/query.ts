@@ -1,4 +1,4 @@
-import fetch from '../util/fetch';
+import {fetch} from '../util';
 import {Item} from '../types';
 
 interface ListParam{

@@ -2,6 +2,7 @@ import {dbs, ServerId, mainDb} from '../../config';
 import * as Router from "koa-router";
 import * as compose from "koa-compose";
 import list from './list';
+import item from './item';
 
 let router = new Router();
 // success与failure方法
@@ -33,4 +34,5 @@ async function ensureDb(ctx, next){
 
 router.use(shortcutResponse).use(ensureDb);
 router.post('/list', list);
+router.post('/item', item);
 export default router.routes();

@@ -3,8 +3,7 @@ import {getConnectionAsync} from '../../lib/mysql';
 import {ServerId, Table, dbs} from '../../config';
 import logger from '../../logger';
 import {success, failure} from '../util';
-import promisify from '../../util/promisify';
-import {waterfall} from 'async';
+import {promisify} from '../../util';
 
 interface Query{
     loc: ServerId;

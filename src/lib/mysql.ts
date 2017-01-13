@@ -3,7 +3,7 @@
  */
 import * as mysql from 'mysql';
 import {mysql as mysqlConfig} from '../config';
-import promisify from '../util/promisify';
+import {promisify} from '../util';
 const pool  = mysql.createPool(Object.assign({
     connectionLimit : 10,
     // debug : true

@@ -6,7 +6,7 @@ import * as isomorphicFetch from 'isomorphic-fetch';
  * @param path 请求相对路径
  * @param params 请求参数，对象，以json格式传给后台
  */
-export default async function fetch<T>(path: string, params: any) : Promise<T>{
+export async function fetch<T>(path: string, params: any) : Promise<T>{
     if(!global.IS_BROWSER){
         path = require('url').resolve(`http://${config.deployServer}`, path);
     }

@@ -3,7 +3,7 @@
 import { observable, computed, action, reaction, useStrict, IObservableArray } from 'mobx';
 import {Item} from '../types';
 import * as query from './query';
-import delay from '../util/delay';
+import {delay} from '../util';
 
 interface InitableProperties{
     keyword?: string;
