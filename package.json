@@ -58,7 +58,7 @@
     "eslint-plugin-react": "^6.8.0",
     "iconv": "^2.2.1",
     "koa-webpack-hot-middleware": "^1.0.3",
-    "koa2-connect": "^1.0.1",
+    "koa2-connect": "^1.0.2",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "mt-downloader": "1.4.1",
