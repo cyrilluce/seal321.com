@@ -1,11 +1,17 @@
 import { ServerId, Table, dbs } from '../../config';
+import { Item } from '../../types';
 import { QueryContext } from '.';
 
-interface Query {
+export interface Query {
     loc: ServerId;
     keyword: string;
     offset?: number;
     limit?: number;
+}
+
+export interface Result {
+    list : Item[];
+    count: number;
 }
 
 function constrain(v: number, min: number, max: number): number {
@@ -17,7 +23,6 @@ function constrain(v: number, min: number, max: number): number {
 
 export default async function (ctx: QueryContext, next) {
     const query: Query = ctx.request.body;
-    const table: Table = "item";
     const {
         loc: db,
         keyword = "",
@@ -29,7 +34,7 @@ export default async function (ctx: QueryContext, next) {
 
     ctx.logger.info('搜索', keyword, offset, limit);
 
-    const tableName = `seal_${db}_${table}`;
+    const tableName = ctx.getTableName('item');
 
     const [data, countData] = await Promise.all([
         ctx.withConn((conn, query) => {
@@ -41,8 +46,9 @@ export default async function (ctx: QueryContext, next) {
         }),
     ]);
     // ctx.logger.info(data, countData);
-    ctx.success({
+    let result: Result = {
         list: data,
         count: countData && countData[0] && countData[0].count || 0
-    });
+    }
+    ctx.success(result);
 }

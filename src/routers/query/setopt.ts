@@ -1,5 +1,5 @@
 import {ServerId, Table, dbs} from '../../config';
-import { Item } from '../../types';
+import { SetOption } from '../../types';
 import { QueryContext } from '.';
 
 export interface Query{
@@ -8,7 +8,7 @@ export interface Query{
 }
 
 export interface Result{
-    [id:number]: Item;
+    [id:number]: SetOption;
 }
 
 export default async function(ctx: QueryContext, next){
@@ -22,10 +22,10 @@ export default async function(ctx: QueryContext, next){
         return +id>0;
     }).slice(0, 100);
 
-    const tableName = ctx.getTableName('item');
+    const tableName = ctx.getTableName('setopt');
 
     await ctx.withConn(async (conn, query)=>{
-        const data = await query(`SELECT * FROM ${tableName} WHERE id in (?)`, [ids]);
+        const data = await query(`SELECT * FROM ${tableName} WHERE id in ?`, [ids]);
 
         const map:Result = {};
         (data || []).forEach(item=>{

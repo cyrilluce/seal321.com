@@ -1,7 +1,7 @@
 /**
  * Created by cyrilluce on 2016/8/7.
  */
-export type Table = "item" | "monster"
+export type Table = "item" | "monster" | "setopt"
 
 export interface Tables{
     item?: any;

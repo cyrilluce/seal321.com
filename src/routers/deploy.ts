@@ -95,7 +95,7 @@ async function processDb(data) {
                             [fields, values], cb);
                     })
                 }
-                async.parallelLimit(tasks, 1, err => {
+                asyncLib.parallelLimit(tasks, 1, err => {
                     cb(err, conn);
                 })
             },

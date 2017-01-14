@@ -1,4 +1,4 @@
-import { dbs, ServerId, mainDb } from '../../config';
+import { dbs, ServerId, mainDb, Table } from '../../config';
 import * as Koa from "koa"
 import * as Router from "koa-router";
 import * as compose from "koa-compose";
@@ -19,7 +19,7 @@ export interface QueryContext extends Koa.Context {
     success: (data: any) => void;
     failure: (msg: string) => void;
     request: QueryRequest;
-    tableName
+    getTableName: (table: Table)=>string;
 }
 
 let router = new Router();
@@ -51,6 +51,8 @@ async function ensureDb(ctx: QueryContext, next) {
         return ctx.failure('无此主数据库');
     }
     ctx.request.body.loc = loc;
+
+    ctx.getTableName = (name)=>`seal_${loc}_${name}`;
 
     ctx.withConn = async (asyncTask: IWithConnTask) => {
         let conn: mysql.IConnection;

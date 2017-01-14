@@ -17,10 +17,16 @@ export default class AddLevelTools extends React.Component<Props, State>{
     private handler: ()=>void;
     private expanding: boolean;
     componentWillMount(){
+        if(!global.IS_BROWSER){
+            return
+        }
         this.handler = this.handleOuterClick.bind(this);
         document.addEventListener('click', this.handler, false);
     }
     componentWillUnmount(){
+        if(!global.IS_BROWSER){
+            return
+        }
         document.removeEventListener('click', this.handler, false);
     }
     handleOuterClick(e: MouseEvent){

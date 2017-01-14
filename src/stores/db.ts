@@ -1,43 +1,53 @@
 // 物品数据库store
 // TODO 如何解决reaction进行中的判断？用于服务端判断是否加载完成
 import { observable, computed, action, reaction, useStrict, IObservableArray } from 'mobx';
-import {Item} from '../types';
+import { Item } from '../types';
 import * as query from './query';
-import {delay} from '../util';
+import { delay } from '../util';
+import { ServerId, mainDb } from '../config';
 
-interface InitableProperties{
+interface InitableProperties {
+    loc?: ServerId;
     keyword?: string;
     page?: number;
     pageSize?: number;
+    itemId?: number;
 }
 
-export default class ItemDbStore{
-    constructor(options: InitableProperties = {}, skipReaction: boolean = false){
-        if(!skipReaction){
+export default class ItemDbStore {
+    constructor(options: InitableProperties = {}, skipReaction: boolean = false) {
+        if (!skipReaction) {
             this.initReactions();
         }
-        
-        const {keyword="", page, pageSize} = options;
-        if(keyword){
+
+        const {loc, keyword = "", page, pageSize, itemId} = options;
+        if (loc) {
+            this.loc = loc;
+        }
+        if (keyword) {
             this.search(keyword);
         }
-        if(page){
+        if (page) {
             this.paginate(+page, +pageSize);
+        }
+        if (itemId) {
+            this.itemId = itemId;
         }
     }
     /**
      * 初始化Reactions
      */
-    initReactions(){
+    initReactions() {
         this.reactionSearch();
+        this.reactionViewItem();
     }
     /**
      * 用于前端进行store复原
      */
-    static fromJS(data): ItemDbStore{
+    static fromJS(data): ItemDbStore {
         const store = new ItemDbStore(undefined, true);
-        Object.keys(data).forEach(key=>{
-            if(key in store){
+        Object.keys(data).forEach(key => {
+            if (key in store) {
                 store[key] = data[key];
             }
         });
@@ -45,6 +55,10 @@ export default class ItemDbStore{
         return store;
     }
     // ------------------- 原始属性 --------------------
+    /**
+     * 当前查询的服务器
+     */
+    @observable loc: ServerId = mainDb;
     /**
      * 错误信息
      */
@@ -73,6 +87,10 @@ export default class ItemDbStore{
      * 当前页面大小
      */
     @observable pageSize: number = 15;
+    /** 想要查看的物品id，如果它与item不符，会自动查询item */
+    @observable itemId: number;
+    /** 物品是否处于查询状态 */
+    @observable itemQuerying: boolean = false;
     /**
      * 当前查看的物品
      */
@@ -84,53 +102,54 @@ export default class ItemDbStore{
     /**
      * 是否初始化结束（用于服务端渲染判断）
      */
-    @computed get initialized(): boolean{
-        return !this.searching;
+    @computed get initialized(): boolean {
+        return !this.searching && !this.itemQuerying;
     }
     /**
      * 总页数
      */
-    @computed get pageCount(): number{
-        return Math.ceil(this.totalCount/this.pageSize) || 1;
+    @computed get pageCount(): number {
+        return Math.ceil(this.totalCount / this.pageSize) || 1;
     }
     /**
      * 起始位置
      */
-    @computed get offset(): number{
+    @computed get offset(): number {
         return (this.page - 1) * this.pageSize;
     }
     /**
      * 拉取数量
      */
-    @computed get limit(): number{
+    @computed get limit(): number {
         return this.pageSize;
     }
     // ------------------- 动作 --------------------
     /**
      * 搜索
      */
-    @action search(keyword: string){
+    @action search(keyword: string) {
         this.keyword = keyword;
-        this.page=1; // 搜索时，重置页码
+        this.page = 1; // 搜索时，重置页码
     }
     /**
      * 翻页
      */
-    @action paginate(page: number, pageSize?: number){
+    @action paginate(page: number, pageSize?: number) {
         this.page = page;
-        if(pageSize){
+        if (pageSize) {
             this.pageSize = pageSize;
         }
     }
     /**
      * 查看物品
      */
-    @action viewItem(item?: Item, level: number = 0){
+    @action viewItem(item?: Item, level: number = 0) {
         this.item = item;
+        this.itemId = item ? item.id : 0;
         this.itemLevel = level;
     }
     /** 设置精炼等级 */
-    @action setItemLevel(level: number){
+    @action setItemLevel(level: number) {
         // 装备、宠物才可以精练
         level = Math.max(0, level);
         level = Math.min(12, level);
@@ -141,11 +160,12 @@ export default class ItemDbStore{
     /**
      * 响应搜索
      */
-    reactionSearch(){
+    reactionSearch() {
         let token = 1;
         reaction(
             '搜索',
-            ()=>({
+            () => ({
+                loc: this.loc,
                 keyword: this.keyword,
                 offset: this.offset,
                 limit: this.limit
@@ -155,7 +175,7 @@ export default class ItemDbStore{
 
                 const myToken = ++token;
 
-                if(params.keyword){
+                if (params.keyword) {
                     // 搜索
                     this.searching = true;
 
@@ -163,23 +183,23 @@ export default class ItemDbStore{
                     await delay();
 
                     // 如果重复执行了，本次取消，类似于debounce？
-                    if(myToken !== token){
+                    if (myToken !== token) {
                         return;
                     }
-                    try{
+                    try {
                         let data = await query.list(params);
-                        if(myToken !== token){
+                        if (myToken !== token) {
                             return;
                         }
                         list = data.list;
                         totalCount = data.count;
-                    }catch(err){
+                    } catch (err) {
                         list = [];
                         totalCount = 0;
                         this.message = err.message || JSON.stringify(err);
                     }
-                    
-                }else{ // 空关键字，清空列表
+
+                } else { // 空关键字，清空列表
                     list = [];
                     totalCount = 0;
                 }
@@ -191,5 +211,53 @@ export default class ItemDbStore{
             }
         )
     }
+    /** 响应物品查询 */
+    reactionViewItem() {
+        let token = 1;
+        reaction(
+            '搜索',
+            () => ({
+                loc: this.loc,
+                itemId: this.itemId
+            }),
+            async params => {
+                const myToken = ++token;
+                const {loc, itemId} = params;
+                let curItem = this.item;
+                let item: Item;
 
+                if (!itemId || curItem && curItem.id === itemId) {
+                    return;
+                }
+
+                // 搜索
+                this.itemQuerying = true;
+
+                // 缓冲
+                await delay();
+
+                // 如果重复执行了，本次取消，类似于debounce？
+                if (myToken !== token) {
+                    return;
+                }
+                try {
+                    let data = await query.item({
+                        loc,
+                        id: itemId
+                    });
+                    if (myToken !== token) {
+                        return;
+                    }
+                    item = data[itemId]
+                } catch (err) {
+                    this.itemId = 0;
+                    item = null;
+                    //this.message = err.message || JSON.stringify(err);
+                }
+                // 搜索结束
+                this.item = item;
+                this.itemQuerying = false;
+            }
+        )
+    }
 }
