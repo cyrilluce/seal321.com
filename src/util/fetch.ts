@@ -8,7 +8,13 @@ import * as isomorphicFetch from 'isomorphic-fetch';
  */
 export async function fetch<T>(path: string, params: any) : Promise<T>{
     if(!global.IS_BROWSER){
-        path = require('url').resolve(`http://${config.deployServer}`, path);
+        let server = config.deployServer;
+        let port = config.nginxWebPort;
+
+        if(process.env.NODE_ENV === 'development'){
+            server = '127.0.0.1';
+        }
+        path = require('url').resolve(`http://${server}`, path);
     }
     // 这里判断如果是本服务，可以自动加上sessionId
     let res = await isomorphicFetch(path, {

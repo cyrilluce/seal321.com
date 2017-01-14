@@ -1,9 +1,6 @@
-import * as mysql from 'mysql';
-import {getConnectionAsync} from '../../lib/mysql';
 import {ServerId, Table, dbs} from '../../config';
-import logger from '../../logger';
 import { Item } from '../../types';
-import {promisify} from '../../util';
+import { QueryContext } from '.';
 
 interface Query{
     loc: ServerId;
@@ -14,7 +11,7 @@ interface Result{
     [id:number]: Item;
 }
 
-export default async function(ctx, next){
+export default async function(ctx: QueryContext, next){
     const query: Query = ctx.request.body;
     const table: Table = "item";
     const {
@@ -27,12 +24,9 @@ export default async function(ctx, next){
     }).slice(0, 100);
 
     const tableName = `seal_${db}_${table}`;
-    let conn: mysql.IConnection;
-    try{
-        conn = await getConnectionAsync();
-        const queryAsync = promisify<any[]>(conn.query, conn);
 
-        const data = await queryAsync(`SELECT * FROM ${tableName} WHERE id in (?)`, [ids]);
+    await ctx.withConn(async (conn, query)=>{
+        const data = await query(`SELECT * FROM ${tableName} WHERE id in ?`, [ids]);
 
         const map:Result = {};
         (data || []).forEach(item=>{
@@ -40,12 +34,5 @@ export default async function(ctx, next){
         })
 
         ctx.success(map);
-    }catch(err){
-        logger.error('query/item', err);
-        ctx.failure(err.message);
-    }finally{
-        if(conn){
-            conn.release();
-        }
-    }
+    });
 }
