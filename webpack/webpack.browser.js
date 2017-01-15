@@ -12,6 +12,7 @@ var externals = require('./externals'),
 var publicPath = webpackCommonConfig.publicPath;
 
 module.exports = {
+    debug: true,
     resolve : webpackCommonConfig.resolve,
     module : {
         loaders : [

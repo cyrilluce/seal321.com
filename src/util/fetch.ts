@@ -1,4 +1,4 @@
-import * as config from '../config';
+import * as localConfig from '../localConfig';
 import * as isomorphicFetch from 'isomorphic-fetch';
 
 /**
@@ -8,8 +8,8 @@ import * as isomorphicFetch from 'isomorphic-fetch';
  */
 export async function fetch<T>(path: string, params: any) : Promise<T>{
     if(!global.IS_BROWSER){
-        let server = config.deployServer;
-        let port = config.nginxWebPort;
+        let server = localConfig.deployServer;
+        let port = localConfig.nginxWebPort;
 
         if(process.env.NODE_ENV === 'development'){
             server = '127.0.0.1';

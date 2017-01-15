@@ -1,4 +1,5 @@
 import * as fs from 'mz/fs';
+import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import mysqlPool from '../lib/mysql';
 import * as mysql from 'mysql';
@@ -6,6 +7,7 @@ import * as config from '../config';
 import logger from '../logger';
 import * as  deployUtil from '../util/deploy';
 import * as asyncLib from 'async';
+import { promiseCall } from '../util';
 
 async function backupFile(filePath) {
     return new Promise((resolve, reject) => {
@@ -19,6 +21,9 @@ async function backupFile(filePath) {
 async function processFile(data) {
     let content = new Buffer(data.content, 'hex');
     let filePath = path.resolve(__dirname, '../..', data.filePath);
+
+    // 保证目录存在
+    await promiseCall(mkdirp, null, path.dirname(filePath));
 
     let stat = await fs.stat(filePath);
 

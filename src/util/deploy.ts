@@ -9,9 +9,9 @@
  */
 import { createCipher, createDecipher } from 'crypto';
 import * as zlib from 'zlib';
-import * as config from '../config';
+import * as securityConfig from '../securityConfig';
 import {promisify} from "./promisify";
-const key = config.deployKey;
+const key = securityConfig.deployKey;
 const alg = 'aes256';
 
 /**

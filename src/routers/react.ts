@@ -6,11 +6,11 @@ import { renderToString } from 'react-dom/server';
 import { useStaticRendering } from 'mobx-react';
 import { when, toJS } from 'mobx';
 import getRoot from '../react/getRoot';
-import * as config from '../config';
+import * as localConfig from '../localConfig';
 import ItemDbStore from '../stores/db';
 import logger from '../logger';
 import { join } from 'path';
-
+import * as config from '../config';
 import * as compose from "koa-compose";
 import * as views from "koa-views";
 
@@ -45,7 +45,7 @@ export default compose([
       html: renderToString(getRoot(store)),
       development: process.env.NODE_ENV === 'development',
       state,
-      staticPath: process.env.NODE_ENV === 'development' ? `http://127.0.0.1:${config.localHotLoadPort}` : ''
+      staticPath: process.env.NODE_ENV === 'development' ? `http://127.0.0.1:${localConfig.localHotLoadPort}` : ''
     });
   }
 ]);

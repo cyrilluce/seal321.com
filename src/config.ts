@@ -41,6 +41,3 @@ export const dbs:Servers = {
         item : 1
     }
 }
-
-export * from './localConfig';
-export * from './securityConfig';

@@ -10,18 +10,18 @@ var http = require('http');
 var path = require('path');
 var asyncLib = require('async');
 var fs = require('mz/fs');
-var config = require('./src/config');
 var deployUtil = require('./src/util/deploy');
 var recursive = require('recursive-readdir');
 import {promisify} from './src/util';
+import * as localConfig from './src/localConfig';
 
 const args = require('minimist')(process.argv.slice(2));
 
 var deployer = module.exports = {
     deploy: function (data, cb) {
         var req = http.request({
-            hostname: args.D ? '127.0.0.1' : config.deployServer,
-            port: config.deployPort,
+            hostname: args.D ? '127.0.0.1' : localConfig.deployServer,
+            port: localConfig.deployPort,
             path: '/',
             method: 'POST'
         }, res => {
@@ -72,7 +72,6 @@ var types = {
         // 开始分发
         var blackLists = {
             'src/localConfig.ts': 1,
-            'src/localConfig.example.ts': 1,
             'deploy.ts': 1
         };
         let fileList = await resolveAll(files);
