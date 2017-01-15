@@ -12,7 +12,7 @@ var asyncLib = require('async');
 var fs = require('mz/fs');
 var deployUtil = require('./src/util/deploy');
 var recursive = require('recursive-readdir');
-import {promisify} from './src/util';
+import { promisify } from './src/util';
 import * as localConfig from './src/localConfig';
 
 const args = require('minimist')(process.argv.slice(2));
@@ -72,6 +72,8 @@ var types = {
         // 开始分发
         var blackLists = {
             'src/localConfig.ts': 1,
+            'localConfig.example.js': 1,
+            'securityConfig.example.js': 1,
             'deploy.ts': 1
         };
         let fileList = await resolveAll(files);
@@ -82,20 +84,22 @@ var types = {
         return await Promise.all(fileList.map(async file => {
             /** 真实文件 */
             let realFile = file;
+            let writeFile = file;
             // 如果是src目录的*.tsx?文件，则自动发布ts-build/src/下的*.js文件
-            if(/^src\/.*\.(jsx?|tsx?)$/.test(file)){
+            if (/^src\/.*\.(jsx?|tsx?)$/.test(file)) {
                 file = file.replace(/\.(jsx?|tsx?)$/, '.js');
-                realFile = 'ts-build/'+file;
+                realFile = 'ts-build/' + file;
+                writeFile = file.replace(/^src\//, 'build/');
             }
             let data = await fs.readFile(path.resolve(__dirname, realFile));
-            if(!data){
-                throw new Error(`文件不存在 ${file}`)
+            if (!data) {
+                throw new Error(`文件不存在 ${realFile}`)
             }
             return {
                 title: '文件 ' + file,
                 data: {
                     type: 'file',
-                    filePath: file,
+                    filePath: writeFile,
                     content: data.toString('hex')
                 }
             };
@@ -109,6 +113,14 @@ var types = {
                 type: 'restart'
             }
         }];
+    },
+    reset: async function () {
+        return [{
+            title: '重置服务端文件',
+            data: {
+                type: 'reset'
+            }
+        }]
     },
     db: async function (argv) {
         /*
@@ -150,7 +162,8 @@ if (!(type in types)) {
     console.log(`示例：
             ts-node deploy file src/*
             ts-node deploy db tw2 item 0.654
-            ts-node deploy restart`);
+            ts-node deploy restart
+            ts-node deploy reset`);
     process.exit(0);
 }
 

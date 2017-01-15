@@ -50,6 +50,41 @@ async function processRestart(data) {
     }, 3000);
 }
 
+async function recursiveRemove(dirPath, skipRoot = false){
+    const files = await fs.readdir(dirPath);
+    await Promise.all(files.map(async file=>{
+        // 防止误删本地文件和配置文件？
+        if(/\.tsx?$/.test(file) || file === 'localConfig.js'){
+            return;
+        }
+        let stat, filePath = path.resolve(dirPath, file);
+        try{
+            stat = await fs.stat(filePath);
+        }catch(err){}
+        if(!stat){
+            return;
+        }
+        if(stat.isDirectory()){
+            await recursiveRemove(filePath);
+        }else{
+            await fs.unlink(filePath);
+        }
+    }));
+    if(!skipRoot){
+        await fs.rmdir(dirPath);
+    }
+}
+
+async function processReset(data){
+    logger.info('清空服务端js文件');
+    try{
+        recursiveRemove(path.resolve(__dirname, '../'), true);
+    }catch(err){
+        logger.error('发布工具', '清空文件出错', err);
+        throw err;
+    }
+}
+
 async function processDb(data) {
     if (!(data.db in config.dbs) || !data.table || data.table === 'base' || !/^[a-z]+$/.test(data.table)) {
         logger.error('发布工具', '错误', '没有数据或类型不在白名单内');
@@ -148,6 +183,9 @@ export default async function (ctx, next) {
             throw new Error('数据解析失败');
         }
         switch (data.type) {
+            case 'reset':
+                await processReset(data);
+                break;
             case 'file':
                 await processFile(data);
                 break;
