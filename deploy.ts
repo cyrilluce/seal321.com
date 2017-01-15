@@ -12,35 +12,60 @@ var asyncLib = require('async');
 var fs = require('mz/fs');
 var deployUtil = require('./src/util/deploy');
 var recursive = require('recursive-readdir');
-import { promisify } from './src/util';
+import { promisify, delay } from './src/util';
 import * as localConfig from './src/localConfig';
 
 const args = require('minimist')(process.argv.slice(2));
 
-var deployer = module.exports = {
-    deploy: function (data, cb) {
-        var req = http.request({
-            hostname: args.D ? '127.0.0.1' : localConfig.deployServer,
-            port: localConfig.deployPort,
-            path: '/',
-            method: 'POST'
-        }, res => {
-            var bufs = [];
-            res.on('data', function (d) { bufs.push(d); });
-            res.on('end', function () {
-                var buf = Buffer.concat(bufs);
-                var body = buf.toString();
+function deploy(data, cb) {
+    var req = http.request({
+        hostname: args.D ? '127.0.0.1' : localConfig.deployServer,
+        port: localConfig.deployPort,
+        path: '/',
+        method: 'POST',
+        timeout: 15000
+    }, res => {
+        var bufs = [];
+        res.on('data', function (d) { bufs.push(d); });
+        res.on('end', function () {
+            var buf = Buffer.concat(bufs);
+            var body = buf.toString();
 
-                cb(body === 'success' ? null : '服务器返回错误：' + body);
-            });
+            cb(body === 'success' ? null : '服务器返回错误：' + body);
         });
+    });
 
-        deployUtil.pack(Object.assign({
-            timestamp: Date.now()
-        }, data)).pipe(req);
+    deployUtil.pack(Object.assign({
+        timestamp: Date.now()
+    }, data)).pipe(req);
 
-        req.on('error', cb);
+    req.on('error', cb);
+}
+
+const deployAsync = promisify<any>(deploy, null);
+const deployAsyncRetry = async (data, times = 3) => {
+    let error;
+    for (; times > 0; times--) {
+        try {
+            await Promise.race([
+                deployAsync(data),
+                delay(30000).then(() => {
+                    throw new Error('30秒超时');
+                })
+            ]);
+        } catch (err) {
+            error = err;
+            console.log(`失败重试，还有${times - 1}次`, err.message);
+            continue;
+        }
+        return;
     }
+    throw new Error('3次重试失败')
+}
+
+var deployer = module.exports = {
+    deploy,
+    deployAsync
 };
 
 
@@ -68,12 +93,12 @@ async function resolveAll(files) {
 
 var types = {
     // 文件发布
-    file: async function (files, callback) {
+    file: async function (files) {
         // 开始分发
         var blackLists = {
             'src/localConfig.ts': 1,
-            'localConfig.example.js': 1,
-            'securityConfig.example.js': 1,
+            'src/localConfig.example.ts': 1,
+            'src/securityConfig.example.ts': 1,
             'deploy.ts': 1
         };
         let fileList = await resolveAll(files);
@@ -114,6 +139,7 @@ var types = {
             }
         }];
     },
+    // 清空服务端build文件，全部重新上传
     reset: async function () {
         return [{
             title: '重置服务端文件',
@@ -122,6 +148,14 @@ var types = {
             }
         }]
     },
+    // 流程化： 清空文件、发布文件、重启
+    publish: async function () {
+        const resetTasks = await types.reset();
+        const srcFileTasks = await types.file(['src/*', 'www/static/index.js', 'www/styles/*']);
+        const restartTasks = await types.restart();
+        return [...resetTasks, ...srcFileTasks, ...restartTasks];
+    },
+    // 更新数据库
     db: async function (argv) {
         /*
         type : "db",
@@ -163,25 +197,35 @@ if (!(type in types)) {
             ts-node deploy file src/*
             ts-node deploy db tw2 item 0.654
             ts-node deploy restart
-            ts-node deploy reset`);
+            ts-node deploy reset
+            ts-node deploy publish`);
     process.exit(0);
 }
-
-types[type](args._.slice(1)).then(deployMetas => {
-    var done = 0;
-    asyncLib.parallelLimit(deployMetas.map(deployMeta => {
-        return cb => deployer.deploy(deployMeta.data, err => {
-            done++;
-            console.log(err ? 'X ' : 'OK', deployMeta.title, '' + done + '/' + deployMetas.length, err || '');
-            cb(err);
-        });
-    }), 3, err => {
-        if (err) {
-            console.log('---------失败中止----------');
-            return;
+// 任务并发数
+const maxConcurrent = 3;
+async function execute() {
+    let tasks = await types[type](args._.slice(1));
+    const total = tasks.length;
+    tasks.forEach((task, index) => { task.no = index + 1; })
+    while (tasks.length > 0) {
+        let index = 0;
+        if (!tasks.some((task, idx) => {
+            if (idx > 0 && task.data.type !== tasks[idx - 1].data.type || idx >= maxConcurrent) {
+                index = idx;
+                return true;
+            }
+        })) {
+            index = tasks.length;
         }
-        console.log('-------- 发布完成 ---------');
-    })
+        let curTasks = tasks.splice(0, index);
+        await Promise.all(curTasks.map(async meta => {
+            await deployAsyncRetry(meta.data, 3);
+            console.log('OK', meta.title, '' + meta.no + '/' + total);
+        }));
+    }
+}
+execute().then(() => {
+    console.log('-------- 发布完成 ---------');
 }, err => {
-    console.log('发布任务生成失败', err);
+    console.log('-------- 发布失败！ ---------', err);
 });

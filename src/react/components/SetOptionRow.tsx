@@ -18,6 +18,9 @@ export default class SetOptionRow extends React.Component<Props, State>{
     render() {
         const { model } = this.props;
         const setOptions = model.data;
+        if(!model.id){
+            return <noscript/>
+        }
         if (model.err) {
             return <div className="row no-gutter item-setopt">
                 <div className="col-xs-12">{model.err.message}</div>

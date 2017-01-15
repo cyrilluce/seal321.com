@@ -387,11 +387,8 @@ export class ItemModel {
 
         autorun(() => {
             const item = this.item;
-            if(!item){
-                return;
-            }
             this.setOptionModel.loc = this.loc;
-            this.setOptionModel.setId(item.setid);
+            this.setOptionModel.setId(item ? item.setid : 0);
         })
 
         if (restoreFromData) {

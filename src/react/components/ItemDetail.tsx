@@ -138,7 +138,7 @@ export default class ItemDetail extends React.Component<Props, {}>{
                     <div className="col-xs-12 item-description">喂养值 - {item.petpoint}</div>
                 </div>}
 
-                {setOptionModel && <SetOptionRow model={setOptionModel} />}
+                {setOptionModel && !addMode && <SetOptionRow model={setOptionModel} />}
                 
                 {item.type === ItemType.GEM && <div className="row">
                     <div className="col-xs-12 item-description">PT - {item.pt / crystalPoint}</div>

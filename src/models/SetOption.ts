@@ -38,11 +38,14 @@ export class SetOptionModel{
     /** 加载失败信息 */
     @observable.ref err: any = null;
     /** 套装属性map（件数:属性） */
-    @observable.ref data: SetOptions = null;
+    @observable data: SetOptions = null;
     // ------------------- 动作 --------------------
     @action setId(id: number){
         this.err = null;
         this.id = id;
+        if(!id){
+            this.data = null;
+        }
     }
     // ------------------- 响应 --------------------
     /** 响应查询 */
