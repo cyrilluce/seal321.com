@@ -1,5 +1,8 @@
 import { Item, ItemType, GType, Job, BattlePetJob, EquipPosition, TypeRes1 } from '../types';
 import { observable, computed, action, reaction } from 'mobx';
+import { ServerId, mainDb } from '../config';
+import * as query from '../stores/query';
+import { delay } from '../util';
 
 /** 不可以装备的 */
 const UnEquipable = [
@@ -232,21 +235,21 @@ const res = [
     ItemType.WEAPON_FOOD_FIGHTER,
 ];
 
-interface PtTable{
+interface PtTable {
     [level: number]: number;
 }
 
-interface IDescription{
-    properties : string[];
-    description : string;
+interface IDescription {
+    properties: string[];
+    description: string;
 }
 
-interface IAdditionalFactors{
+interface IAdditionalFactors {
     [level: number]: number;
 }
 
 /** 装备属性在各精练等级下的加成系数 */
-const propertyFactors : IAdditionalFactors= {
+const propertyFactors: IAdditionalFactors = {
     0: 0,
     1: 1,
     2: 2,
@@ -263,7 +266,7 @@ const propertyFactors : IAdditionalFactors= {
 };
 
 /** 装备需求在各精练等级下的加成系数 */
-const limitFactors : IAdditionalFactors= {
+const limitFactors: IAdditionalFactors = {
     0: 0,
     1: 0,
     2: 0,
@@ -280,7 +283,7 @@ const limitFactors : IAdditionalFactors= {
 };
 
 /** 武器增减伤在各精练等级下的加成系数 */
-const weaponPercentFactors : IAdditionalFactors= {
+const weaponPercentFactors: IAdditionalFactors = {
     0: 0,
     1: 0,
     2: 0,
@@ -297,7 +300,7 @@ const weaponPercentFactors : IAdditionalFactors= {
 };
 
 /** 飾品增减伤在各精练等级下的加成系数 */
-const percentFactors : IAdditionalFactors= {
+const percentFactors: IAdditionalFactors = {
     0: 0,
     1: 0,
     2: 0,
@@ -314,7 +317,7 @@ const percentFactors : IAdditionalFactors= {
 };
 
 /** 价格在各精练等级下的增加面分比 */
-const priceFactors : IAdditionalFactors = {
+const priceFactors: IAdditionalFactors = {
     0: 0,
     1: 0.2,
     2: 0.4,
@@ -331,7 +334,7 @@ const priceFactors : IAdditionalFactors = {
 }
 
 /** 所需喂养值在各等级下的增加面分比 */
-const feedFactors : IAdditionalFactors = {
+const feedFactors: IAdditionalFactors = {
     0: 0,
     1: 0.1,
     2: 0.2,
@@ -344,7 +347,7 @@ const feedFactors : IAdditionalFactors = {
     9: 0.9
 }
 
-interface IAdditionals{
+interface IAdditionals {
     "level": number;
     "attack": number;
     "magic": number;
@@ -354,7 +357,7 @@ interface IAdditionals{
     "needint": number;
     "needvit": number;
     "needwisdom": number;
-    "needluck":number;
+    "needluck": number;
     "demageinc": number;
     "demagedec": number;
     sellprice: number;
@@ -362,44 +365,67 @@ interface IAdditionals{
     petpoint: number;
 }
 
-export class ItemModel{
-    constructor(item: Item, level: number = 0){
-        this.item = item;
-        this.addLevel = level;
+export class ItemModel {
+    constructor(options = {}, skipReaction = false) {
+        if (!skipReaction) {
+            this.initReactions();
+        }
+
+        Object.keys(options).forEach(key => {
+            if (key in this) {
+                this[key] = options[key];
+            }
+        });
+
+        if (skipReaction) {
+            this.initReactions();
+        }
     }
+    /**
+     * 初始化Reactions
+     */
+    initReactions() {
+        this.reactionViewItem();
+    }
+
+    @observable loc: ServerId = mainDb;
+    /** 想要查看的物品id，如果它与item不符，会自动查询item */
+    @observable itemId: number = 0;
+    /** 物品是否处于查询状态 */
+    @observable itemQuerying: boolean = false;
     /**
      * 物品信息
      */
-    @observable item: Item;
+    @observable item: Item = null;
     /** 精炼等级 */
-    @observable addLevel: number;
+    @observable addLevel: number = 0;
     // ------------- 以下为扩展计算属性 ---------------
     /** 最高精炼等级 */
-    @computed get maxAddLevel(): number{
+    @computed get maxAddLevel(): number {
         const item = this.item;
         const { type, g_type } = item;
         // 宠物 +9
-        if(type === ItemType.ITEM_PET){
+        if (type === ItemType.ITEM_PET) {
             return 9;
         }
         // 装备类+12
-        if(g_type === GType.ACCESSORY || g_type === GType.ARMOUR || g_type === GType.WEAPON){
+        if (g_type === GType.ACCESSORY || g_type === GType.ARMOUR || g_type === GType.WEAPON) {
             return 12;
         }
-        
+
         // 其它的不能精练
         return 0;
     }
-    @computed get additional(): IAdditionals{
+    @computed get additional(): IAdditionals {
         const { item, addLevel } = this;
         const { type, type_res1, g_type,
-            level_step, attack_step, magic_step, defense_step, 
+            level_step, attack_step, magic_step, defense_step,
             demagedec, demageinc, buyprice, sellprice, petpoint,
             needstrength_step, needagile_step, needint_step, needvit_step, needwisdom_step, needluck_step } = item;
         const propertyFactor = propertyFactors[addLevel];
         const limitFactor = limitFactors[addLevel];
         // 武器类、战宠装备、宠物的增减伤增长快，其它的4 7 10才+1
-        const percentFactor = (g_type === GType.WEAPON || type === ItemType.BATTLE_PET_EQUIPMENT || type === ItemType.ITEM_PET ) ? weaponPercentFactors[addLevel] : percentFactors[addLevel];
+        const percentFactor = (g_type === GType.WEAPON || type === ItemType.BATTLE_PET_EQUIPMENT || type === ItemType.ITEM_PET) ? weaponPercentFactors[addLevel] : percentFactors[addLevel];
         // 价格是比例加的
         const priceFactor = priceFactors[addLevel];
         // 所需喂养值也是按比例加的
@@ -408,7 +434,7 @@ export class ItemModel{
             // 1-3 +1N 4-6 +2N 7-9 +3N 10-12 +4N
             attack: attack_step * propertyFactor,
             magic: magic_step * propertyFactor,
-            defense : defense_step * propertyFactor,
+            defense: defense_step * propertyFactor,
             // 1-3不加 4-12每级+1
             level: level_step * limitFactor,
             needstrength: needstrength_step * limitFactor,
@@ -428,38 +454,38 @@ export class ItemModel{
         };
     }
     /** 高级描述信息 */
-    @computed get description(){
+    @computed get description() {
         // #B# 起始 #X#结束 #N#换行
         const item = this.item;
         const description = item.description;
         const match = description.match(/^#B#(.*?)#X#/);
-        if(match){
+        if (match) {
             return {
-                properties : match[1].split('#N#'),
-                description : description.slice(match[0].length)
+                properties: match[1].split('#N#'),
+                description: description.slice(match[0].length)
             }
         }
     }
     /**
      * 是否可以装备
      */
-    @computed get equipable(){
+    @computed get equipable() {
         return UnEquipable.indexOf(this.item.type) < 0;
     }
     /** 职业 */
-    @computed get jobs(): (Job|BattlePetJob)[]{
+    @computed get jobs(): (Job | BattlePetJob)[] {
         const item = this.item;
         let jobid = item.jobid;
-        if(item.type === ItemType.BATTLE_PET_EQUIPMENT){
+        if (item.type === ItemType.BATTLE_PET_EQUIPMENT) {
             return [jobid];
         }
         let job = 0, jobs: Job[] = [];
-        while(jobid>0){
-            if(jobid & 0x1){
+        while (jobid > 0) {
+            if (jobid & 0x1) {
                 jobs.push(job);
             }
             job++;
-            jobid>>=1;
+            jobid >>= 1;
         }
         // if(jobid === 1<<Job.GAME_MASTER){
         //     return ['禁止任何职业使用'];
@@ -471,7 +497,7 @@ export class ItemModel{
         return jobs;
     }
     /** 是否可以作为G辅助 */
-    @computed get gAssistable(){
+    @computed get gAssistable() {
         const item = this.item;
         return item.type !== ItemType.BOOK && // 不能是合成书
             item.type_res1 !== TypeRes1.UNKNOW0 && // 不能是？
@@ -480,19 +506,19 @@ export class ItemModel{
 
     }
     /** PT表 */
-    @computed get ptTable(): PtTable{
+    @computed get ptTable(): PtTable {
         const item = this.item;
-        if(item.pt > 0 && item.type !== ItemType.GEM && this.gAssistable){
+        if (item.pt > 0 && item.type !== ItemType.GEM && this.gAssistable) {
             let ptTable = {};
 
             let pt = item.pt;
             let mul = 1, increase = 1;
-            let a,b;
+            let a, b;
 
-            a = pt*0.2;
-            b = pt*0.4;
-            
-            switch(item.glevel%100){
+            a = pt * 0.2;
+            b = pt * 0.4;
+
+            switch (item.glevel % 100) {
                 case 2:
                     mul = 4;
                     increase = 1;
@@ -506,29 +532,29 @@ export class ItemModel{
                     increase = 0;
                     break;
             }
-            ptTable[5] = pt*mul;
-            ptTable[6] = ptTable[5]+a*increase;
-            ptTable[7] = ptTable[5]+b*increase;
-            ptTable[8] = ptTable[5]+pt*increase;
-            ptTable[9] = ptTable[5]+pt*2*increase;
-            ptTable[10] = ptTable[5]+pt*3*increase;
-            ptTable[11] = ptTable[5]+pt*4*increase;
-            ptTable[12] = ptTable[5]+pt*5*increase;
+            ptTable[5] = pt * mul;
+            ptTable[6] = ptTable[5] + a * increase;
+            ptTable[7] = ptTable[5] + b * increase;
+            ptTable[8] = ptTable[5] + pt * increase;
+            ptTable[9] = ptTable[5] + pt * 2 * increase;
+            ptTable[10] = ptTable[5] + pt * 3 * increase;
+            ptTable[11] = ptTable[5] + pt * 4 * increase;
+            ptTable[12] = ptTable[5] + pt * 5 * increase;
 
             return ptTable;
         }
     }
     /** 强化所需PT表 */
-    @computed get ptNeedTable(): PtTable{
+    @computed get ptNeedTable(): PtTable {
         const item = this.item;
-        if(item.g_item || item.t_item || item.s_item || item.c_item){
+        if (item.g_item || item.t_item || item.s_item || item.c_item) {
             let needPtTable = {};
             let npt = item.needpt;
-				
-            let _p7,_p8,_p9,_p10,_p11,_p12;
+
+            let _p7, _p8, _p9, _p10, _p11, _p12;
 
             // 2010.2.24 经测试发现国服180防具合成系数计算有所不同，算是一个bug
-            switch(item.glevel%100){
+            switch (item.glevel % 100) {
                 case 2:
                     _p7 = npt;
                     _p8 = _p7 + 5;
@@ -559,5 +585,60 @@ export class ItemModel{
 
             return needPtTable;
         }
+    }
+    // ------------------- 动作 ------------------
+    @action setLevel(level: number) {
+        const min = 0,
+            max = this.maxAddLevel;
+        this.addLevel = Math.max(min, Math.min(level, max));
+    }
+    // ------------------- 响应 --------------------
+    /** 响应物品查询 */
+    reactionViewItem() {
+        let token = 1;
+        reaction(
+            () => ({
+                loc: this.loc,
+                itemId: this.itemId
+            }),
+            async params => {
+                const myToken = ++token;
+                const {loc, itemId} = params;
+                let curItem = this.item;
+                let item: Item;
+
+                if (!itemId || curItem && curItem.id === itemId) {
+                    return;
+                }
+
+                // 搜索
+                this.itemQuerying = true;
+
+                // 缓冲
+                await delay();
+
+                // 如果重复执行了，本次取消，类似于debounce？
+                if (myToken !== token) {
+                    return;
+                }
+                try {
+                    let data = await query.item({
+                        loc,
+                        id: itemId
+                    });
+                    if (myToken !== token) {
+                        return;
+                    }
+                    item = data[itemId]
+                } catch (err) {
+                    this.itemId = 0;
+                    item = null;
+                    //this.message = err.message || JSON.stringify(err);
+                }
+                // 搜索结束
+                this.item = item;
+                this.itemQuerying = false;
+            }
+        )
     }
 }

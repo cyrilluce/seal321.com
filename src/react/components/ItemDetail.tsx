@@ -35,11 +35,11 @@ export default class ItemDetail extends React.Component<Props, {}>{
     }
     render() {
         const { store } = this.props;
-        const { item, itemLevel } = store;
-        if(!item){
+        const { itemModel } = store;
+        if(!itemModel || !itemModel.item){
             return <noscript />;
         }
-        const itemModel = new ItemModel(item, itemLevel);
+        const { item, addLevel: itemLevel } = itemModel;
         // 是否为精炼模拟模式
         const addMode = itemLevel > 0;
         const additional = itemModel.additional;

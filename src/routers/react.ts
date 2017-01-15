@@ -27,10 +27,11 @@ export default compose([
   }),
   async (ctx, next) => {
     const store = new ItemDbStore({
-      loc: ctx.request.query.db,
-      keyword: ctx.request.query.keyword,
-      page: +ctx.request.query.page,
-      itemId: +ctx.request.query.id
+      loc: ctx.request.query.db || config.mainDb,
+      keyword: ctx.request.query.keyword || '',
+      page: +ctx.request.query.page || 1,
+      itemId: +ctx.request.query.id || 0,
+      itemLevel: +ctx.request.query.level || 0
     });
 
     // 如果store加载完成（服务端加载），则渲染之

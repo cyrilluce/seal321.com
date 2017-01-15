@@ -1,37 +1,38 @@
 // 物品数据库store
 // TODO 如何解决reaction进行中的判断？用于服务端判断是否加载完成
-import { observable, computed, action, reaction, useStrict, IObservableArray } from 'mobx';
+import { observable, computed, action, reaction, useStrict, IObservableArray, untracked, autorun } from 'mobx';
 import { Item } from '../types';
 import * as query from './query';
 import { delay } from '../util';
 import { ServerId, mainDb } from '../config';
-
-interface InitableProperties {
-    loc?: ServerId;
-    keyword?: string;
-    page?: number;
-    pageSize?: number;
-    itemId?: number;
-}
+import { ItemModel } from '../models';
 
 export default class ItemDbStore {
-    constructor(options: InitableProperties = {}, skipReaction: boolean = false) {
-        if (!skipReaction) {
+    constructor(options?: any, restoreFromData: boolean = false) {
+        if (!restoreFromData) {
             this.initReactions();
         }
 
-        const {loc, keyword = "", page, pageSize, itemId} = options;
-        if (loc) {
-            this.loc = loc;
+
+        if(restoreFromData){
+            this.itemModel = new ItemModel(options.itemModel, true);
+            delete options.itemModel;
+        }else{
+            this.itemModel = new ItemModel();
         }
-        if (keyword) {
-            this.search(keyword);
-        }
-        if (page) {
-            this.paginate(+page, +pageSize);
-        }
-        if (itemId) {
-            this.itemId = itemId;
+
+        Object.keys(options).forEach(key => {
+            if (key in this) {
+                this[key] = options[key];
+            }
+        });
+
+        autorun(()=>{
+            this.itemModel.loc = this.loc;
+        })
+
+        if (restoreFromData) {
+            this.initReactions();
         }
     }
     /**
@@ -39,20 +40,7 @@ export default class ItemDbStore {
      */
     initReactions() {
         this.reactionSearch();
-        this.reactionViewItem();
-    }
-    /**
-     * 用于前端进行store复原
-     */
-    static fromJS(data): ItemDbStore {
-        const store = new ItemDbStore(undefined, true);
-        Object.keys(data).forEach(key => {
-            if (key in store) {
-                store[key] = data[key];
-            }
-        });
-        store.initReactions();
-        return store;
+        
     }
     // ------------------- 原始属性 --------------------
     /**
@@ -70,7 +58,7 @@ export default class ItemDbStore {
     /**
      * 搜索出的物品列表
      */
-    @observable list: Item[] = [];
+    @observable.shallow list: Item[] = [];
     /**
      * 搜索出的物品总数
      */
@@ -87,23 +75,26 @@ export default class ItemDbStore {
      * 当前页面大小
      */
     @observable pageSize: number = 15;
-    /** 想要查看的物品id，如果它与item不符，会自动查询item */
-    @observable itemId: number;
-    /** 物品是否处于查询状态 */
-    @observable itemQuerying: boolean = false;
+    
+    
     /**
      * 当前查看的物品
      */
-    @observable item: Item;
+    // @observable.ref item: Item = null;
     /** 当前查看的物品的模拟等级 */
-    @observable itemLevel: number = 0;
+    // @observable itemLevel: number = 0;
+    @observable.ref itemModel: ItemModel = null;
 
     // ------------------- 高级属性 ----------------
+    /** 物品详情面板 */
+    // @computed get itemModel(): ItemModel {
+    //     return new ItemModel(this.item);
+    // }
     /**
      * 是否初始化结束（用于服务端渲染判断）
      */
     @computed get initialized(): boolean {
-        return !this.searching && !this.itemQuerying;
+        return !this.searching && !this.itemModel.itemQuerying;
     }
     /**
      * 总页数
@@ -148,7 +139,16 @@ export default class ItemDbStore {
         this.itemId = item ? item.id : 0;
         this.itemLevel = level;
     }
+    set item(item: Item){
+        this.itemModel.item = item;
+    }
+    set itemId(id: number){
+        this.itemModel.itemId = id;
+    }
     /** 设置精炼等级 */
+    set itemLevel(itemLevel){
+        this.itemModel.addLevel = itemLevel;
+    }
     @action setItemLevel(level: number) {
         // 装备、宠物才可以精练
         level = Math.max(0, level);
@@ -163,7 +163,6 @@ export default class ItemDbStore {
     reactionSearch() {
         let token = 1;
         reaction(
-            '搜索',
             () => ({
                 loc: this.loc,
                 keyword: this.keyword,
@@ -211,53 +210,21 @@ export default class ItemDbStore {
             }
         )
     }
-    /** 响应物品查询 */
-    reactionViewItem() {
-        let token = 1;
-        reaction(
-            '搜索',
-            () => ({
-                loc: this.loc,
-                itemId: this.itemId
-            }),
-            async params => {
-                const myToken = ++token;
-                const {loc, itemId} = params;
-                let curItem = this.item;
-                let item: Item;
-
-                if (!itemId || curItem && curItem.id === itemId) {
-                    return;
-                }
-
-                // 搜索
-                this.itemQuerying = true;
-
-                // 缓冲
-                await delay();
-
-                // 如果重复执行了，本次取消，类似于debounce？
-                if (myToken !== token) {
-                    return;
-                }
-                try {
-                    let data = await query.item({
-                        loc,
-                        id: itemId
-                    });
-                    if (myToken !== token) {
-                        return;
-                    }
-                    item = data[itemId]
-                } catch (err) {
-                    this.itemId = 0;
-                    item = null;
-                    //this.message = err.message || JSON.stringify(err);
-                }
-                // 搜索结束
-                this.item = item;
-                this.itemQuerying = false;
-            }
-        )
-    }
+    
+    // reactItemDetail(){
+    //     reaction(
+    //         () => ({
+    //             item: this.item,
+    //             itemLevel: this.itemLevel
+    //         }),
+    //         async params => {
+    //             const {item, itemLevel} = params;
+    //             if(item){
+    //                 this.itemModel = new ItemModel(item, itemLevel);
+    //             }else{
+    //                 this.itemModel = null;
+    //             }
+    //         }
+    //     )
+    // }
 }
