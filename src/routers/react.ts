@@ -42,6 +42,7 @@ export default compose([
     const state = toJS(store);
     await ctx.render("index", {
       // 把组件渲染成字符串
+      title: store.pageTitle,
       html: renderToString(getRoot(store)),
       development: process.env.NODE_ENV === 'development',
       state,

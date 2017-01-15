@@ -14,10 +14,10 @@ export default class ItemDbStore {
         }
 
 
-        if(restoreFromData){
+        if (restoreFromData) {
             this.itemModel = new ItemModel(options.itemModel, true);
             delete options.itemModel;
-        }else{
+        } else {
             this.itemModel = new ItemModel();
         }
 
@@ -27,7 +27,7 @@ export default class ItemDbStore {
             }
         });
 
-        autorun(()=>{
+        autorun(() => {
             this.itemModel.loc = this.loc;
         })
 
@@ -40,7 +40,7 @@ export default class ItemDbStore {
      */
     initReactions() {
         this.reactionSearch();
-        
+
     }
     // ------------------- 原始属性 --------------------
     /**
@@ -75,8 +75,8 @@ export default class ItemDbStore {
      * 当前页面大小
      */
     @observable pageSize: number = 15;
-    
-    
+
+
     /**
      * 当前查看的物品
      */
@@ -114,7 +114,52 @@ export default class ItemDbStore {
     @computed get limit(): number {
         return this.pageSize;
     }
+    /** 页面标题 */
+    @computed get pageTitle(): string {
+        return '希尔特国家地理';
+    }
+    /** 页面URL search */
+    @computed get pagePath(): string {
+        let params = [];
+        const {keyword, page, itemModel} = this;
+        const {itemId, addLevel} = itemModel;
+        if (keyword) {
+            params.push(['keyword', keyword]);
+        }
+        if (page > 1) {
+            params.push(['page', page]);
+        }
+        if (itemId > 0) {
+            params.push(['id', itemId]);
+        }
+        if (addLevel > 0) {
+            params.push(['level', addLevel]);
+        }
+        return '?' + params.map(pair => `${encodeURIComponent(pair[0])}=${encodeURIComponent(pair[1])}`).join('&');
+    }
     // ------------------- 动作 --------------------
+    /** 从页面URL中读取数据 */
+    @action navigatePath(search: string) {
+        search.replace(/^\?/, '').split('&').map(part => {
+            let [key, value] = part.split('=');
+            key = decodeURIComponent(key);
+            value = decodeURIComponent(value);
+            switch (key) {
+                case 'keyword':
+                    this.keyword = value;
+                    break;
+                case 'page':
+                    this.page = +value || 1;
+                    break;
+                case 'id':
+                    this.itemId = +value || 0;
+                    break;
+                case 'level':
+                    this.itemLevel = +value || 0;
+                    break;
+            }
+        });
+    }
     /**
      * 搜索
      */
@@ -139,14 +184,14 @@ export default class ItemDbStore {
         this.itemId = item ? item.id : 0;
         this.itemLevel = level;
     }
-    set item(item: Item){
+    set item(item: Item) {
         this.itemModel.item = item;
     }
-    set itemId(id: number){
+    set itemId(id: number) {
         this.itemModel.itemId = id;
     }
     /** 设置精炼等级 */
-    set itemLevel(itemLevel){
+    set itemLevel(itemLevel) {
         this.itemModel.addLevel = itemLevel;
     }
     @action setItemLevel(level: number) {
@@ -210,7 +255,7 @@ export default class ItemDbStore {
             }
         )
     }
-    
+
     // reactItemDetail(){
     //     reaction(
     //         () => ({
