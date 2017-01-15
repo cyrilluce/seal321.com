@@ -7,8 +7,12 @@ export interface Query{
     id: number|number[];
 }
 
+interface SetOptions{
+    [level: number]: SetOption;
+}
+
 export interface Result{
-    [id:number]: SetOption;
+    [id:number]: SetOptions;
 }
 
 export default async function(ctx: QueryContext, next){
@@ -25,11 +29,12 @@ export default async function(ctx: QueryContext, next){
     const tableName = ctx.getTableName('setopt');
 
     await ctx.withConn(async (conn, query)=>{
-        const data = await query(`SELECT * FROM ${tableName} WHERE id in ?`, [ids]);
+        const data: SetOption[] = await query(`SELECT * FROM ${tableName} WHERE id in ?`, [ids]);
 
         const map:Result = {};
         (data || []).forEach(item=>{
-            map[item.id] = item;
+            let optionsMap = map[item.id] || (map[item.id] = {});
+            optionsMap[item.count] = item;
         })
 
         ctx.success(map);

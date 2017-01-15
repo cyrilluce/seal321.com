@@ -7,6 +7,7 @@ import { ItemModel } from '../../models';
 import { ItemDbStore } from '../../stores';
 import * as lang from '../../lang';
 import AddLevelTools from './AddLevelTools';
+import SetOptionRow from './SetOptionRow';
 
 interface Props {
     store?: ItemDbStore
@@ -39,7 +40,7 @@ export default class ItemDetail extends React.Component<Props, {}>{
         if(!itemModel || !itemModel.item){
             return <noscript />;
         }
-        const { item, addLevel: itemLevel } = itemModel;
+        const { item, addLevel: itemLevel, setOptionModel } = itemModel;
         // 是否为精炼模拟模式
         const addMode = itemLevel > 0;
         const additional = itemModel.additional;
@@ -136,6 +137,9 @@ export default class ItemDetail extends React.Component<Props, {}>{
                 {item.type !== ItemType.ITEM_PET && item.petpoint !== 0 && <div className="row">
                     <div className="col-xs-12 item-description">喂养值 - {item.petpoint}</div>
                 </div>}
+
+                {setOptionModel && <SetOptionRow model={setOptionModel} />}
+                
                 {item.type === ItemType.GEM && <div className="row">
                     <div className="col-xs-12 item-description">PT - {item.pt / crystalPoint}</div>
                 </div>}

@@ -3,6 +3,7 @@ import { observable, computed, action, reaction } from 'mobx';
 import { ServerId, mainDb } from '../config';
 import * as query from '../stores/query';
 import { delay } from '../util';
+import { SetOptionModel } from './SetOption';
 
 /** 不可以装备的 */
 const UnEquipable = [
@@ -366,8 +367,8 @@ interface IAdditionals {
 }
 
 export class ItemModel {
-    constructor(options = {}, skipReaction = false) {
-        if (!skipReaction) {
+    constructor(options = {}, isRestore = false) {
+        if (!isRestore) {
             this.initReactions();
         }
 
@@ -377,7 +378,7 @@ export class ItemModel {
             }
         });
 
-        if (skipReaction) {
+        if (isRestore) {
             this.initReactions();
         }
     }
@@ -393,13 +394,16 @@ export class ItemModel {
     @observable itemId: number = 0;
     /** 物品是否处于查询状态 */
     @observable itemQuerying: boolean = false;
-    /**
-     * 物品信息
-     */
+    /** 物品信息 */
     @observable item: Item = null;
     /** 精炼等级 */
     @observable addLevel: number = 0;
+    /** 套装属性 */
+    @observable.ref setOptionModel: SetOptionModel = null;
     // ------------- 以下为扩展计算属性 ---------------
+    @computed get loading(): boolean{
+        return this.itemQuerying || this.setOptionModel && this.setOptionModel.loading;
+    }
     /** 最高精炼等级 */
     @computed get maxAddLevel(): number {
         const item = this.item;

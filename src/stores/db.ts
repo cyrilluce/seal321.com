@@ -94,7 +94,7 @@ export default class ItemDbStore {
      * 是否初始化结束（用于服务端渲染判断）
      */
     @computed get initialized(): boolean {
-        return !this.searching && !this.itemModel.itemQuerying;
+        return !this.searching && !this.itemModel.loading;
     }
     /**
      * 总页数
@@ -188,7 +188,7 @@ export default class ItemDbStore {
         this.itemModel.item = item;
     }
     set itemId(id: number) {
-        this.itemModel.itemId = id;
+        this.itemModel.setId(id);
     }
     /** 设置精炼等级 */
     set itemLevel(itemLevel) {
