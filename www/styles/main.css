@@ -145,6 +145,20 @@
 .item-popover .item-require{
   color: #0000b5;
 }
+.item-popover .item-setopt{
+  color: #B40000;
+  margin-top: 10px;
+}
+.item-popover .item-setopt .count{
+  text-decoration: underline;
+  margin: 0 2px;
+  cursor: pointer;
+}
+.item-popover .item-setopt .count.active{
+  font-weight: bold;
+  text-decoration: none;
+  cursor: default;
+}
 .item-popover .item-pt-table{
   margin-top: 10px;
   color: #7830b4;

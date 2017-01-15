@@ -8,6 +8,7 @@ import { promisify, promiseCall } from '../../util';
 import logger from '../../logger';
 import list from './list';
 import item from './item';
+import setopt from './setopt';
 
 interface QueryRequest extends Koa.Request {
     body: any;
@@ -82,4 +83,5 @@ async function ensureDb(ctx: QueryContext, next) {
 router.use(shortcutResponse).use(ensureDb);
 router.post('/list', list);
 router.post('/item', item);
+router.post('/setopt', setopt);
 export default router.routes();

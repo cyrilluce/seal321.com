@@ -29,7 +29,7 @@ export default async function(ctx: QueryContext, next){
     const tableName = ctx.getTableName('setopt');
 
     await ctx.withConn(async (conn, query)=>{
-        const data: SetOption[] = await query(`SELECT * FROM ${tableName} WHERE id in ?`, [ids]);
+        const data: SetOption[] = await query(`SELECT * FROM ${tableName} WHERE id in (?)`, [ids]);
 
         const map:Result = {};
         (data || []).forEach(item=>{

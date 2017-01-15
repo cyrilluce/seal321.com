@@ -8,7 +8,7 @@ import { ServerId, mainDb } from '../config';
 import { ItemModel } from '../models';
 
 export default class ItemDbStore {
-    constructor(options?: any, restoreFromData: boolean = false) {
+    constructor(options: any = {}, restoreFromData: boolean = false) {
         if (!restoreFromData) {
             this.initReactions();
         }

@@ -1,5 +1,5 @@
 import { Item, ItemType, GType, Job, BattlePetJob, EquipPosition, TypeRes1 } from '../types';
-import { observable, computed, action, reaction } from 'mobx';
+import { observable, computed, action, reaction, autorun } from 'mobx';
 import { ServerId, mainDb } from '../config';
 import * as query from '../stores/query';
 import { delay } from '../util';
@@ -367,9 +367,16 @@ interface IAdditionals {
 }
 
 export class ItemModel {
-    constructor(options = {}, isRestore = false) {
-        if (!isRestore) {
+    constructor(options: any = {}, restoreFromData = false) {
+        if (!restoreFromData) {
             this.initReactions();
+        }
+
+        if (restoreFromData) {
+            this.setOptionModel = new SetOptionModel(options.setOptionModel, true);
+            delete options.setOptionModel;
+        } else {
+            this.setOptionModel = new SetOptionModel();
         }
 
         Object.keys(options).forEach(key => {
@@ -378,7 +385,16 @@ export class ItemModel {
             }
         });
 
-        if (isRestore) {
+        autorun(() => {
+            const item = this.item;
+            if(!item){
+                return;
+            }
+            this.setOptionModel.loc = this.loc;
+            this.setOptionModel.setId(item.setid);
+        })
+
+        if (restoreFromData) {
             this.initReactions();
         }
     }
@@ -396,6 +412,8 @@ export class ItemModel {
     @observable itemQuerying: boolean = false;
     /** 物品信息 */
     @observable item: Item = null;
+    /** 请求失败 */
+    @observable.ref err: any = null;
     /** 精炼等级 */
     @observable addLevel: number = 0;
     /** 套装属性 */
@@ -591,6 +609,10 @@ export class ItemModel {
         }
     }
     // ------------------- 动作 ------------------
+    @action setId(id: number){
+        this.err = null;
+        this.itemId = id;
+    }
     @action setLevel(level: number) {
         const min = 0,
             max = this.maxAddLevel;
@@ -611,7 +633,7 @@ export class ItemModel {
                 let curItem = this.item;
                 let item: Item;
 
-                if (!itemId || curItem && curItem.id === itemId) {
+                if (!itemId || curItem && curItem.id === itemId || this.err) {
                     return;
                 }
 
@@ -635,7 +657,7 @@ export class ItemModel {
                     }
                     item = data[itemId]
                 } catch (err) {
-                    this.itemId = 0;
+                    this.err = err;
                     item = null;
                     //this.message = err.message || JSON.stringify(err);
                 }
