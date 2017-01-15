@@ -25,9 +25,14 @@ async function processFile(data) {
     // 保证目录存在
     await promiseCall(mkdirp, null, path.dirname(filePath));
 
-    let stat = await fs.stat(filePath);
+    let stat;
+    try {
+        stat = await fs.stat(filePath);
+    } catch (err) {
 
-    if (stat.isFile()) {
+    }
+
+    if (stat && stat.isFile()) {
         logger.info('发布工具', '备份文件', filePath);
         await backupFile(filePath);
     }
@@ -159,6 +164,7 @@ export default async function (ctx, next) {
         }
         ctx.body = "success";
     } catch (err) {
+        logger.error('发布工具', '错误', err);
         ctx.body = "error " + err && err.message;
     }
 };
