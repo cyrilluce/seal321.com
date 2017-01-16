@@ -159,6 +159,12 @@
   text-decoration: none;
   cursor: default;
 }
+.item-popover .item-convert{
+  margin-top: 10px;
+}
+.item-popover .item-convert ~ .item-convert{
+  margin-top: 0;
+}
 .item-popover .item-pt-table{
   margin-top: 10px;
   color: #7830b4;

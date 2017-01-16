@@ -27,6 +27,7 @@ export default class SearchList extends Component<Props, {}> {
     render() {
         const {onItemClick, store} = this.props;
         let content, message: string, cls: string;
+        
         if (store.dataLoading) {
             //message = '搜索中...';
         } else if(store.err){
@@ -36,7 +37,8 @@ export default class SearchList extends Component<Props, {}> {
         } else if(!store.data.list.length) {
             message = '此页无数据'
         }
-        content = store.data.list.map((data, index) =>
+
+        content = store.data && store.data.list.map((data, index) =>
             <SearchItem data={data}
                 key={index}
                 onClick={this.onItemClick.bind(this, index)} />

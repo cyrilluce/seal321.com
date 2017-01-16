@@ -7,6 +7,7 @@ import { ItemDbStore } from '../../stores';
 import * as lang from '../../lang';
 import AddLevelTools from './AddLevelTools';
 import SetOptionRow from './SetOptionRow';
+import ConvertRow from './ConvertRow';
 
 interface Props {
     store?: ItemDbStore
@@ -156,6 +157,11 @@ export default class ItemDetail extends React.Component<Props, {}>{
                         {this.renderPtTable(itemModel.ptNeedTable, true)}
                     </div>}
                 </div>}
+
+                <ConvertRow name="G化产物" model={itemModel.gItem} />
+                <ConvertRow name="命中强化产物" model={itemModel.tItem} />
+                <ConvertRow name="攻速强化产物" model={itemModel.sItem} />
+                <ConvertRow name="必杀强化产物" model={itemModel.cItem} />
             </div>
         </Draggable>
     }
