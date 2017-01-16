@@ -3,7 +3,6 @@ import { inject, observer } from 'mobx-react';
 import * as Draggable from 'react-draggable';
 import { getIconStyle } from '../util';
 import { Item, ItemType, Job, BattlePetJob } from '../../types';
-import { ItemModel } from '../../models';
 import { ItemDbStore } from '../../stores';
 import * as lang from '../../lang';
 import AddLevelTools from './AddLevelTools';

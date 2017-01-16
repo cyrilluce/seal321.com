@@ -5,7 +5,7 @@ import { Item } from '../types';
 import * as query from './query';
 import { delay } from '../util';
 import { ServerId, mainDb } from '../config';
-import { ItemModel, Loadable } from '../models';
+import { ItemDetail, Loadable } from '../models';
 
 interface Param{
     loc: ServerId;
@@ -19,7 +19,7 @@ interface Result{
 }
 export default class ItemDbStore extends Loadable<Param, Result> {
     protected initOptions(options?: any, restoreFromData = false){
-        this.itemModel = new ItemModel();
+        this.itemModel = new ItemDetail();
         this.itemModel.init(options.itemModel, restoreFromData);
         delete options.itemModel;
 
@@ -66,7 +66,7 @@ export default class ItemDbStore extends Loadable<Param, Result> {
     /** 不需要详情 */
     @observable.ref data: Result = null;
     /** 物品详情Model */
-    @observable.ref itemModel: ItemModel = null;
+    @observable.ref itemModel: ItemDetail = null;
 
     // ------------------- 高级属性 ----------------
     /** 物品详情面板 */

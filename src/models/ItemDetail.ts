@@ -367,7 +367,7 @@ interface IAdditionals {
     petpoint: number;
 }
 
-export class ItemModel extends IDLoadable<Item> {
+export class ItemDetail extends IDLoadable<Item> {
     /** 精炼等级 */
     @observable addLevel: number = 0;
     /** 套装属性 */
