@@ -5,60 +5,52 @@ import { Item } from '../types';
 import * as query from './query';
 import { delay } from '../util';
 import { ServerId, mainDb } from '../config';
-import { ItemModel } from '../models';
+import { ItemModel, Loadable } from '../models';
 
-export default class ItemDbStore {
-    constructor(options: any = {}, restoreFromData: boolean = false) {
-        if (!restoreFromData) {
-            this.initReactions();
-        }
-
+interface Param{
+    loc: ServerId;
+    keyword: string;
+    offset: number;
+    limit: number;
+}
+interface Result{
+    list: Item[];
+    count: number;
+}
+export default class ItemDbStore extends Loadable<Param, Result> {
+    protected initOptions(options?: any, restoreFromData = false){
         this.itemModel = new ItemModel();
         this.itemModel.init(options.itemModel, restoreFromData);
         delete options.itemModel;
 
-        Object.keys(options).forEach(key => {
-            if (key in this) {
-                this[key] = options[key];
-            }
-        });
+        super.initOptions(options, restoreFromData);
 
         autorun(() => {
             this.itemModel.loc = this.loc;
         })
-
-        if (restoreFromData) {
-            this.initReactions();
+    }
+    protected isParamValid(param: Param): boolean{
+        return param.loc && param.keyword && param.limit>0 && param.offset>=0;
+    }
+    protected isDataMatch(param: Param, data: Result): boolean{
+        return false; // 始终查询
+    }
+    @computed protected get param(): Param{
+        return {
+            loc: this.loc,
+            keyword: this.keyword,
+            offset: this.offset,
+            limit: this.limit
         }
     }
-    /**
-     * 初始化Reactions
-     */
-    initReactions() {
-        this.reactionSearch();
-
+    protected query(param: Param){
+        return query.list(param);
     }
     // ------------------- 原始属性 --------------------
     /**
      * 当前查询的服务器
      */
     @observable loc: ServerId = mainDb;
-    /**
-     * 错误信息
-     */
-    @observable message: string = "";
-    /**
-     * 是否处于搜索状态
-     */
-    @observable searching: boolean = false;
-    /**
-     * 搜索出的物品列表
-     */
-    @observable.shallow list: Item[] = [];
-    /**
-     * 搜索出的物品总数
-     */
-    @observable totalCount: number = 0;
     /**
      * 搜索关键字
      */
@@ -71,14 +63,9 @@ export default class ItemDbStore {
      * 当前页面大小
      */
     @observable pageSize: number = 15;
-
-
-    /**
-     * 当前查看的物品
-     */
-    // @observable.ref item: Item = null;
-    /** 当前查看的物品的模拟等级 */
-    // @observable itemLevel: number = 0;
+    /** 不需要详情 */
+    @observable.ref data: Result = null;
+    /** 物品详情Model */
     @observable.ref itemModel: ItemModel = null;
 
     // ------------------- 高级属性 ----------------
@@ -90,13 +77,13 @@ export default class ItemDbStore {
      * 是否初始化结束（用于服务端渲染判断）
      */
     @computed get initialized(): boolean {
-        return !this.searching && !this.itemModel.loading;
+        return !this.loading && !this.itemModel.loading;
     }
     /**
      * 总页数
      */
     @computed get pageCount(): number {
-        return Math.ceil(this.totalCount / this.pageSize) || 1;
+        return Math.ceil((this.data && this.data.count || 0) / this.pageSize) || 1;
     }
     /**
      * 起始位置
@@ -196,76 +183,4 @@ export default class ItemDbStore {
         level = Math.min(12, level);
         this.itemLevel = level;
     }
-
-    // ------------------ 响应 Reactions ---------------------
-    /**
-     * 响应搜索
-     */
-    reactionSearch() {
-        let token = 1;
-        reaction(
-            () => ({
-                loc: this.loc,
-                keyword: this.keyword,
-                offset: this.offset,
-                limit: this.limit
-            }),
-            async params => {
-                let list: Item[], totalCount: number;
-
-                const myToken = ++token;
-
-                if (params.keyword) {
-                    // 搜索
-                    this.searching = true;
-
-                    // 缓冲
-                    await delay();
-
-                    // 如果重复执行了，本次取消，类似于debounce？
-                    if (myToken !== token) {
-                        return;
-                    }
-                    try {
-                        let data = await query.list(params);
-                        if (myToken !== token) {
-                            return;
-                        }
-                        list = data.list;
-                        totalCount = data.count;
-                    } catch (err) {
-                        list = [];
-                        totalCount = 0;
-                        this.message = err.message || JSON.stringify(err);
-                    }
-
-                } else { // 空关键字，清空列表
-                    list = [];
-                    totalCount = 0;
-                }
-
-                // 搜索结束
-                this.list = list;
-                this.totalCount = totalCount;
-                this.searching = false;
-            }
-        )
-    }
-
-    // reactItemDetail(){
-    //     reaction(
-    //         () => ({
-    //             item: this.item,
-    //             itemLevel: this.itemLevel
-    //         }),
-    //         async params => {
-    //             const {item, itemLevel} = params;
-    //             if(item){
-    //                 this.itemModel = new ItemModel(item, itemLevel);
-    //             }else{
-    //                 this.itemModel = null;
-    //             }
-    //         }
-    //     )
-    // }
 }

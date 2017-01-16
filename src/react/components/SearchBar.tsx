@@ -18,13 +18,12 @@ interface Props {
 export default class SearchBar extends Component<Props, {}> {
     render() {
         const {store} = this.props;
-        const { keyword, searching } = store;
         return (
             <div className="row">
                 <div className="col-lg-6 col-md-6 col-sm-9 col-xs-12">
                     <div className="input-group">
                         <span className="input-group-addon">物品名称：</span>
-                        <input ref="input" type="text" className="form-control" size={50} placeholder="输入物品名称后回车搜索" defaultValue={keyword} aria-describedby="basic-addon1"
+                        <input ref="input" type="text" className="form-control" size={50} placeholder="输入物品名称后回车搜索" defaultValue={store.keyword} aria-describedby="basic-addon1"
                             onChange={() => { } } onKeyUp={this.handleEnter.bind(this)}
                             />
                         <span className="input-group-btn">

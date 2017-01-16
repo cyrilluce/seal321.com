@@ -26,7 +26,7 @@ export default compose([
     }
   }),
   async (ctx, next) => {
-    const store = new ItemDbStore({
+    const store = new ItemDbStore().init({
       loc: ctx.request.query.db || config.mainDb,
       keyword: ctx.request.query.keyword || '',
       page: +ctx.request.query.page || 1,

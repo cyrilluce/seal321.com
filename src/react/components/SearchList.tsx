@@ -21,20 +21,22 @@ export default class SearchList extends Component<Props, {}> {
     onItemClick(index: number) {
         const {onItemClick, store} = this.props;
         if (onItemClick) {
-            onItemClick(store.list[index]);
+            onItemClick(store.data.list[index]);
         }
     }
     render() {
         const {onItemClick, store} = this.props;
         let content, message: string, cls: string;
-        if (store.searching) {
+        if (store.dataLoading) {
             //message = '搜索中...';
-        } else if (!store.totalCount) {
+        } else if(store.err){
+            message = store.err.message;
+        }else if (!store.data) {
             message = store.keyword ? `未查到匹配“${store.keyword}”的物品` : '请输入关键字开始搜索物品';
-        } else if(!store.list.length) {
+        } else if(!store.data.list.length) {
             message = '此页无数据'
         }
-        content = store.list.map((data, index) =>
+        content = store.data.list.map((data, index) =>
             <SearchItem data={data}
                 key={index}
                 onClick={this.onItemClick.bind(this, index)} />

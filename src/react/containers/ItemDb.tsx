@@ -137,8 +137,8 @@ export default class ItemDb extends Component<Props, State> {
         // Injected by connect() call:
         const { store } = this.props;
         const state = this.state || {};
-        const {paginationExpanded} = state;
-        const { keyword, page, pageSize, list, totalCount, pageCount, searching} = store;
+        const { paginationExpanded} = state;
+        const { keyword, page, pageSize, pageCount, dataLoading: searching, data } = store;
         return <div className="container-fluid">
             {
                 // <div className="row logo">
@@ -172,7 +172,7 @@ export default class ItemDb extends Component<Props, State> {
                 onPageChange={this.handlePageClick.bind(this)}
                 containerClassName={"pagination"}
                 activeClassName={"active"} />{searching && <span className="db-loading" dangerouslySetInnerHTML={{__html:loadingSvg}}></span>}
-            {totalCount>0 && <p>共{totalCount}条记录</p>}
+            {data && data.count>0 && <p>共{data.count}条记录</p>}
             <ItemDetail />
         </div>
     }

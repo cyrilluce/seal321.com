@@ -20,6 +20,7 @@ export abstract class Base{
         if (restoreFromData) {
             this.initReactions();
         }
+        return this;
     }
     /** 初始化属性，以后可以在这里初始化子Model、数据联动，以及它们的reaction */
     protected initOptions(options: Options, skipReaction = false) {

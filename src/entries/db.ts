@@ -9,7 +9,7 @@ import getRoot from '../react/getRoot';
 import { autorun } from 'mobx';
 
 // 创建新的 mobx store 实例
-const store = new ItemDbStore(window.__INITIAL_STATE__, true);
+const store = new ItemDbStore().init(window.__INITIAL_STATE__, true);
 
 let rootInstance = render(getRoot(store), document.getElementById('root'));
 

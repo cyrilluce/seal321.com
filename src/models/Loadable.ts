@@ -23,7 +23,7 @@ export abstract class Loadable<TParam, TData> extends Base{
     /** 数据 */
     @observable data: TData = null;
     // ------------------- 高级属性 -----------------
-    abstract get param(): TParam;
+    protected abstract get param(): TParam;
     @computed get loading(): boolean{
         return this.dataLoading;
     }
