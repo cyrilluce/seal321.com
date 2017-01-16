@@ -171,7 +171,7 @@ var types = {
         // TODO 可以不传version，自动识别
         // TODO 发布成功后，删除文件
         let name = `${db}_${table}_${version}`;
-        let buff = await fs.readFile(path.join('F:\\seal-samples', `${name}.json`))
+        let buff = await fs.readFile(path.join(localConfig.sampleDir, `${name}.json`))
 
         let data = JSON.parse(buff.toString());
 

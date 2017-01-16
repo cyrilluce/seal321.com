@@ -1,6 +1,7 @@
 /**
  * Created by cyrilluce on 2016/8/7.
  */
+import { sampleDir } from '../src/localConfig'
 var parseVersionNo = require('./parsers/versionNo');
 var path = require("path");
 var fs = require('fs');
@@ -46,7 +47,7 @@ Object.keys(servers).forEach(serverId=>{
 });
 
 var config = module.exports = {
-    samplesDir : 'F:\\seal-samples',
+    samplesDir : sampleDir,
     servers : servers,
     getResourcePath : (serverId, version, type, file)=>
         path.join(config.samplesDir, serverId, 'source', type, file+'.'+version),

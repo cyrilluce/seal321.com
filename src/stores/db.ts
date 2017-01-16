@@ -13,13 +13,9 @@ export default class ItemDbStore {
             this.initReactions();
         }
 
-
-        if (restoreFromData) {
-            this.itemModel = new ItemModel(options.itemModel, true);
-            delete options.itemModel;
-        } else {
-            this.itemModel = new ItemModel();
-        }
+        this.itemModel = new ItemModel();
+        this.itemModel.init(options.itemModel, restoreFromData);
+        delete options.itemModel;
 
         Object.keys(options).forEach(key => {
             if (key in this) {
@@ -122,7 +118,7 @@ export default class ItemDbStore {
     @computed get pagePath(): string {
         let params = [];
         const {keyword, page, itemModel} = this;
-        const {itemId, addLevel} = itemModel;
+        const {id: itemId, addLevel} = itemModel;
         if (keyword) {
             params.push(['keyword', keyword]);
         }
@@ -185,7 +181,7 @@ export default class ItemDbStore {
         this.itemLevel = level;
     }
     set item(item: Item) {
-        this.itemModel.item = item;
+        this.itemModel.data = item;
     }
     set itemId(id: number) {
         this.itemModel.setId(id);

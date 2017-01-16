@@ -4,6 +4,7 @@ import { ServerId, mainDb } from '../config';
 import * as query from '../stores/query';
 import { delay } from '../util';
 import { SetOptionModel } from './SetOption';
+import { IDLoadable, Param } from './IDLoadable';
 
 /** 不可以装备的 */
 const UnEquipable = [
@@ -366,62 +367,42 @@ interface IAdditionals {
     petpoint: number;
 }
 
-export class ItemModel {
-    constructor(options: any = {}, restoreFromData = false) {
-        if (!restoreFromData) {
-            this.initReactions();
-        }
-
-        if (restoreFromData) {
-            this.setOptionModel = new SetOptionModel(options.setOptionModel, true);
-            delete options.setOptionModel;
-        } else {
-            this.setOptionModel = new SetOptionModel();
-        }
-
-        Object.keys(options).forEach(key => {
-            if (key in this) {
-                this[key] = options[key];
-            }
-        });
-
-        autorun(() => {
-            const item = this.item;
-            this.setOptionModel.loc = this.loc;
-            this.setOptionModel.setId(item ? item.setid : 0);
-        })
-
-        if (restoreFromData) {
-            this.initReactions();
-        }
-    }
-    /**
-     * 初始化Reactions
-     */
-    initReactions() {
-        this.reactionViewItem();
-    }
-
-    @observable loc: ServerId = mainDb;
-    /** 想要查看的物品id，如果它与item不符，会自动查询item */
-    @observable itemId: number = 0;
-    /** 物品是否处于查询状态 */
-    @observable itemQuerying: boolean = false;
-    /** 物品信息 */
-    @observable item: Item = null;
-    /** 请求失败 */
-    @observable.ref err: any = null;
+export class ItemModel extends IDLoadable<Item> {
     /** 精炼等级 */
     @observable addLevel: number = 0;
     /** 套装属性 */
     @observable.ref setOptionModel: SetOptionModel = null;
+    protected initOptions(options: any = {}, restoreFromData = false){
+        this.setOptionModel = new SetOptionModel();
+        this.setOptionModel.init(options.setOptionModel, restoreFromData);
+        delete options.setOptionModel;
+
+        super.initOptions(options, restoreFromData);
+
+        autorun(() => {
+            const item = this.data;
+            this.setOptionModel.loc = this.loc;
+            this.setOptionModel.setId(item ? item.setid : 0);
+        })
+    }
+    protected isDataMatch(param: Param, data: Item){
+        return data && data.id === param.id;
+    }
+    // 实现父类
+    protected async query(param: Param){
+        const map = await query.item(param);
+        return map[param.id];
+    }
+    protected isNeedLoad(param: Param, data: Item){
+        return param.id && data && data.id === param.id;
+    }
     // ------------- 以下为扩展计算属性 ---------------
     @computed get loading(): boolean{
-        return this.itemQuerying || this.setOptionModel && this.setOptionModel.loading;
+        return this.dataLoading || this.setOptionModel && this.setOptionModel.loading;
     }
     /** 最高精炼等级 */
     @computed get maxAddLevel(): number {
-        const item = this.item;
+        const item = this.data;
         const { type, g_type } = item;
         // 宠物 +9
         if (type === ItemType.ITEM_PET) {
@@ -436,7 +417,7 @@ export class ItemModel {
         return 0;
     }
     @computed get additional(): IAdditionals {
-        const { item, addLevel } = this;
+        const { data: item, addLevel } = this;
         const { type, type_res1, g_type,
             level_step, attack_step, magic_step, defense_step,
             demagedec, demageinc, buyprice, sellprice, petpoint,
@@ -475,7 +456,7 @@ export class ItemModel {
     /** 高级描述信息 */
     @computed get description() {
         // #B# 起始 #X#结束 #N#换行
-        const item = this.item;
+        const item = this.data;
         const description = item.description;
         const match = description.match(/^#B#(.*?)#X#/);
         if (match) {
@@ -489,11 +470,11 @@ export class ItemModel {
      * 是否可以装备
      */
     @computed get equipable() {
-        return UnEquipable.indexOf(this.item.type) < 0;
+        return UnEquipable.indexOf(this.data.type) < 0;
     }
     /** 职业 */
     @computed get jobs(): (Job | BattlePetJob)[] {
-        const item = this.item;
+        const item = this.data;
         let jobid = item.jobid;
         if (item.type === ItemType.BATTLE_PET_EQUIPMENT) {
             return [jobid];
@@ -517,7 +498,7 @@ export class ItemModel {
     }
     /** 是否可以作为G辅助 */
     @computed get gAssistable() {
-        const item = this.item;
+        const item = this.data;
         return item.type !== ItemType.BOOK && // 不能是合成书
             item.type_res1 !== TypeRes1.UNKNOW0 && // 不能是？
             item.type_res1 !== TypeRes1.ACCESSORY && // 不能是特殊配件
@@ -526,7 +507,7 @@ export class ItemModel {
     }
     /** PT表 */
     @computed get ptTable(): PtTable {
-        const item = this.item;
+        const item = this.data;
         if (item.pt > 0 && item.type !== ItemType.GEM && this.gAssistable) {
             let ptTable = {};
 
@@ -565,7 +546,7 @@ export class ItemModel {
     }
     /** 强化所需PT表 */
     @computed get ptNeedTable(): PtTable {
-        const item = this.item;
+        const item = this.data;
         if (item.g_item || item.t_item || item.s_item || item.c_item) {
             let needPtTable = {};
             let npt = item.needpt;
@@ -606,62 +587,10 @@ export class ItemModel {
         }
     }
     // ------------------- 动作 ------------------
-    @action setId(id: number){
-        this.err = null;
-        this.itemId = id;
-    }
     @action setLevel(level: number) {
         const min = 0,
             max = this.maxAddLevel;
         this.addLevel = Math.max(min, Math.min(level, max));
     }
-    // ------------------- 响应 --------------------
-    /** 响应物品查询 */
-    reactionViewItem() {
-        let token = 1;
-        reaction(
-            () => ({
-                loc: this.loc,
-                itemId: this.itemId
-            }),
-            async params => {
-                const myToken = ++token;
-                const {loc, itemId} = params;
-                let curItem = this.item;
-                let item: Item;
-
-                if (!itemId || curItem && curItem.id === itemId || this.err) {
-                    return;
-                }
-
-                // 搜索
-                this.itemQuerying = true;
-
-                // 缓冲
-                await delay();
-
-                // 如果重复执行了，本次取消，类似于debounce？
-                if (myToken !== token) {
-                    return;
-                }
-                try {
-                    let data = await query.item({
-                        loc,
-                        id: itemId
-                    });
-                    if (myToken !== token) {
-                        return;
-                    }
-                    item = data[itemId]
-                } catch (err) {
-                    this.err = err;
-                    item = null;
-                    //this.message = err.message || JSON.stringify(err);
-                }
-                // 搜索结束
-                this.item = item;
-                this.itemQuerying = false;
-            }
-        )
-    }
+    
 }

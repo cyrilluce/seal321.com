@@ -8,10 +8,10 @@ cnpm run dev 运行
 
 
 1. 更新包下载解压器
-node tools/watch
+ts-node tools/watch
 
 2. 提取数据
-node pickup tw2 item *
+ts-node pickup tw2 item *
 craft
 monster
 setopt

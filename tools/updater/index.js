@@ -20,7 +20,7 @@ var defaultOptions = {
     versionCheckInterval : 60*60*1000, // 1小时检查一次版本
     recently : 5, // 下载最近多少个版本
     types : {
-        etc : 1,
+        etc : 10,
         root : 1,
         interface : 1,
         item : 1

@@ -23,3 +23,5 @@ export const mysql: MySQLConfig = {
     password : '123456',
     database : 'seal-v2'
 }
+/** 更新包监控等，工作目录 */
+export const sampleDir: string = "D:\\seal-samples";
