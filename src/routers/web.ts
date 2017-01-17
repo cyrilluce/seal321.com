@@ -37,7 +37,7 @@ let debug = (str)=> async (ctx, next)=>{
 
 router.use(bodyParser());
 router.use('/node/query', query);
-router.get(['/', '/:loc/db'], react);
+router.get(['/', '/:loc', '/:loc/db'], react);
 router.get('(.*)', serve(path.join(__dirname, '../../www')));
 
 export default compose([
