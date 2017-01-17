@@ -25,6 +25,33 @@ module.exports = require('./CommonData').extend({
             "ap",
             "res10",
             "res11"
+        ],
+        "Seal Online ItemSetOption File v5" : [
+            "id",
+
+            {
+                name : "count",
+                type : 'fixed',
+                value : 4
+            },
+
+            // 0-3
+            "attack",
+            "magic",
+            "defense",
+            "attackspeed",
+
+            // 4-7
+            "accuracy",
+            "critical",
+            "evade",
+            "movespeed",
+
+            // 8-b
+            "hp",
+            "ap",
+            "res10",
+            "res11"
         ]
     },
 });

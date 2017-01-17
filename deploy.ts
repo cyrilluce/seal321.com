@@ -14,6 +14,7 @@ var deployUtil = require('./src/util/deploy');
 var recursive = require('recursive-readdir');
 import { promisify, delay } from './src/util';
 import * as localConfig from './src/localConfig';
+import * as semver from 'semver';
 
 const args = require('minimist')(process.argv.slice(2));
 
@@ -148,6 +149,24 @@ var types = {
             }
         }]
     },
+    // 发布公告
+    notice: async function(noticeType, content){
+        if(!content){
+            content = noticeType;
+            noticeType = 'manual';
+        }
+        if(!content){
+            throw new Error('公告内容不能为空');
+        }
+        return [{
+            title: '发布公告',
+            data: {
+                type: 'notice',
+                noticeType,
+                content
+            }
+        }]
+    },
     // 流程化： 清空文件、发布文件、重启
     publish: async function () {
         const resetTasks = await types.reset();
@@ -167,17 +186,34 @@ var types = {
         // let [db, table, version] = argv;
         let db = argv[0];
         let table = argv[1];
-        let version = argv[2];
         // TODO 可以不传version，自动识别
-        // TODO 发布成功后，删除文件
-        let name = `${db}_${table}_${version}`;
-        let buff = await fs.readFile(path.join(localConfig.sampleDir, `${name}.json`))
+        let files: string[] = await fs.readdir(localConfig.sampleDir);
+        const fileNameRegex = new RegExp(`^${db}_${table}_([0-9.]+)\.json$`);
+        const getVer = file => file.match(fileNameRegex)[1];
+        // 筛选 tw2_item_0.001.json 文件，并按版本排序
+        // semver定义版本号要有3段 0.0.1， 这里只有两段，自动加上0.
+        files = files.filter(file => fileNameRegex.test(file)).sort((a, b)=>{
+            return semver.gt('0.'+getVer(a), '0.'+getVer(b));
+        });
+        // 取第一个文件
+        const file = files[0];
+        const version = getVer(file);
+        if(!file){
+            throw new Error('没有找到要发布的数据文件：'+fileNameRegex.source);
+        }
+        // 只保留最新的两个版本文件
+        const toRemoveFiles: string[] = files.slice(2);
+        let toRemoveFile;
+        while((toRemoveFile = toRemoveFiles.pop())){
+            await fs.unlink(path.join(localConfig.sampleDir, toRemoveFile));
+        }
+
+        let buff = await fs.readFile(path.join(localConfig.sampleDir, file))
 
         let data = JSON.parse(buff.toString());
 
-
         return [{
-            title: `数据库 ${name}`,
+            title: `数据库 ${db} ${table} ${version}`,
             data: {
                 type: 'db',
                 db,
@@ -195,7 +231,8 @@ if (!(type in types)) {
     console.log('无法识别指令', type);
     console.log(`示例：
             ts-node deploy file src/*
-            ts-node deploy db tw2 item 0.654
+            ts-node deploy db tw2 item
+            ts-node deploy notice [manual] 测试公告
             ts-node deploy restart
             ts-node deploy reset
             ts-node deploy publish`);

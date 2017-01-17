@@ -12,15 +12,16 @@ export interface Tables{
 //     tw2,
 //     us
 // }
-export type ServerId = "cn" | "tw2" | "us";
+export type ServerId = "cn" | "tw2" | "tw" | "us";
 // 目前这个支持得不好... 据说typescript 2.1.3中会支持
 // interface Servers{
 //     [key in ServerId]: any;
 // }
 interface Servers{
     // [key: string]: Tables;
-    cn : Tables;
+    // cn : Tables;
     tw2 : Tables;
+    tw : Tables;
     us : Tables;
 }
 
@@ -33,10 +34,13 @@ export const dbs:Servers = {
     "tw2" : {
         item : 1
     },
-    "cn" : {
-        item : 1,
-        monster : 1
+    "tw" : {
+        item: 1
     },
+    // "cn" : {
+    //     item : 1,
+    //     monster : 1
+    // },
     "us" : {
         item : 1
     },

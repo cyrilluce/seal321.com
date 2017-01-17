@@ -50,7 +50,7 @@ export default class ItemDetail extends React.Component<Props, {}>{
                 <img className="item-popover-close glyphicon glyphicon-off" src="/images/close.png" onClick={() => { store.viewItem(null) } } />
                 <div className="row handler">
                     <div className="col-xs-12">
-                        <p className="text-center"><strong>希尔特国家地理 物品查看</strong></p>
+                        <p className="text-center"><strong>希尔特国家地理 物品查看 {lang.ServerNames[itemModel.loc]}</strong></p>
                     </div>
                 </div>
                 <div className="row">

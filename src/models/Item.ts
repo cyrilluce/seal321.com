@@ -372,15 +372,13 @@ export class Item extends IDLoadable<IItem> {
     /** 精炼等级 */
     @observable addLevel: number = 0;
     protected isDataMatch(param: Param, data: IItem){
-        return data && data.id === param.id;
+        return false;
+        // return data && data.id === param.id;
     }
     // 实现父类
     protected async query(param: Param){
         const map = await query.item(param);
         return map[param.id];
-    }
-    protected isNeedLoad(param: Param, data: IItem){
-        return param.id && data && data.id === param.id;
     }
     // ------------- 以下为扩展计算属性 ---------------
     /** 最高精炼等级 */

@@ -319,6 +319,14 @@ var Packer = Base.extend({
             write : function(value, config, data){
                 return config.write.call(this, config, data);
             }
+        },
+        "fixed" : {
+            read : function(config){
+                return config.value;
+            },
+            write : function(value, config){
+                
+            }
         }
     },
     constructor : function(data, offset, encoding){

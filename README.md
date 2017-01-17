@@ -11,7 +11,7 @@ cnpm run dev 运行
 ts-node tools/watch
 
 2. 提取数据
-ts-node pickup tw2 item *
+ts-node pickup tw2 item
 craft
 monster
 setopt

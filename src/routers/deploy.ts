@@ -8,6 +8,7 @@ import logger from '../logger';
 import * as  deployUtil from '../util/deploy';
 import * as asyncLib from 'async';
 import { promiseCall, promisify } from '../util';
+import { ServerNames, DbNames } from '../lang'
 
 async function backupFile(filePath) {
     return new Promise((resolve, reject) => {
@@ -105,7 +106,7 @@ async function processDb(data) {
 
     let db = data.db;
     let table = data.table;
-    let version = data.version;
+    let version:string = data.version + '';
     // 创建
     let tableName = `seal_${db}_${table}`;
     let tmpTableName = `${tableName}_${version}`;
@@ -114,8 +115,29 @@ async function processDb(data) {
     let conn: mysql.IConnection;
 
     try {
+        let versionTableName = `seal_version`;
+        let versionModel = require('../dbs/version');
+        let noticeTableName = `seal_notice`;
+        let noticeModel = require('../dbs/notice');
+
         conn = await promiseCall<mysql.IConnection>(mysqlPool.getConnection, mysqlPool);
         const query = promisify<any[]>(conn.query, conn);
+
+        // 如果版本表没有，自动新建
+        {
+            try {
+                await query(`SELECT count(*) from ${versionTableName}`);
+            } catch (err) {
+                let fieldsSql = versionModel.getFieldsSql();
+                let indexesSql = versionModel.getIndexesSql();
+                await query(`CREATE TABLE IF NOT EXISTS ${versionTableName} ( ${fieldsSql} ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci`);
+                await query(`ALTER TABLE ${versionTableName} ${indexesSql}`);
+            }
+            let [row] = await query(`SELECT * FROM ${versionTableName} WHERE loc=? and type=?`, [db, table]);
+            if(row && row.version === version){
+                throw new Error('版本重复')
+            }
+        }
 
         // 确保没有脏数据
         await query(`DROP TABLE IF EXISTS ${tmpTableName}`);
@@ -145,29 +167,65 @@ async function processDb(data) {
 
         // 更新版本
         {
-            let tableName = `seal_version`;
-            let versionModel = require('../dbs/version');
             let fields = versionModel.getFields();
-            // 如果表没有，自动新建
-            try {
-                await query(`SELECT count(*) from ${tableName}`);
-            } catch (err) {
-                let fieldsSql = versionModel.getFieldsSql();
-                let indexesSql = versionModel.getIndexesSql();
-                await query(`CREATE TABLE IF NOT EXISTS ${tableName} ( ${fieldsSql} ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci`);
-                await query(`ALTER TABLE ${tableName} ${indexesSql}`);
-            }
-            // 更新版本
             const time = Math.round(Date.now() / 1000);
             const values = [db, table, version, time];
-            await query(`INSERT INTO ${tableName} (??) VALUES ? ON DUPLICATE KEY UPDATE version=?, time=? `,
+            await query(`INSERT INTO ${versionTableName} (??) VALUES ? ON DUPLICATE KEY UPDATE version=?, time=? `,
                 [fields, [values], version, time]);
+        }
+
+        // 更新公告
+        {
+            let fields = noticeModel.getFields().slice(1); // 排除id字段
+            const time = Math.round(Date.now() / 1000);
+            const values = [time, 'db', `${ServerNames[db]}${DbNames[table]}数据库已更新至${version}`];
+            await query(`INSERT INTO ${noticeTableName} (??) VALUES ?`,
+                [fields, [values]]);
         }
 
         // 完成
         logger.info('发布工具', 'db', db, table, version, '成功');
     } catch (err) {
         logger.error('发布工具', 'db', db, table, version, '失败', err);
+        throw err;
+    } finally {
+        if (conn) {
+            conn.release();
+        }
+    }
+}
+
+async function processNotice(data){
+    const {
+        noticeType: type, content
+    } = data;
+    logger.info('发布工具', '公告', type, content);
+    let conn: mysql.IConnection;
+    let noticeTableName = `seal_notice`;
+    let noticeModel = require('../dbs/notice');
+
+    try{
+        conn = await promiseCall<mysql.IConnection>(mysqlPool.getConnection, mysqlPool);
+        const query = promisify<any[]>(conn.query, conn);
+
+        // 保证表存在
+        try {
+            await query(`SELECT count(*) from ${noticeTableName}`);
+        } catch (err) {
+            let fieldsSql = noticeModel.getFieldsSql();
+            let indexesSql = noticeModel.getIndexesSql();
+            await query(`CREATE TABLE IF NOT EXISTS ${noticeTableName} ( ${fieldsSql} ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci`);
+            await query(`ALTER TABLE ${noticeTableName} ${indexesSql}`);
+        }
+
+        // 写入
+        let fields = noticeModel.getFields().slice(1); // 排除id字段
+        const time = Math.round(Date.now() / 1000);
+        const values = [time, type, content];
+        await query(`INSERT INTO ${noticeTableName} (??) VALUES ?`,
+            [fields, [values]]);
+    } catch (err) {
+        logger.error('发布工具', '公告', type, content, '失败', err);
         throw err;
     } finally {
         if (conn) {
@@ -197,6 +255,10 @@ export default async function (ctx, next) {
                 break;
             case 'db': {
                 await processDb(data);
+                break;
+            }
+            case 'notice':{
+                await processNotice(data);
                 break;
             }
             default:

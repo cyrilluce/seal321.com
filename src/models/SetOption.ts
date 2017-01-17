@@ -12,6 +12,7 @@ export class SetOptionModel extends IDLoadable<SetOptions>{
         return map[param.id];
     }
     protected isDataMatch(param: Param, data: SetOptions): boolean{
-        return param.id && !!data;
+        return false;
+        // return param.id && !!data;
     }
 }

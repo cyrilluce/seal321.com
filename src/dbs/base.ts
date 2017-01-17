@@ -43,7 +43,8 @@ var base = module.exports = {
                     break;
             }
             var field = mysql.escapeId(property.name);
-            return `${field} ${type}`;
+            var autoIncrement = property.autoIncrement ? ' AUTO_INCREMENT PRIMARY KEY' : ''
+            return `${field} ${type} ${autoIncrement}`;
         }).join(',');
     },
     getIndexesSql : function(){
