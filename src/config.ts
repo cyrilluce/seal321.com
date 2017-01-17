@@ -30,6 +30,9 @@ export const mainDb: ServerId = "tw2";
 
 // 服务器列表
 export const dbs:Servers = {
+    "tw2" : {
+        item : 1
+    },
     "cn" : {
         item : 1,
         monster : 1
@@ -37,7 +40,4 @@ export const dbs:Servers = {
     "us" : {
         item : 1
     },
-    "tw2" : {
-        item : 1
-    }
 }

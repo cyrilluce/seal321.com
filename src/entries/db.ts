@@ -24,7 +24,7 @@ if (global.IS_BROWSER && window.history && history.pushState) {
   });
   window.addEventListener('popstate', (e) => {
     isHistoryBack = true;
-    store.navigatePath(location.search);
+    store.navigatePath(location.pathname+'?'+location.search);
     isHistoryBack = false;
   })
 }

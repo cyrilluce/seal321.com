@@ -38,7 +38,7 @@ export abstract class Loadable<TParam, TData> extends Base{
                 let curData = this.data;
                 let data: TData;
 
-                if (!this.isParamValid(params) || curData && this.isDataMatch(params, curData) || this.err) {
+                if (!this.isParamValid(params) || curData && this.isDataMatch(params, curData)) {
                     return;
                 }
 

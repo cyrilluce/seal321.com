@@ -104,7 +104,7 @@ export default class ItemDbStore extends Loadable<Param, Result> {
     /** 页面URL search */
     @computed get pagePath(): string {
         let params = [];
-        const {keyword, page, itemModel} = this;
+        const {loc, keyword, page, itemModel} = this;
         const {id: itemId, addLevel} = itemModel;
         if (keyword) {
             params.push(['keyword', keyword]);
@@ -118,11 +118,16 @@ export default class ItemDbStore extends Loadable<Param, Result> {
         if (addLevel > 0) {
             params.push(['level', addLevel]);
         }
-        return '?' + params.map(pair => `${encodeURIComponent(pair[0])}=${encodeURIComponent(pair[1])}`).join('&');
+        return `/${loc}/db?` + params.map(pair => `${encodeURIComponent(pair[0])}=${encodeURIComponent(pair[1])}`).join('&');
     }
     // ------------------- 动作 --------------------
     /** 从页面URL中读取数据 */
-    @action navigatePath(search: string) {
+    @action navigatePath(pathAndQuery: string) {
+        const [path, search] = pathAndQuery.split('?');
+        const [,loc,mod] = path.split('/');
+        if(loc && /^\w+$/.test(loc)){
+            this.loc = <ServerId>loc;
+        }
         search.replace(/^\?/, '').split('&').map(part => {
             let [key, value] = part.split('=');
             key = decodeURIComponent(key);
@@ -143,12 +148,18 @@ export default class ItemDbStore extends Loadable<Param, Result> {
             }
         });
     }
+    @action changeServer(loc: ServerId){
+        this.loc = loc;
+        this.err = null;
+    }
     /**
      * 搜索
      */
     @action search(keyword: string) {
         this.keyword = keyword;
         this.page = 1; // 搜索时，重置页码
+        // 清空之前的错误
+        this.err = null;
     }
     /**
      * 翻页
