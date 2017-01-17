@@ -1,14 +1,20 @@
 ## 基本功能&改进（工具&环境&底层）
-dev将server与webpack server分开（webpack太慢了），或者实现express hot reload
-server端hot reload？
-deploy自动化？或自动更新版本？
-deploy配置共同化，添加--debug参数？
+deploy自动取版本 2017-01-17
+pickup及deploy自动化
+itemiconXX.tex自动化 -> dds -> png -> deploy
 
 ## 业务功能
-item icon相关工具
-物品数据库列表（翻页、搜索）
-路由（兼容server端）
+添加数据库切换的功能 2017-01-17
+deploy db添加版本号 2017-01-17
+站点公告 - 以及旧版添加引流链接
+G化模拟器
+* 计算器  2017-01-18
+* 显示面板 2017-01-18
+* 书本过滤&加载 2017-01-19
+* DragAndDrop 2017-01-19
+本地缓存背包
 怪物信息页
+QQ connect接入
 掉落维护
 
 ## 锦上添花
