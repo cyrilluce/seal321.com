@@ -7,7 +7,7 @@ import * as config from '../config';
 import logger from '../logger';
 import * as  deployUtil from '../util/deploy';
 import * as asyncLib from 'async';
-import { promiseCall } from '../util';
+import { promiseCall, promisify } from '../util';
 
 async function backupFile(filePath) {
     return new Promise((resolve, reject) => {
@@ -50,36 +50,36 @@ async function processRestart(data) {
     }, 3000);
 }
 
-async function recursiveRemove(dirPath, skipRoot = false){
+async function recursiveRemove(dirPath, skipRoot = false) {
     const files = await fs.readdir(dirPath);
-    await Promise.all(files.map(async file=>{
+    await Promise.all(files.map(async file => {
         // 防止误删本地文件和配置文件？
-        if(/\.tsx?$/.test(file) || file === 'localConfig.js'){
+        if (/\.tsx?$/.test(file) || file === 'localConfig.js') {
             return;
         }
         let stat, filePath = path.resolve(dirPath, file);
-        try{
+        try {
             stat = await fs.stat(filePath);
-        }catch(err){}
-        if(!stat){
+        } catch (err) { }
+        if (!stat) {
             return;
         }
-        if(stat.isDirectory()){
+        if (stat.isDirectory()) {
             await recursiveRemove(filePath);
-        }else{
+        } else {
             await fs.unlink(filePath);
         }
     }));
-    if(!skipRoot){
+    if (!skipRoot) {
         await fs.rmdir(dirPath);
     }
 }
 
-async function processReset(data){
+async function processReset(data) {
     logger.info('清空服务端js文件');
-    try{
-        recursiveRemove(path.resolve(__dirname, '../'), true);
-    }catch(err){
+    try {
+        await recursiveRemove(path.resolve(__dirname, '../'), true);
+    } catch (err) {
         logger.error('发布工具', '清空文件出错', err);
         throw err;
     }
@@ -111,66 +111,69 @@ async function processDb(data) {
     let tmpTableName = `${tableName}_${version}`;
     tableName = mysql['escapeId'](tableName, true);
     tmpTableName = mysql['escapeId'](tmpTableName, true);
-    await new Promise((resolve, reject) => {
-        asyncLib.waterfall([
-            cb => mysqlPool.getConnection(cb),
-            // 确保没有脏数据
-            (conn: mysql.IConnection, cb) => {
-                conn.query(`DROP TABLE IF EXISTS ${tmpTableName}`,
-                    err => cb(err, conn));
-            },
-            // 创建表
-            (conn: mysql.IConnection, cb) => {
-                let fieldsSql = model.getFieldsSql();
-                conn.query(`CREATE TABLE ${tmpTableName} ( ${fieldsSql} ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci`,
-                    err => cb(err, conn));
-            },
-            // 写入数据
-            (conn: mysql.IConnection, cb) => {
-                let fields = model.getFields();
-                // 数据量比较大，最好分批？
-                const batch = 100;
-                let list = data.data;
-                let size = Math.ceil(list.length / batch);
-                let tasks = [];
-                for (let i = 0; i < size; i++) {
-                    tasks.push(cb => {
-                        let values = list.slice(i * batch, (i + 1) * batch).map(row => fields.map(field => row[field]));
-                        conn.query(`INSERT INTO ${tmpTableName} (??) VALUES ?`,
-                            [fields, values], cb);
-                    })
-                }
-                asyncLib.parallelLimit(tasks, 1, err => {
-                    cb(err, conn);
-                })
-            },
-            // 添加索引、主键
-            (conn: mysql.IConnection, cb) => {
-                let indexesSql = model.getIndexesSql();
-                conn.query(`ALTER TABLE ${tmpTableName} ${indexesSql}`,
-                    err => cb(err, conn));
-            },
-            // 删除旧表
-            (conn: mysql.IConnection, cb) => {
-                conn.query(`DROP TABLE IF EXISTS ${tableName}`,
-                    err => cb(err, conn));
-            },
-            // 改名新表
-            (conn: mysql.IConnection, cb) => {
-                conn.query(`RENAME TABLE ${tmpTableName} TO ${tableName}`,
-                    err => cb(err, conn));
-            },
-            // TODO 更新版本，用mysql或mongo？
+    let conn: mysql.IConnection;
 
-        ], err => {
-            if (err) {
-                logger.error('发布工具', 'db', db, table, version, '失败', err);
-                return reject(err);
+    try {
+        conn = await promiseCall<mysql.IConnection>(mysqlPool.getConnection, mysqlPool);
+        const query = promisify<any[]>(conn.query, conn);
+
+        // 确保没有脏数据
+        await query(`DROP TABLE IF EXISTS ${tmpTableName}`);
+        // 创建表
+        let fieldsSql = model.getFieldsSql();
+        await query(`CREATE TABLE ${tmpTableName} ( ${fieldsSql} ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci`);
+        // 写入数据
+        {
+            let fields = model.getFields();
+            // 数据量比较大，最好分批？
+            const batch = 100;
+            let list = data.data;
+            let size = Math.ceil(list.length / batch);
+            let tasks = [];
+            for (let i = 0; i < size; i++) {
+                let values = list.slice(i * batch, (i + 1) * batch).map(row => fields.map(field => row[field]));
+                await query(`INSERT INTO ${tmpTableName} (??) VALUES ?`, [fields, values]);
             }
-            logger.info('发布工具', 'db', db, table, version, '成功');
-            resolve();
-        });
-    })
+        }
+        // 添加索引、主键
+        let indexesSql = model.getIndexesSql();
+        await query(`ALTER TABLE ${tmpTableName} ${indexesSql}`);
+        // 删除旧表
+        await query(`DROP TABLE IF EXISTS ${tableName}`);
+        // 改名新表
+        await query(`RENAME TABLE ${tmpTableName} TO ${tableName}`);
+
+        // 更新版本
+        {
+            let tableName = `seal_version`;
+            let versionModel = require('../dbs/version');
+            let fields = versionModel.getFields();
+            // 如果表没有，自动新建
+            try {
+                await query(`SELECT count(*) from ${tableName}`);
+            } catch (err) {
+                let fieldsSql = versionModel.getFieldsSql();
+                let indexesSql = versionModel.getIndexesSql();
+                await query(`CREATE TABLE IF NOT EXISTS ${tableName} ( ${fieldsSql} ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci`);
+                await query(`ALTER TABLE ${tableName} ${indexesSql}`);
+            }
+            // 更新版本
+            const time = Math.round(Date.now() / 1000);
+            const values = [db, table, version, time];
+            await query(`INSERT INTO ${tableName} (??) VALUES ? ON DUPLICATE KEY UPDATE version=?, time=? `,
+                [fields, [values], version, time]);
+        }
+
+        // 完成
+        logger.info('发布工具', 'db', db, table, version, '成功');
+    } catch (err) {
+        logger.error('发布工具', 'db', db, table, version, '失败', err);
+        throw err;
+    } finally {
+        if (conn) {
+            conn.release();
+        }
+    }
 }
 
 export default async function (ctx, next) {

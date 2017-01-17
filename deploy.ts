@@ -55,7 +55,7 @@ const deployAsyncRetry = async (data, times = 3) => {
             ]);
         } catch (err) {
             error = err;
-            console.log(`失败重试，还有${times - 1}次`, err.message);
+            console.log(`失败重试，还有${times - 1}次`, err.message || err);
             continue;
         }
         return;

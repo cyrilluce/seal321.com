@@ -4,8 +4,6 @@ pickup及deploy自动化
 itemiconXX.tex自动化 -> dds -> png -> deploy
 
 ## 业务功能
-添加数据库切换的功能 2017-01-17
-deploy db添加版本号 2017-01-17
 站点公告 - 以及旧版添加引流链接
 G化模拟器
 * 计算器  2017-01-18
