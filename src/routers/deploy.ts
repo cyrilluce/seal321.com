@@ -134,7 +134,7 @@ async function processDb(data) {
                 await query(`ALTER TABLE ${versionTableName} ${indexesSql}`);
             }
             let [row] = await query(`SELECT * FROM ${versionTableName} WHERE loc=? and type=?`, [db, table]);
-            if(row && row.version === version){
+            if(row && row.version === version && !data.force){
                 throw new Error('版本重复')
             }
         }

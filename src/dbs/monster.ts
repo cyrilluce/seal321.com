@@ -37,6 +37,7 @@ module.exports = require('./base').extend({
         "res22",
         "res23",
         "res24",
-        "res25"
+        "res25",
+        "res26"
     ]
 });

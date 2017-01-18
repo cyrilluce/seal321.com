@@ -128,6 +128,16 @@ const UnGemable = UnEquipable.concat([
     ItemType.BATTLE_PET,
 ]);
 
+/** 可以使用的 药水/状态/锻造书  */
+const Usable = [
+    /** 特殊物品（药水、经验+） */
+    ItemType.SPECIAL,
+    /** 时光 */
+    ItemType.TIME,
+    /** 合成/制作书 */
+    ItemType.BOOK,
+]
+
 const res = [
     /** 普通物品 */
     ItemType.NORMAL,
@@ -470,6 +480,10 @@ export class Item extends IDLoadable<IItem> {
      */
     @computed get equipable() {
         return UnEquipable.indexOf(this.data.type) < 0;
+    }
+    /** 是否可以使用，例如 锻造书 */
+    @computed get usable(){
+        return Usable.indexOf(this.data.type) >= 0;
     }
     /** 职业 */
     @computed get jobs(): (Job | BattlePetJob)[] {
