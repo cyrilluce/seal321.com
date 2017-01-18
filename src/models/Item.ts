@@ -250,7 +250,7 @@ interface IAdditionalFactors {
     [level: number]: number;
 }
 
-/** 装备属性在各精练等级下的加成系数 */
+/** 装备属性在各精练等级下的加成系数 1234 */
 const propertyFactors: IAdditionalFactors = {
     0: 0,
     1: 1,
@@ -262,9 +262,26 @@ const propertyFactors: IAdditionalFactors = {
     7: 12,
     8: 15,
     9: 18,
-    10: 24,
-    11: 30,
-    12: 36
+    10: 22,
+    11: 26,
+    12: 30
+};
+
+/** 武器属性在各精练等级下的加成系数 1246 */
+const weaponPropertyFactors: IAdditionalFactors = {
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 5,
+    5: 7,
+    6: 9,
+    7: 13,
+    8: 17,
+    9: 21,
+    10: 27,
+    11: 33,
+    12: 39
 };
 
 /** 装备需求在各精练等级下的加成系数 */
@@ -403,7 +420,8 @@ export class Item extends IDLoadable<IItem> {
             level_step, attack_step, magic_step, defense_step,
             demagedec, demageinc, buyprice, sellprice, petpoint,
             needstrength_step, needagile_step, needint_step, needvit_step, needwisdom_step, needluck_step } = item;
-        const propertyFactor = propertyFactors[addLevel];
+        // 属性成长通常是1234，但武器类的属性成长是1246
+        const propertyFactor = g_type === GType.WEAPON ? weaponPropertyFactors[addLevel] : propertyFactors[addLevel];
         const limitFactor = limitFactors[addLevel];
         // 武器类、战宠装备、宠物的增减伤增长快，其它的4 7 10才+1
         const percentFactor = (g_type === GType.WEAPON || type === ItemType.BATTLE_PET_EQUIPMENT || type === ItemType.ITEM_PET) ? weaponPercentFactors[addLevel] : percentFactors[addLevel];
