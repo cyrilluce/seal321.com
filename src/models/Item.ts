@@ -6,6 +6,19 @@ import { delay } from '../util';
 import { SetOptionModel } from './SetOption';
 import { IDLoadable, Param } from './IDLoadable';
 
+/** 
+ * 分类 
+ * 武器类
+ * 盾牌类
+ * 配件类
+ * 配件类（头部）
+ * 帽子类
+ * 上衣类
+ * 下衣类
+ * 鞋子类
+ * 
+ */
+
 /** 不可以装备的 */
 const UnEquipable = [
     /** 普通物品 */
@@ -417,7 +430,7 @@ export class Item extends IDLoadable<IItem> {
             return 9;
         }
         // 装备类+12
-        if (g_type === GType.ACCESSORY || g_type === GType.ARMOUR || g_type === GType.WEAPON) {
+        if (type !== ItemType.BOOK && (g_type === GType.ACCESSORY || g_type === GType.ARMOUR || g_type === GType.WEAPON)) {
             return 12;
         }
 
@@ -431,10 +444,10 @@ export class Item extends IDLoadable<IItem> {
             demagedec, demageinc, buyprice, sellprice, petpoint,
             needstrength_step, needagile_step, needint_step, needvit_step, needwisdom_step, needluck_step } = item;
         // 属性成长通常是1234，但武器类的属性成长是1246
-        const propertyFactor = g_type === GType.WEAPON ? weaponPropertyFactors[addLevel] : propertyFactors[addLevel];
+        const propertyFactor = this.weapon ? weaponPropertyFactors[addLevel] : propertyFactors[addLevel];
         const limitFactor = limitFactors[addLevel];
         // 武器类、战宠装备、宠物的增减伤增长快，其它的4 7 10才+1
-        const percentFactor = (g_type === GType.WEAPON || type === ItemType.BATTLE_PET_EQUIPMENT || type === ItemType.ITEM_PET) ? weaponPercentFactors[addLevel] : percentFactors[addLevel];
+        const percentFactor = (this.weapon || type === ItemType.BATTLE_PET_EQUIPMENT || type === ItemType.ITEM_PET) ? weaponPercentFactors[addLevel] : percentFactors[addLevel];
         // 价格是比例加的
         const priceFactor = priceFactors[addLevel];
         // 所需喂养值也是按比例加的
@@ -475,9 +488,20 @@ export class Item extends IDLoadable<IItem> {
             }
         }
     }
-    /**
-     * 是否可以装备
-     */
+    /** 是否是武器 TODO 以后改为按type判断？ */
+    @computed get weapon(){
+        // 武器G书也在此类里
+        return this.data.g_type === GType.WEAPON && this.data.type !== ItemType.BOOK;
+    }
+    /** 是否是防具 */
+    @computed get armour(){
+        return this.data.g_type === GType.ARMOUR && this.data.type !== ItemType.BOOK;
+    }
+    /** 是否为饰品 */
+    @computed get accessory(){
+        return this.data.g_type === GType.ACCESSORY && this.data.type !== ItemType.BOOK;
+    }
+    /** 是否可以佩戴，装备+宠物 */
     @computed get equipable() {
         return UnEquipable.indexOf(this.data.type) < 0;
     }
