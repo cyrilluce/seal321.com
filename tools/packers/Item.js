@@ -33,7 +33,7 @@ module.exports = require('./CommonData').extend({
 
             //10-14
             "magic",
-            "task_res2",
+            "task_money",
             "magic_step",
             "res8",
             "weapon_res1",
@@ -174,7 +174,7 @@ module.exports = require('./CommonData').extend({
 
             //10-14
             "magic",
-            "task_res2",
+            "task_money",
             "magic_step",
             "res8",
             "weapon_res1",

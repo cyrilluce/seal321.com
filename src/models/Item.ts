@@ -6,6 +6,19 @@ import { delay } from '../util';
 import { SetOptionModel } from './SetOption';
 import { IDLoadable, Param } from './IDLoadable';
 
+/** 
+ * 分类 
+ * 武器类
+ * 盾牌类
+ * 配件类
+ * 配件类（头部）
+ * 帽子类
+ * 上衣类
+ * 下衣类
+ * 鞋子类
+ * 
+ */
+
 /** 不可以装备的 */
 const UnEquipable = [
     /** 普通物品 */
@@ -127,6 +140,16 @@ const UnGemable = UnEquipable.concat([
     ItemType.THROWABLE,
     ItemType.BATTLE_PET,
 ]);
+
+/** 可以使用的 药水/状态/锻造书  */
+const Usable = [
+    /** 特殊物品（药水、经验+） */
+    ItemType.SPECIAL,
+    /** 时光 */
+    ItemType.TIME,
+    /** 合成/制作书 */
+    ItemType.BOOK,
+]
 
 const res = [
     /** 普通物品 */
@@ -250,7 +273,7 @@ interface IAdditionalFactors {
     [level: number]: number;
 }
 
-/** 装备属性在各精练等级下的加成系数 */
+/** 装备属性在各精练等级下的加成系数 1234 */
 const propertyFactors: IAdditionalFactors = {
     0: 0,
     1: 1,
@@ -262,9 +285,26 @@ const propertyFactors: IAdditionalFactors = {
     7: 12,
     8: 15,
     9: 18,
-    10: 24,
-    11: 30,
-    12: 36
+    10: 22,
+    11: 26,
+    12: 30
+};
+
+/** 武器属性在各精练等级下的加成系数 1246 */
+const weaponPropertyFactors: IAdditionalFactors = {
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 5,
+    5: 7,
+    6: 9,
+    7: 13,
+    8: 17,
+    9: 21,
+    10: 27,
+    11: 33,
+    12: 39
 };
 
 /** 装备需求在各精练等级下的加成系数 */
@@ -390,7 +430,7 @@ export class Item extends IDLoadable<IItem> {
             return 9;
         }
         // 装备类+12
-        if (g_type === GType.ACCESSORY || g_type === GType.ARMOUR || g_type === GType.WEAPON) {
+        if (type !== ItemType.BOOK && (g_type === GType.ACCESSORY || g_type === GType.ARMOUR || g_type === GType.WEAPON)) {
             return 12;
         }
 
@@ -403,10 +443,11 @@ export class Item extends IDLoadable<IItem> {
             level_step, attack_step, magic_step, defense_step,
             demagedec, demageinc, buyprice, sellprice, petpoint,
             needstrength_step, needagile_step, needint_step, needvit_step, needwisdom_step, needluck_step } = item;
-        const propertyFactor = propertyFactors[addLevel];
+        // 属性成长通常是1234，但武器类的属性成长是1246
+        const propertyFactor = this.weapon ? weaponPropertyFactors[addLevel] : propertyFactors[addLevel];
         const limitFactor = limitFactors[addLevel];
         // 武器类、战宠装备、宠物的增减伤增长快，其它的4 7 10才+1
-        const percentFactor = (g_type === GType.WEAPON || type === ItemType.BATTLE_PET_EQUIPMENT || type === ItemType.ITEM_PET) ? weaponPercentFactors[addLevel] : percentFactors[addLevel];
+        const percentFactor = (this.weapon || type === ItemType.BATTLE_PET_EQUIPMENT || type === ItemType.ITEM_PET) ? weaponPercentFactors[addLevel] : percentFactors[addLevel];
         // 价格是比例加的
         const priceFactor = priceFactors[addLevel];
         // 所需喂养值也是按比例加的
@@ -447,11 +488,26 @@ export class Item extends IDLoadable<IItem> {
             }
         }
     }
-    /**
-     * 是否可以装备
-     */
+    /** 是否是武器 TODO 以后改为按type判断？ */
+    @computed get weapon(){
+        // 武器G书也在此类里
+        return this.data.g_type === GType.WEAPON && this.data.type !== ItemType.BOOK;
+    }
+    /** 是否是防具 */
+    @computed get armour(){
+        return this.data.g_type === GType.ARMOUR && this.data.type !== ItemType.BOOK;
+    }
+    /** 是否为饰品 */
+    @computed get accessory(){
+        return this.data.g_type === GType.ACCESSORY && this.data.type !== ItemType.BOOK;
+    }
+    /** 是否可以佩戴，装备+宠物 */
     @computed get equipable() {
         return UnEquipable.indexOf(this.data.type) < 0;
+    }
+    /** 是否可以使用，例如 锻造书 */
+    @computed get usable(){
+        return Usable.indexOf(this.data.type) >= 0;
     }
     /** 职业 */
     @computed get jobs(): (Job | BattlePetJob)[] {

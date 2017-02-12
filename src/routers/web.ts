@@ -46,5 +46,6 @@ export default compose([
     webpack,
     koaLogger(logger),
     compress(),
+    favicon(path.join(__dirname, '../../www/favicon.ico')),
     router.routes()
 ])

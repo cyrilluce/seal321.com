@@ -193,7 +193,7 @@ var types = {
         // 筛选 tw2_item_0.001.json 文件，并按版本排序
         // semver定义版本号要有3段 0.0.1， 这里只有两段，自动加上0.
         files = files.filter(file => fileNameRegex.test(file)).sort((a, b)=>{
-            return semver.gt('0.'+getVer(a), '0.'+getVer(b));
+            return semver.gt('0.'+getVer(a), '0.'+getVer(b)) ? -1 : 1;
         });
         // 取第一个文件
         const file = files[0];
@@ -219,7 +219,8 @@ var types = {
                 db,
                 table,
                 version,
-                data
+                data,
+                force: args.F
             }
         }];
     }
@@ -231,7 +232,7 @@ if (!(type in types)) {
     console.log('无法识别指令', type);
     console.log(`示例：
             ts-node deploy file src/*
-            ts-node deploy db tw2 item
+            ts-node deploy db tw2 item -D -F
             ts-node deploy notice [manual] 测试公告
             ts-node deploy restart
             ts-node deploy reset

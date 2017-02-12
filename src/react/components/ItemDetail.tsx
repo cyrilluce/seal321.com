@@ -32,7 +32,7 @@ export default class ItemDetail extends React.Component<Props, {}>{
         if (!jobs.length) {
             return '禁止任何职业使用';
         }
-        return jobs.map(job => lang.JobNames[job]);
+        return jobs.map(job => lang.JobNames[job]).join(' ');
     }
     render() {
         const { store } = this.props;
@@ -43,6 +43,8 @@ export default class ItemDetail extends React.Component<Props, {}>{
         const { data: item, addLevel: itemLevel, setOptionModel } = itemModel;
         // 是否为精炼模拟模式
         const addMode = itemLevel > 0;
+        // 是否可以精炼，不能精炼的，不显示成长
+        const addable = itemModel.maxAddLevel>0;
         const additional = itemModel.additional;
         // return  <Draggable><div>testestset</div></Draggable>;
         return <Draggable handle=".handler" bounds="parent" defaultPosition={this.lastPos} onStop={(e, data)=>{this.lastPos = data;}}>
@@ -76,9 +78,9 @@ export default class ItemDetail extends React.Component<Props, {}>{
                         item.cure_ap !== 0 && <div key="cure_ap" className="col-xs-6 no-wrap">恢复AP {item.cure_ap}</div>
                     ]}
                     {item.type !== ItemType.TASK && item.type !== ItemType.CHEST && item.type !== ItemType.CHEST_KEY && item.type !== ItemType.CHEST_VIP && [
-                        (item.attack !== 0 || item.attack_step !== 0) && <div key="attack" className="col-xs-6 no-wrap">攻击力 {item.attack + additional.attack}{addMode || `(${item.attack_step})`}</div>,
-                        (item.magic !== 0 || item.magic_step !== 0) && <div key="magic" className="col-xs-6 no-wrap">魔法力 {item.magic + additional.magic}{addMode || `(${item.magic_step})`}</div>,
-                        (item.defense !== 0 || item.defense_step !== 0) && <div key="defense" className="col-xs-6 no-wrap">防御力 {item.defense + additional.defense}{addMode || `(${item.defense_step})`}</div>,
+                        (item.attack !== 0 || item.attack_step !== 0) && <div key="attack" className="col-xs-6 no-wrap">攻击力 {item.attack + additional.attack}{addable && !addMode && `(${item.attack_step})`}</div>,
+                        (item.magic !== 0 || item.magic_step !== 0) && <div key="magic" className="col-xs-6 no-wrap">魔法力 {item.magic + additional.magic}{addable && !addMode && `(${item.magic_step})`}</div>,
+                        (item.defense !== 0 || item.defense_step !== 0) && <div key="defense" className="col-xs-6 no-wrap">防御力 {item.defense + additional.defense}{addable && !addMode && `(${item.defense_step})`}</div>,
                         item.attackspeed !== 0 && <div key="attackspeed" className="col-xs-6 no-wrap">攻击速度 {item.attackspeed}</div>,
                         item.critical !== 0 && <div key="critical" className="col-xs-6 no-wrap">必杀技 {item.critical}</div>,
                         item.accuracy !== 0 && <div key="accuracy" className="col-xs-6 no-wrap">命中率 {item.accuracy}</div>,
@@ -91,7 +93,7 @@ export default class ItemDetail extends React.Component<Props, {}>{
                     {item.type === ItemType.TASK && [
                         item.task_fame !== 0 && <div key="task_fame" className="col-xs-6 no-wrap">获得声望 {item.task_fame}</div>,
                         item.magic !== 0 && <div key="magic" className="col-xs-6 no-wrap">获得经验 {item.magic}</div>,
-                        item.task_res2 !== 0 && <div key="task_res2" className="col-xs-6 no-wrap">获得金钱 {item.task_res2}</div>,
+                        item.task_money !== 0 && <div key="task_money" className="col-xs-6 no-wrap">获得金钱 {item.task_money}</div>,
                     ]}
 
                     {item.type !== ItemType.FOOD && [
@@ -102,19 +104,19 @@ export default class ItemDetail extends React.Component<Props, {}>{
 
 
 
-                <div className="row no-gutter item-require">
-                    {itemModel.equipable && [
-                        item.jobid !== 0 && <div key="jobs" className="col-xs-12">{this.renderJobs(itemModel.jobs, item.type === ItemType.BATTLE_PET_EQUIPMENT)}</div>,
-                        (item.level !== 0 || item.level_step !== 0) && <div key="level" className="col-xs-12 no-wrap">等級限制 {item.level + additional.level}{addMode || `(${item.level_step})`}</div>,
+                {(itemModel.equipable || itemModel.usable) && <div className="row no-gutter item-require">
+                    {[
+                        itemModel.equipable && item.jobid !== 0 && <div key="jobs" className="col-xs-12">{this.renderJobs(itemModel.jobs, item.type === ItemType.BATTLE_PET_EQUIPMENT)}</div>,
+                        (item.level !== 0 || item.level_step !== 0) && <div key="level" className="col-xs-12 no-wrap">等級限制 {item.level + additional.level}{addable && !addMode && `(${item.level_step})`}</div>,
                         item.fame !== 0 && <div key="fame" className="col-xs-12 no-wrap">声望限制 {item.fame}</div>,
-                        (item.needstrength !== 0 || item.needstrength_step !== 0) && <div key="needstrength" className="col-xs-6 no-wrap">力量 {item.needstrength + additional.needstrength}{addMode || `(${item.needstrength_step})`}</div>,
-                        (item.needagile !== 0 || item.needagile_step !== 0) && <div key="needagile" className="col-xs-6 no-wrap">敏捷 {item.needagile + additional.needagile}{addMode || `(${item.needagile_step})`}</div>,
-                        (item.needwisdom !== 0 || item.needwisdom_step !== 0) && <div key="needwisdom" className="col-xs-6 no-wrap">智力 {item.needwisdom + additional.needwisdom}{addMode || `(${item.needwisdom_step})`}</div>,
-                        (item.needvit !== 0 || item.needvit_step !== 0) && <div key="needvit" className="col-xs-6 no-wrap">体力 {item.needvit + additional.needvit}{addMode || `(${item.needvit_step})`}</div>,
-                        (item.needint !== 0 || item.needint_step !== 0) && <div key="needint" className="col-xs-6 no-wrap">精神 {item.needint + additional.needint}{addMode || `(${item.needint_step})`}</div>,
-                        (item.needluck !== 0 || item.needluck !== 0) && <div key="needluck" className="col-xs-6 no-wrap">感觉 {item.needluck + additional.needluck}{addMode || `(${item.needluck_step})`}</div>,
+                        (item.needstrength !== 0 || item.needstrength_step !== 0) && <div key="needstrength" className="col-xs-6 no-wrap">力量 {item.needstrength + additional.needstrength}{addable && !addMode && `(${item.needstrength_step})`}</div>,
+                        (item.needagile !== 0 || item.needagile_step !== 0) && <div key="needagile" className="col-xs-6 no-wrap">敏捷 {item.needagile + additional.needagile}{addable && !addMode && `(${item.needagile_step})`}</div>,
+                        (item.needwisdom !== 0 || item.needwisdom_step !== 0) && <div key="needwisdom" className="col-xs-6 no-wrap">智力 {item.needwisdom + additional.needwisdom}{addable && !addMode && `(${item.needwisdom_step})`}</div>,
+                        (item.needvit !== 0 || item.needvit_step !== 0) && <div key="needvit" className="col-xs-6 no-wrap">体力 {item.needvit + additional.needvit}{addable && !addMode && `(${item.needvit_step})`}</div>,
+                        (item.needint !== 0 || item.needint_step !== 0) && <div key="needint" className="col-xs-6 no-wrap">精神 {item.needint + additional.needint}{addable && !addMode && `(${item.needint_step})`}</div>,
+                        (item.needluck !== 0 || item.needluck !== 0) && <div key="needluck" className="col-xs-6 no-wrap">感觉 {item.needluck + additional.needluck}{addable && !addMode && `(${item.needluck_step})`}</div>,
                     ]}
-                </div>
+                </div>}
 
                 {!itemModel.description && <div className="row">
                     <div className="col-xs-12 item-description">

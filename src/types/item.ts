@@ -301,9 +301,9 @@ export interface Item {
     level_step: number;
     /** 需求声望 */
     fame: number;
-    /** 攻击 */
+    /** 攻击  任务-提交NPC*/
     attack: number;
-    /** 未知-任务相关 */
+    /** 未知-任务相关 0: 普通 1: 任务相关 2: */
     task_res1: number;
     /** 攻击增长系数 */
     attack_step: number;
@@ -311,12 +311,12 @@ export interface Item {
     demageinc: number;
     /** 任务完成后增加的声望？ */
     task_fame: number;
-    /** 未知-宠物相关 */
+    /** 未知-宠物相关 0: 普通 1:宠物相关 >6 宝箱相关 */
     pet_res1: number;
-    /** 魔法 */
+    /** 魔法  任务经验 */
     magic: number;
     /** 任务奖励金钱 */
-    task_res2: number;
+    task_money: number;
     /** 魔法增长系统 */
     magic_step: number;
     /** 未知 */
@@ -325,7 +325,7 @@ export interface Item {
     weapon_res1: number;
     /** 防御 */
     defense: number;
-    /** 未知 */
+    /** 未知 0:普通 1:特殊道具 2:战宠装备及G书 >2:宝箱  */
     res10: number;
     /** 防御增长系统 */
     defense_step: number;
