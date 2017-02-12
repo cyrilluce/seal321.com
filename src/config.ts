@@ -19,7 +19,7 @@ export type ServerId = "cn" | "tw2" | "tw" | "us";
 // }
 interface Servers{
     // [key: string]: Tables;
-    // cn : Tables;
+    cn : Tables;
     tw2 : Tables;
     tw : Tables;
     us : Tables;
@@ -37,10 +37,9 @@ export const dbs:Servers = {
     "tw" : {
         item: 1
     },
-    // "cn" : {
-    //     item : 1,
-    //     monster : 1
-    // },
+    "cn" : {
+        item : 1,
+    },
     "us" : {
         item : 1
     },

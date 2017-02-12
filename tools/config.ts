@@ -7,6 +7,10 @@ var path = require("path");
 var fs = require('fs');
 
 var servers = {
+    // 昆仑
+    // 配置 http://seal.download.kunlun.com/conf.kl  zip格式
+    // http://seal.autopatch.kunlun.com/fullversions/200/etc/item.edp
+    // 
     cn : {
         url : "http://patch-tc1.sealonline.com.cn/update/",
         encoding : "CP936",
