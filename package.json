@@ -7,7 +7,7 @@
     "dev": "set NODE_ENV=development&&node dev",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && node ./node_modules/webpack/bin/webpack -p --config webpack/webpack.browser.js --display-modules",
-    "watch": "node tools/watch"
+    "watch": "ts-node tools/watch"
   },
   "author": "",
   "license": "ISC",
