@@ -38,7 +38,7 @@ class BaseFilePacker{
     }
     unpack(data){
         data = this.edtPacker.unpack(data);
-        fs.writeFileSync(path.join(config.samplesDir, 'source._edt'), data);
+        //fs.writeFileSync(path.join(config.samplesDir, 'source._edt'), data);
         return this.packer.unpack(data, this.server.encoding);
     }
     unpackFromFile(cb){

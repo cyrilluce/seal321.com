@@ -18,5 +18,5 @@ setopt
 
 3. 发布数据
 ts-node deploy file server/test.js frontend/js/main.js
-ts-node deploy db tw2 item 0.654
+ts-node deploy db tw2 item
 ts-node deploy restart
