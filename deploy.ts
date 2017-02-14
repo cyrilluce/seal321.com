@@ -12,7 +12,7 @@ var asyncLib = require('async');
 var fs = require('mz/fs');
 var deployUtil = require('./src/util/deploy');
 var recursive = require('recursive-readdir');
-import { promisify, delay } from './src/util';
+import { promisify, delay, timeout } from './src/util';
 import * as localConfig from './src/localConfig';
 import * as semver from 'semver';
 
@@ -48,12 +48,7 @@ const deployAsyncRetry = async (data, times = 3) => {
     let error;
     for (; times > 0; times--) {
         try {
-            await Promise.race([
-                deployAsync(data),
-                delay(30000).then(() => {
-                    throw new Error('30秒超时');
-                })
-            ]);
+            await timeout(deployAsync(data), 30000);
         } catch (err) {
             error = err;
             console.log(`失败重试，还有${times - 1}次`, err.message || err);
@@ -186,7 +181,7 @@ var types = {
         // let [db, table, version] = argv;
         let db = argv[0];
         let table = argv[1];
-        // TODO 可以不传version，自动识别
+        // 可以不传version，自动识别
         let files: string[] = await fs.readdir(localConfig.sampleDir);
         const fileNameRegex = new RegExp(`^${db}_${table}_([0-9.]+)\.json$`);
         const getVer = file => file.match(fileNameRegex)[1];
