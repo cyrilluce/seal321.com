@@ -2,6 +2,7 @@ import * as React from 'react';
 // import {findDOMNode} from 'react-dom';
 import * as classnames from 'classnames';
 import Dropdown, {Props as DropdownProps} from './Dropdown'
+import { sendEvent } from '../../util'
 
 interface Props{
     setLevel: (level: number) => void;
@@ -23,10 +24,10 @@ export default class AddLevelTools extends React.Component<Props, {}>{
             levels.push(i);
         }
         return <div className="btn-group btn-group-xs add-level-tools">
-            <button type="button" className="btn btn-default" onClick={() => { this.setLevel(Math.min(maxLevel, level + 1)) } }>
+            <button type="button" className="btn btn-default" onClick={() => { this.setLevel(Math.min(maxLevel, level + 1)), sendEvent('click', 'level.plus') } }>
                 <span className="glyphicon glyphicon-plus" > </span>
             </button>
-            <button type="button" className="btn btn-default" onClick={() => { this.setLevel(Math.min(maxLevel, level - 1)) } }>
+            <button type="button" className="btn btn-default" onClick={() => { this.setLevel(Math.min(maxLevel, level - 1)), sendEvent('click', 'level.minus') } }>
                 <span className="glyphicon glyphicon-minus" > </span>
             </button>
             <Dropdown className="btn-group btn-group-xs">
@@ -34,7 +35,7 @@ export default class AddLevelTools extends React.Component<Props, {}>{
                     <span className="caret"></span>
                 </button>
                 <ul className="dropdown-menu">
-                    {levels.map(level=><li key={level}><a href="javascript:;" onClick={() => { this.setLevel(level) }}>{level && `+${level}`}</a></li>)}
+                    {levels.map(level=><li key={level}><a href="javascript:;" onClick={() => { this.setLevel(level), sendEvent('click', `level.set${level}`) }}>{level && `+${level}`}</a></li>)}
                 </ul>
             </Dropdown>
         </div>;

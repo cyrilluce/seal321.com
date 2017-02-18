@@ -1,5 +1,6 @@
 import * as localConfig from '../localConfig';
 import * as isomorphicFetch from 'isomorphic-fetch';
+import { sendTiming } from '.'
 
 /**
  * 异步加载
@@ -16,6 +17,8 @@ export async function fetch<T>(path: string, params: any) : Promise<T>{
         }
         path = require('url').resolve(`http://${server}`, path);
     }
+    // 计时
+    let start = new Date().getTime();
     // 这里判断如果是本服务，可以自动加上sessionId
     let res = await isomorphicFetch(path, {
         method: 'POST',
@@ -25,6 +28,8 @@ export async function fetch<T>(path: string, params: any) : Promise<T>{
         body : JSON.stringify(params)
     });
     let json = await res.json();
+    let cost = new Date().getTime() - start;
+    sendTiming('fetch', path, cost);
     if(!json.success){
         throw json;
     }

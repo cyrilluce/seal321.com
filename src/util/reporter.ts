@@ -32,3 +32,14 @@ export function sendPageView(): void{
 export function sendEvent(eventCategory: string, eventAction: string, eventLabel?: string, eventValue?: number): void{
     ga('send', 'event', ...arguments)
 }
+
+/**
+ * 发送计时
+ * @param timingCategory 用于将所有用户计时变量归类到相应逻辑组的字符串（例如 'JS Dependencies'）。
+ * @param timingVar 用于标识要记录的变量（例如 'load'）的字符串。
+ * @param timingValue 向 Google Analytics（分析）报告的，以毫秒为单位的历时时间（例如 20）。
+ * @param timingLabel 可用于提高报告中显示用户计时数据灵活性的字符串（例如 'Google CDN'）。
+ */
+export function sendTiming(timingCategory: string, timingVar: string, timingValue: number, timingLabel?: string): void{
+    ga('send', 'timing', ...arguments)
+}

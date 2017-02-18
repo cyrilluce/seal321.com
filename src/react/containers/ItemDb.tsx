@@ -9,6 +9,7 @@ import SearchList from '../components/SearchList';
 import ItemDetail from '../components/ItemDetail';
 import * as ReactPaginate from 'react-paginate';
 import ItemDbStore from '../../stores/db';
+import { sendEvent } from '../../util';
 // import {ReactPaginateProps} from 'react-paginate';
 
 interface Props {
@@ -130,6 +131,7 @@ export default class ItemDb extends Component<Props, State> {
     handlePageClick(page) {
         // 翻页后，重置展开的状态
         this.setState({paginationExpanded: false});
+        sendEvent('click', 'page');
         // react-paginate的page对象selected属性是0-base
         this.props.store.paginate(page.selected + 1);
     }
@@ -149,7 +151,7 @@ export default class ItemDb extends Component<Props, State> {
             <SearchBar />
             <ReactPaginateFix previousLabel={"«"}
                 nextLabel={"»"}
-                breakLabel={<a href="#" onClick={() => { this.setState({ paginationExpanded: true }) } }>...</a>}
+                breakLabel={<a href="#" onClick={() => { this.setState({ paginationExpanded: true }), sendEvent('click', 'page.more'); } }>...</a>}
                 // breakLabel="..."
                 breakClassName={"break"}
                 forcePage={page-1}
@@ -162,7 +164,7 @@ export default class ItemDb extends Component<Props, State> {
             <SearchList onItemClick={item=>{store.viewItem(item)}}/>
             <ReactPaginateFix previousLabel={"«"}
                 nextLabel={"»"}
-                breakLabel={<a href="#" onClick={() => { this.setState({ paginationExpanded: true }) } }>...</a>}
+                breakLabel={<a href="#" onClick={() => { this.setState({ paginationExpanded: true }), sendEvent('click', 'page.more') } }>...</a>}
                 // breakLabel="..."
                 breakClassName={"break"}
                 forcePage={page-1}
