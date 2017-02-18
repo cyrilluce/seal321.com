@@ -7,7 +7,7 @@ import { useStaticRendering } from 'mobx-react';
 import { when, toJS } from 'mobx';
 import getRoot from '../react/getRoot';
 import * as localConfig from '../localConfig';
-import ItemDbStore from '../stores/db';
+import { ItemDbStore, itemDbParamConfigs} from '../stores';
 import logger from '../logger';
 import { join } from 'path';
 import * as config from '../config';
@@ -26,13 +26,8 @@ export default compose([
     }
   }),
   async (ctx, next) => {
-    const store = new ItemDbStore().init({
-      loc: ctx.params.loc || config.mainDb,
-      keyword: ctx.request.query.keyword || '',
-      page: +ctx.request.query.page || 1,
-      itemId: +ctx.request.query.id || 0,
-      itemLevel: +ctx.request.query.level || 0
-    });
+    const store = new ItemDbStore().init();
+    store.navigateParams(ctx.params, ctx.request.query);
 
     // 如果store加载完成（服务端加载），则渲染之
     await new Promise(resolve => {

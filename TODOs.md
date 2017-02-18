@@ -1,5 +1,5 @@
 ## 基本功能&改进（工具&环境&底层）
-deploy自动取版本 2017-01-17
+deploy自动取版本 2017-01-17 done
 pickup及deploy自动化
 itemiconXX.tex自动化 -> dds -> png -> deploy
 
@@ -14,7 +14,7 @@ G化模拟器
 怪物信息页
 QQ connect接入
 掉落维护
-GA上报
+GA上报 2017-02-18 done
 
 ## 锦上添花
 引入ddos库来防止dos攻击

@@ -5,7 +5,7 @@ import { Item } from '../types';
 import * as query from './query';
 import { delay } from '../util';
 import { ServerId, mainDb } from '../config';
-import { ItemDetail, Loadable } from '../models';
+import { ItemDetail, Loadable, GSimulate } from '../models';
 
 interface Param{
     loc: ServerId;
@@ -34,7 +34,7 @@ interface ParamConfig<T>{
     /** 从model读取值 */
     getter: (o: ItemDbStore)=>T;
 }
-const paramConfigs: ParamConfig<any>[] = [
+export const itemDbParamConfigs: ParamConfig<any>[] = [
     /** 当前查询的服务器 */
     {
         query: "loc",
@@ -111,19 +111,58 @@ const paramConfigs: ParamConfig<any>[] = [
         setter: (model, v)=>{
             model.itemLevel = v;
         }
-    } as ParamConfig<number>
+    } as ParamConfig<number>,
+    {
+        query: "gsim",
+        defaults: '',
+        history: true,
+        formula: v=>v,
+        getter: (o)=>{
+            const gSim = o.gSimulate;
+            if(!gSim.book.id){
+                return '';
+            }
+            const assistsSeriallized = gSim.assists.map(assist=>`${assist.id}.${assist.addLevel}`).join('i');
+            return `${gSim.book.id}i${gSim.target.id}.${gSim.target.addLevel}i${assistsSeriallized}`;
+        },
+        setter: (model, v)=>{
+            const gSim = model.gSimulate;
+            if(!v){
+                return;
+            }
+            const [bookId, targetStr = "", ...assistStrs] = v.split('i');
+            gSim.book.id = +bookId || 0;
+            const [targetId, targetLevel] = targetStr.split('.');
+            gSim.target.id = +targetId || 0;
+            gSim.target.addLevel = +targetLevel || 0;
+
+            assistStrs.forEach((assistStr = "", index)=>{
+                const [id, level] = assistStr.split('.');
+                const assist = gSim.assists[index];
+                if(!assist){
+                    return;
+                }
+                assist.id = +id || 0;
+                assist.addLevel = +level || 0;
+            })
+        }
+    } as ParamConfig<string>
 ];
 
-export default class ItemDbStore extends Loadable<Param, Result> {
+export class ItemDbStore extends Loadable<Param, Result> {
     protected initOptions(options?: any, restoreFromData = false){
         this.itemModel = new ItemDetail();
         this.itemModel.init(options.itemModel, restoreFromData);
         delete options.itemModel;
 
+        this.gSimulate = new GSimulate().init(options.gSimulate, restoreFromData);
+        delete options.gSimulate;
+
         super.initOptions(options, restoreFromData);
 
         autorun(() => {
             this.itemModel.loc = this.loc;
+            this.gSimulate.loc = this.loc;
         })
     }
     protected isParamValid(param: Param): boolean{
@@ -164,6 +203,8 @@ export default class ItemDbStore extends Loadable<Param, Result> {
     @observable.ref data: Result = null;
     /** 物品详情Model */
     @observable.ref itemModel: ItemDetail = null;
+    /** G化模拟器 */
+    @observable.ref gSimulate: GSimulate = null;
 
     // ------------------- 高级属性 ----------------
     /** 物品详情面板 */
@@ -174,7 +215,7 @@ export default class ItemDbStore extends Loadable<Param, Result> {
      * 是否初始化结束（用于服务端渲染判断）
      */
     @computed get initialized(): boolean {
-        return !this.loading && !this.itemModel.loading;
+        return !this.loading && !this.itemModel.loading && !this.gSimulate.loading;
     }
     /**
      * 总页数
@@ -201,7 +242,7 @@ export default class ItemDbStore extends Loadable<Param, Result> {
      */
     private getParams(inPath?: boolean, historyOnly: boolean = false){
         const params = {};
-        paramConfigs.filter(o=>!o.inPath !== inPath)
+        itemDbParamConfigs.filter(o=>!o.inPath !== inPath)
         .filter(o=>!historyOnly || o.history)
         .forEach(o=>{
             const key = o.query;
@@ -259,7 +300,10 @@ export default class ItemDbStore extends Loadable<Param, Result> {
             params[key] = value;
         });
 
-        paramConfigs.forEach(o=>{
+        this.navigateParams(pathParam, params);
+    }
+    @action navigateParams(pathParam: any, params: any){
+        itemDbParamConfigs.forEach(o=>{
             const map = o.inPath ? pathParam : params;
             let value;
             if(o.query in map){

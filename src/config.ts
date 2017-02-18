@@ -1,11 +1,13 @@
 /**
  * Created by cyrilluce on 2016/8/7.
  */
-export type Table = "item" | "monster" | "setopt"
+export type Table = "item" | "monster" | "setopt" | "craft"
 
-export interface Tables{
+export interface ServerConfig{
     item?: any;
     monster?: any;
+    /** 最高制作成功率 */
+    maxRate: number;
 }
 // export enum ServerId{
 //     cn,
@@ -19,10 +21,10 @@ export type ServerId = "cn" | "tw2" | "tw" | "us";
 // }
 interface Servers{
     // [key: string]: Tables;
-    cn : Tables;
-    tw2 : Tables;
-    tw : Tables;
-    us : Tables;
+    cn : ServerConfig;
+    tw2 : ServerConfig;
+    tw : ServerConfig;
+    us : ServerConfig;
 }
 
 
@@ -32,15 +34,19 @@ export const mainDb: ServerId = "tw2";
 // 服务器列表
 export const dbs:Servers = {
     "tw2" : {
-        item : 1
+        item : 1,
+        maxRate : 0.9
     },
     "tw" : {
-        item: 1
+        item: 1,
+        maxRate : 1
     },
     "cn" : {
         item : 1,
+        maxRate : 1
     },
     "us" : {
-        item : 1
+        item : 1,
+        maxRate : 1
     },
 }

@@ -15,6 +15,10 @@ export abstract class Loadable<TParam, TData> extends Base{
         super.initReactions();
         this.reactionLoad();
     }
+    /** 直接设置数据，如果相符就不需要加载了 */
+    @action setData(data: TData){
+        this.data = data;
+    }
     // ------------------ 基础属性 --------------------
     /** 是否处于查询状态 */
     @observable dataLoading: boolean = false;

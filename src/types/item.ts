@@ -372,7 +372,7 @@ export interface Item {
     g_type: GType;
     /** G化需要辅助值 */
     needpt: number;
-    /** 料理产物 */
+    /** 料理产物 或 制作书ID */
     convertid: number;
     /** 钓鱼结果 */
     fishingid: number;

@@ -4,3 +4,5 @@ export * from './IDLoadable';
 export * from './SetOption';
 export * from './Item';
 export * from './ItemDetail';
+export * from './Craft';
+export * from './GSimulate';

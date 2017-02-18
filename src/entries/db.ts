@@ -4,7 +4,7 @@
 ///<reference path="../types/window.d.ts" />
 import React from 'react';
 import { render } from 'react-dom'
-import ItemDbStore from '../stores/db';
+import { ItemDbStore } from '../stores';
 import getRoot from '../react/getRoot';
 import { autorun } from 'mobx';
 import { setPage, sendPageView, sendTiming } from '../util';

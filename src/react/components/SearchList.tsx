@@ -7,7 +7,7 @@
 import * as React from 'react';
 import { Component, PropTypes } from 'react'
 import { inject, observer } from 'mobx-react';
-import ItemDbStore from '../../stores/db';
+import {ItemDbStore} from '../../stores';
 import SearchItem from './SearchItem'
 
 interface Props {

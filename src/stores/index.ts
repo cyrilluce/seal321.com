@@ -1,3 +1,1 @@
-import ItemDbStore from './db';
-
-export {ItemDbStore};
+export * from './db';

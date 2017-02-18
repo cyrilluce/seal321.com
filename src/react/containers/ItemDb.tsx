@@ -8,7 +8,7 @@ import SearchBar from '../components/SearchBar';
 import SearchList from '../components/SearchList';
 import ItemDetail from '../components/ItemDetail';
 import * as ReactPaginate from 'react-paginate';
-import ItemDbStore from '../../stores/db';
+import {ItemDbStore} from '../../stores';
 import { sendEvent } from '../../util';
 // import {ReactPaginateProps} from 'react-paginate';
 

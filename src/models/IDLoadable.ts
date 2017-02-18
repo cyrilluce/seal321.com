@@ -20,9 +20,9 @@ export abstract class IDLoadable<TData> extends Loadable<Param, TData>{
         return param.loc && param.id>0;
     }
     // ------------------ 基础属性 --------------------
-    @observable loc: ServerId;
+    @observable loc: ServerId = mainDb;
     /** 套装id */
-    @observable id: number;
+    @observable id: number = 0;
     // ------------------- 高级属性 -----------------
     @computed get param(): Param{
         return {

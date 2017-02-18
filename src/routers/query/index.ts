@@ -9,6 +9,7 @@ import logger from '../../logger';
 import list from './list';
 import item from './item';
 import setopt from './setopt';
+import craft from './craft';
 
 interface QueryRequest extends Koa.Request {
     body: any;
@@ -84,4 +85,5 @@ router.use(shortcutResponse).use(ensureDb);
 router.post('/list', list);
 router.post('/item', item);
 router.post('/setopt', setopt);
+router.post('/craft', craft);
 export default router.routes();
