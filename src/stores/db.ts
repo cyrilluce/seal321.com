@@ -17,6 +17,98 @@ interface Result{
     list: Item[];
     count: number;
 }
+
+interface ParamConfig<T>{
+    /** 默认值，如果为默认，则不显示在url中 */
+    defaults: T;
+    /** url的参数名 */
+    query: string;
+    /** 是否位于path中（而非query中） */
+    inPath?: boolean;
+    /** 格式化值 */
+    formula: (v: string)=>T;
+    /** 设置值到model */
+    setter: (o: ItemDbStore, v: T)=>void;
+    /** 从model读取值 */
+    getter: (o: ItemDbStore)=>T;
+}
+const paramConfigs: ParamConfig<any>[] = [
+    /** 当前查询的服务器 */
+    {
+        query: "loc",
+        inPath: true,
+        defaults: mainDb,
+        formula: (v)=>{
+            return <ServerId>v;
+        },
+        getter: (o)=>{
+            return o.loc;
+        },
+        setter: (model, v)=>{
+            model.loc = v;
+        }
+    } as ParamConfig<ServerId>,
+    /** 搜索关键字 */
+    {
+        query: "keyword",
+        defaults: "",
+        formula: v=>v,
+        getter: (o)=>{
+            return o.keyword;
+        },
+        setter: (model, v)=>{
+            model.keyword = v;
+        }
+    } as ParamConfig<string>,
+    /** 当前页码 */
+    {
+        query: "page",
+        defaults: 1,
+        formula: v=>(+v || 1),
+        getter: (o)=>{
+            return o.page;
+        },
+        setter: (model, v)=>{
+            model.page = v;
+        }
+    } as ParamConfig<number>,
+    /** 当前页面大小 */
+    {
+        query: "count",
+        defaults: 15,
+        formula: v=>(+v || 15),
+        getter: (o)=>{
+            return o.pageSize;
+        },
+        setter: (model, v)=>{
+            model.pageSize = v;
+        }
+    } as ParamConfig<number>,
+    /** 查看的物品id */
+    {
+        query: "id",
+        defaults: 0,
+        formula: v=>+v||0,
+        getter: (o)=>{
+            return o.itemModel && o.itemModel.id;
+        },
+        setter: (model, v)=>{
+            model.itemId = v;
+        }
+    } as ParamConfig<number>,
+    {
+        query: "level",
+        defaults: 0,
+        formula: v=>+v||0,
+        getter: (o)=>{
+            return o.itemModel && o.itemModel.addLevel;
+        },
+        setter: (model, v)=>{
+            model.itemLevel = v;
+        }
+    } as ParamConfig<number>
+];
+
 export default class ItemDbStore extends Loadable<Param, Result> {
     protected initOptions(options?: any, restoreFromData = false){
         this.itemModel = new ItemDetail();
@@ -103,50 +195,54 @@ export default class ItemDbStore extends Loadable<Param, Result> {
     }
     /** 页面URL search */
     @computed get pagePath(): string {
-        let params = [];
-        const {loc, keyword, page, itemModel} = this;
-        const {id: itemId, addLevel} = itemModel;
-        if (keyword) {
-            params.push(['keyword', keyword]);
-        }
-        if (page > 1) {
-            params.push(['page', page]);
-        }
-        if (itemId > 0) {
-            params.push(['id', itemId]);
-        }
-        if (addLevel > 0) {
-            params.push(['level', addLevel]);
-        }
-        return `/${loc}/db?` + params.map(pair => `${encodeURIComponent(pair[0])}=${encodeURIComponent(pair[1])}`).join('&');
+        const pathParam = {},
+            params = [];
+
+        paramConfigs.forEach(o=>{
+            const key = o.query;
+            const value = o.getter(this);
+            // 位于path中，强制显示
+            if(o.inPath){
+                pathParam[key] = value;
+            }else if(value !== o.defaults){ // 位于query中，如果是默认值就无视
+                params.push([key, value])
+            }
+        })
+
+        const path = `/${pathParam["loc"]}/db`;
+        const query = params.map(pair => `${encodeURIComponent(pair[0])}=${encodeURIComponent(pair[1])}`).join('&');
+  
+        return path + (query ? '?' : '') + query;
     }
     // ------------------- 动作 --------------------
     /** 从页面URL中读取数据 */
     @action navigatePath(pathAndQuery: string) {
-        const [path, search] = pathAndQuery.split('?');
+        const [path, search=""] = pathAndQuery.split('?');
         const [,loc,mod] = path.split('/');
+
+        const pathParam: any = {},
+            params = {};
         if(loc && /^\w+$/.test(loc)){
-            this.loc = <ServerId>loc;
+            pathParam.loc = loc;
         }
+
         search.replace(/^\?/, '').split('&').map(part => {
             let [key, value] = part.split('=');
             key = decodeURIComponent(key);
             value = decodeURIComponent(value);
-            switch (key) {
-                case 'keyword':
-                    this.keyword = value;
-                    break;
-                case 'page':
-                    this.page = +value || 1;
-                    break;
-                case 'id':
-                    this.itemId = +value || 0;
-                    break;
-                case 'level':
-                    this.itemLevel = +value || 0;
-                    break;
-            }
+            params[key] = value;
         });
+
+        paramConfigs.forEach(o=>{
+            const map = o.inPath ? pathParam : params;
+            let value;
+            if(o.query in map){
+                value = map[o.query];
+            }else{
+                value = o.defaults;
+            }
+            o.setter(this, value);
+        })
     }
     @action changeServer(loc: ServerId){
         this.loc = loc;
@@ -185,7 +281,7 @@ export default class ItemDbStore extends Loadable<Param, Result> {
         this.itemModel.setId(id);
     }
     /** 设置精炼等级 */
-    set itemLevel(itemLevel) {
+    set itemLevel(itemLevel: number) {
         this.itemModel.addLevel = itemLevel;
     }
     @action setItemLevel(level: number) {

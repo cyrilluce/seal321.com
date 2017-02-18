@@ -32,7 +32,7 @@ export default async function (ctx: QueryContext, next) {
     // 模糊搜索
     const keywordSearch = '%' + keyword.replace(/(%_)/g, '\\$1') + '%';
 
-    ctx.logger.info('搜索', keyword, offset, limit);
+    ctx.logger.info('搜索', db, keyword, offset, limit);
 
     const tableName = ctx.getTableName('item');
 

@@ -4,3 +4,4 @@ export * from './delay';
 export * from './fetch';
 export * from './promiseCall';
 export * from './promisify';
+export * from './reporter';

@@ -8,7 +8,7 @@ cnpm run dev 运行
 
 
 1. 更新包下载解压器
-ts-node tools/watch
+npm run watch
 
 2. 提取数据
 ts-node pickup tw2 item
@@ -17,6 +17,7 @@ monster
 setopt
 
 3. 发布数据
-ts-node deploy file server/test.js frontend/js/main.js
+ts-node deploy file www/favicon.ico
 ts-node deploy db tw2 item
 ts-node deploy restart
+ts-node deploy publish

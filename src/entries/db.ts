@@ -7,6 +7,7 @@ import { render } from 'react-dom'
 import ItemDbStore from '../stores/db';
 import getRoot from '../react/getRoot';
 import { autorun } from 'mobx';
+import { setPage, sendPageView } from '../util';
 
 // 创建新的 mobx store 实例
 const store = new ItemDbStore().init(window.__INITIAL_STATE__, true);
@@ -20,11 +21,13 @@ if (global.IS_BROWSER && window.history && history.pushState) {
     const {pageTitle, pagePath} = store;
     if (!isHistoryBack) {
       history.pushState({}, pageTitle, pagePath);
+      setPage(pagePath);
+      sendPageView();
     }
   });
   window.addEventListener('popstate', (e) => {
     isHistoryBack = true;
-    store.navigatePath(location.pathname+'?'+location.search);
+    store.navigatePath(location.pathname+location.search);
     isHistoryBack = false;
   })
 }
