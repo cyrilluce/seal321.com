@@ -6,7 +6,7 @@ const ga = function(...any){
     if(!ga){
         return;
     }
-
+    ga(...arguments);
 }
 /**
  * 设置页面

@@ -21,9 +21,13 @@ if (global.IS_BROWSER && window.history && history.pushState) {
     const {pageTitle, pagePath} = store;
     if (!isHistoryBack) {
       history.pushState({}, pageTitle, pagePath);
-      setPage(pagePath);
-      sendPageView();
     }
+    setPage(pagePath);
+  });
+  // 计算pv
+  autorun(()=>{
+    const {historyParams} = store;
+    sendPageView();
   });
   window.addEventListener('popstate', (e) => {
     isHistoryBack = true;

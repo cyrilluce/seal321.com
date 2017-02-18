@@ -25,6 +25,8 @@ interface ParamConfig<T>{
     query: string;
     /** 是否位于path中（而非query中） */
     inPath?: boolean;
+    /** 是否需要history记录（算成pv） */
+    history?: boolean;
     /** 格式化值 */
     formula: (v: string)=>T;
     /** 设置值到model */
@@ -37,6 +39,7 @@ const paramConfigs: ParamConfig<any>[] = [
     {
         query: "loc",
         inPath: true,
+        history: true,
         defaults: mainDb,
         formula: (v)=>{
             return <ServerId>v;
@@ -51,6 +54,7 @@ const paramConfigs: ParamConfig<any>[] = [
     /** 搜索关键字 */
     {
         query: "keyword",
+        history: true,
         defaults: "",
         formula: v=>v,
         getter: (o)=>{
@@ -87,6 +91,7 @@ const paramConfigs: ParamConfig<any>[] = [
     /** 查看的物品id */
     {
         query: "id",
+        history: true,
         defaults: 0,
         formula: v=>+v||0,
         getter: (o)=>{
@@ -189,28 +194,49 @@ export default class ItemDbStore extends Loadable<Param, Result> {
     @computed get limit(): number {
         return this.pageSize;
     }
+    /**
+     * 获取参数对象
+     * @param inPath 如果为null，则获取所有；true获取path；false获取query；
+     * @param historyOnly 如果为false，获取所有；如果为true，获取history:true的参数；
+     */
+    private getParams(inPath?: boolean, historyOnly: boolean = false){
+        const params = {};
+        paramConfigs.filter(o=>!o.inPath !== inPath)
+        .filter(o=>!historyOnly || o.history)
+        .forEach(o=>{
+            const key = o.query;
+            const value = o.getter(this);
+            if(o.inPath || value !== o.defaults){
+                params[key] = value;
+            }
+        })
+        return params;
+    }
+    /** path中的参数对象 */
+    @computed get pathParams(): any{
+        return this.getParams(true);
+    }
+    /** query中的参数对象 */
+    @computed get queryParams(): any{
+        return this.getParams(false);
+    }
+    /** 主要参数，变动代表需要加入history */
+    @computed get historyParams(): any{
+        return this.getParams(null, true);
+    }
     /** 页面标题 */
     @computed get pageTitle(): string {
         return '希尔特国家地理';
     }
     /** 页面URL search */
     @computed get pagePath(): string {
-        const pathParam = {},
-            params = [];
+        const {pathParams, queryParams} = this;
 
-        paramConfigs.forEach(o=>{
-            const key = o.query;
-            const value = o.getter(this);
-            // 位于path中，强制显示
-            if(o.inPath){
-                pathParam[key] = value;
-            }else if(value !== o.defaults){ // 位于query中，如果是默认值就无视
-                params.push([key, value])
-            }
-        })
-
-        const path = `/${pathParam["loc"]}/db`;
-        const query = params.map(pair => `${encodeURIComponent(pair[0])}=${encodeURIComponent(pair[1])}`).join('&');
+        const path = `/${pathParams["loc"]}/db`;
+        const query = Object.keys(queryParams).map(key=>{
+            const value = queryParams[key];
+            return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+        }).join('&');
   
         return path + (query ? '?' : '') + query;
     }
