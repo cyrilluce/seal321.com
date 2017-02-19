@@ -19,8 +19,15 @@ export abstract class IDLoadable<TData> extends Loadable<Param, TData>{
     protected isParamValid(param: Param): boolean{
         return param.loc && param.id>0;
     }
+    // 如果地域切换过，一定要重新加载
+    protected isDataMatch(param: Param, data: TData): boolean{
+        return this.loc === this.lastLoc;
+    }
     // ------------------ 基础属性 --------------------
+    /** 所属数据库 */
     @observable loc: ServerId = mainDb;
+    /** 上次加载的数据库，用于判断是否要重新加载 */
+    lastLoc: ServerId = mainDb;
     /** 套装id */
     @observable id: number = 0;
     // ------------------- 高级属性 -----------------
@@ -31,6 +38,7 @@ export abstract class IDLoadable<TData> extends Loadable<Param, TData>{
         }
     }
     // ------------------- 动作 --------------------
+    /** 设置ID，一般会触发加载 */
     @action setId(id: number) {
         this.err = null;
         this.dataLoading = false;
@@ -38,5 +46,13 @@ export abstract class IDLoadable<TData> extends Loadable<Param, TData>{
         if (!id) {
             this.data = null;
         }
+    }
+    /** 直接设置数据，如果相符就不需要加载了 */
+    @action setData(id: number, data: TData){
+        this.err = null;
+        this.dataLoading = false;
+        this.id = id;
+        this.data = data;
+        this.lastLoc = this.loc;
     }
 }

@@ -412,8 +412,7 @@ export class Item extends IDLoadable<IItem> {
     /** 精炼等级 */
     @observable addLevel: number = 0;
     protected isDataMatch(param: Param, data: IItem){
-        return false;
-        // return data && data.id === param.id;
+        return data && data.id === param.id && super.isDataMatch(param, data);
     }
     // 实现父类
     protected async query(param: Param){
@@ -537,7 +536,7 @@ export class Item extends IDLoadable<IItem> {
     @computed get gAssistable() {
         const item = this.data;
         return item.type !== ItemType.BOOK && // 不能是合成书
-            item.type_res1 !== TypeRes1.UNKNOW0 && // 不能是？
+            // item.type_res1 !== TypeRes1.UNKNOW0 && // 不能是？
             item.type_res1 !== TypeRes1.ACCESSORY && // 不能是特殊配件
             (item.type === ItemType.GEM || item.g_type === GType.ARMOUR || item.g_type === GType.WEAPON); // 可以是宝石及装备
 
@@ -545,9 +544,15 @@ export class Item extends IDLoadable<IItem> {
     /** PT表 */
     @computed get ptTable(): PtTable {
         const item = this.data;
-        if (item.pt > 0 && item.type !== ItemType.GEM && this.gAssistable) {
-            let ptTable = {};
-
+        if (item.pt <= 0 || !this.gAssistable) {
+            return;
+        }
+        const ptTable = {};
+        if (item.type === ItemType.GEM) {
+            for(let i=0; i<=12; i++){
+                ptTable[i] = item.pt;
+            }
+        }else{
             let pt = item.pt;
             let mul = 1, increase = 1;
             let a, b;
@@ -577,9 +582,8 @@ export class Item extends IDLoadable<IItem> {
             ptTable[10] = ptTable[5] + pt * 3 * increase;
             ptTable[11] = ptTable[5] + pt * 4 * increase;
             ptTable[12] = ptTable[5] + pt * 5 * increase;
-
-            return ptTable;
         }
+        return ptTable;
     }
     /** 强化所需PT表 */
     @computed get ptNeedTable(): PtTable {

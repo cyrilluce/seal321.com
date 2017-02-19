@@ -340,9 +340,9 @@ export class ItemDbStore extends Loadable<Param, Result> {
      * 查看物品
      */
     @action viewItem(item?: Item, level: number = 0) {
-        this.item = item;
-        this.itemId = item ? item.id : 0;
-        this.itemLevel = level;
+        const model = this.itemModel;
+        model.setData(item ? item.id : 0, item);
+        model.addLevel = level;
     }
     set item(item: Item) {
         this.itemModel.data = item;

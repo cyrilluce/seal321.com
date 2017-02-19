@@ -8,6 +8,7 @@ import * as lang from '../../lang';
 import AddLevelTools from './AddLevelTools';
 import SetOptionRow from './SetOptionRow';
 import ConvertRow from './ConvertRow';
+import ItemWidget from './Item';
 
 interface Props {
     store?: ItemDbStore
@@ -58,7 +59,7 @@ export default class ItemDetail extends React.Component<Props, {}>{
                 <div className="row">
                     <div className="col-xs-2">
                         <div className="icon">
-                            <div style={getIconStyle(item.displayid)} />
+                            <ItemWidget data={item} />
                         </div>
                     </div>
                     <div className="col-xs-10">

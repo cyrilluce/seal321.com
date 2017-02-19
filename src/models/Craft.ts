@@ -9,6 +9,6 @@ export class CraftModel extends IDLoadable<Craft>{
         return map[param.id];
     }
     protected isDataMatch(param: Param, data: Craft): boolean{
-        return param.id && !!data;
+        return param.id === data.id && super.isDataMatch(param, data);
     }
 }
