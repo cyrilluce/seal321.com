@@ -22,6 +22,8 @@ export abstract class Loadable<TParam, TData> extends Base{
     @observable.ref err: any = null;
     /** 数据 */
     @observable data: TData = null;
+    /** 上次的查询条件 */
+    lastParam: TParam = null;
     // ------------------- 高级属性 -----------------
     protected abstract get param(): TParam;
     @computed get loading(): boolean{
@@ -65,6 +67,7 @@ export abstract class Loadable<TParam, TData> extends Base{
                 // 搜索结束
                 this.data = data;
                 this.dataLoading = false;
+                this.lastParam = params;
             }
         )
     }

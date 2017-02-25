@@ -500,6 +500,10 @@ export class Item extends IDLoadable<IItem> {
     @computed get accessory(){
         return this.data.g_type === GType.ACCESSORY && this.data.type !== ItemType.BOOK;
     }
+    /** 是否为装备（强化） */
+    @computed get equipment(): boolean{
+        return this.weapon || this.armour || this.accessory;
+    } 
     /** 是否可以佩戴，装备+宠物 */
     @computed get equipable() {
         return UnEquipable.indexOf(this.data.type) < 0;
@@ -507,6 +511,10 @@ export class Item extends IDLoadable<IItem> {
     /** 是否可以使用，例如 锻造书 */
     @computed get usable(){
         return Usable.indexOf(this.data.type) >= 0;
+    }
+    /** 是否可以料理 */
+    @computed get cookable(): boolean{
+        return this.data.type === ItemType.NORMAL && this.data.g_item>0;
     }
     /** 职业 */
     @computed get jobs(): (Job | BattlePetJob)[] {
@@ -544,7 +552,7 @@ export class Item extends IDLoadable<IItem> {
     /** PT表 */
     @computed get ptTable(): PtTable {
         const item = this.data;
-        if (item.pt <= 0 || !this.gAssistable) {
+        if (!item || item.pt <= 0 || !this.gAssistable) {
             return;
         }
         const ptTable = {};
@@ -584,6 +592,13 @@ export class Item extends IDLoadable<IItem> {
             ptTable[12] = ptTable[5] + pt * 5 * increase;
         }
         return ptTable;
+    }
+    @computed get pt(): number{
+        const {ptTable, addLevel} = this;
+        if(ptTable && (addLevel in ptTable)){
+            return ptTable[addLevel];
+        }
+        return 0;
     }
     /** 强化所需PT表 */
     @computed get ptNeedTable(): PtTable {

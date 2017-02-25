@@ -1,4 +1,4 @@
-import { Item, ItemType, GType, Job, BattlePetJob, EquipPosition, TypeRes1 } from '../types';
+import { Item, ItemType, GType, Job, BattlePetJob, EquipPosition, TypeRes1, CraftType } from '../types';
 import { observable, computed, action, reaction, autorun } from 'mobx';
 import { ServerId, mainDb, dbs } from '../config';
 import * as query from '../stores/query';
@@ -28,6 +28,10 @@ export class GSimulate extends Base {
     @observable maxRate: number = 1;
     /** 技能增加成功率 */
     @observable skillRate: number = 0.25;
+    /** 被G化装备是否合法 */
+    @observable targetInvalid: string;
+    /** 辅助是否合法 */
+    @observable assistInvalids: string[] = [];
 
     protected initOptions(options: any = {}, restoreFromData = false) {
         this.book = new ItemModel().init(options.book, restoreFromData);
@@ -42,6 +46,7 @@ export class GSimulate extends Base {
         const assists = options.assists || [];
         for (let i = 0; i < maxAssist; i++) {
             this.assists[i] = new ItemModel().init(assists[i], restoreFromData);
+            this.assistInvalids[i] = '';
         }
         delete options.assists;
 
@@ -77,6 +82,8 @@ export class GSimulate extends Base {
             if (!data) {
                 return;
             }
+
+            // 更新必需材料信息
             this.needs[0].loc = loc;
             this.needs[0].setId(craft.data.need1);
 
@@ -92,29 +99,71 @@ export class GSimulate extends Base {
             this.needs[4].loc = loc;
             this.needs[4].setId(craft.data.need5);
 
-            // 限定物品精练等级
-            if (this.target.addLevel < data.needitemlevel) {
-                this.target.addLevel = data.needitemlevel;
+
+            // G书限定物品精练等级
+            if (craft.isGTSC) {
+                if (this.target.addLevel < data.needitemlevel) {
+                    this.target.addLevel = data.needitemlevel;
+                }
+            } else {
+                // 其它书，限定材料或無材料
+                this.target.setId(data.needitem);
+                // 此时data.needitemlevel代表数量限定
             }
+
+            // 如果限定辅助，直接清空
+            this.assists.forEach((assist, index) => {
+                if (index >= data.fieldnum) {
+                    assist.setId(0);
+                }
+            })
         })
+
+        // 合成产物显示
+        autorun(() => {
+            const { craft: craftModel, target: targetModel } = this;
+            const craft = craftModel.data;
+            const target = targetModel.data;
+
+            if (!craft) {
+                return;
+            }
+
+            let resultId: number = 0;
+
+            if (craft.type === CraftType.NORMAL) {
+                if (craft.mix && craft.needitem <= 0) {
+                    resultId = craft.mix;
+                }
+            } else if (!target) {
+                // 没有待制作的装备，无视
+            } else if (craft.type === CraftType.G) {
+                resultId = target.g_item;
+            } else if (craft.type === CraftType.T) {
+                resultId = target.t_item;
+            } else if (craft.type === CraftType.S) {
+                resultId = target.s_item;
+            } else if (craft.type === CraftType.C) {
+                resultId = target.c_item;
+            }
+            this.result.setId(resultId);
+        });
+
+        // 初始化错误信息
+        if (this.target.data) {
+            this.targetInvalid = this.tryTargetItem(this.target.data);
+        }
+        for (let i = 0; i < maxAssist; i++) {
+            const assist = this.assists[i].data;
+            if (assist) {
+                this.assistInvalids[i] = this.tryAssistItem(i, assist);
+            }
+        }
     }
     // ------------- 以下为扩展计算属性 ---------------
-    /** 判断被G化装备是否合法 */
-    @computed get targetInvalid(): string {
-        const target = this.target;
-        const craft = this.craft.data;
-
-        if (!target || !craft) {
-            return '请放置制作书与待制作物品';
-        }
-        // 精练等级是否符合
-        if (target.addLevel < craft.needitemlevel) {
-            return `精练等级不符合G书要求，要求最低+${craft.needitemlevel}`;
-        }
-        // 物品等级
-        if (target.data.level + target.additional.level > craft.level) {
-            return `物品等级超出G书范围，要求不能高于${craft.level}级`
-        }
+    /** 最近的错误信息 */
+    @computed get invalid(): string {
+        return this.targetInvalid || this.assistInvalids.filter(err => err)[0];
     }
     @computed get loading(): boolean {
         return this.book && this.book.loading ||
@@ -127,8 +176,13 @@ export class GSimulate extends Base {
     /** 需要PT，不计算基础成功率 */
     @computed get needPt(): number {
         const { craft, target } = this;
-        if (!target.ptNeedTable) {
-            return;
+        if (!craft || !target.data || !target.ptNeedTable) {
+            return Number.MAX_VALUE;
+        }
+        // 非G化的，需求PT直接在书上定义
+        // TODO 药水没有定义
+        if (craft.data.type === CraftType.NORMAL) {
+            return this.book.data.needpt;
         }
         return target.ptNeedTable[target.addLevel];
     }
@@ -137,7 +191,7 @@ export class GSimulate extends Base {
         let pt = 0;
         const craft = this.craft;
         if (!craft || !craft.data) {
-            return;
+            return 0;
         }
 
         this.assists.forEach((assist, index) => {
@@ -147,40 +201,78 @@ export class GSimulate extends Base {
         })
         return pt;
     }
-    /** 成功率 0~1 */
+    /** 成功率 0~100 (已计算服务器总系数) */
     @computed get percentage(): number {
-        const { craft, target } = this;
-        if (!craft || !craft.data || !target || !target.data) {
-            return;
+        const { craft, book } = this;
+        if (!craft.data || !book.data || this.invalid) {
+            return 0;
         }
         const { needPt, hasPt } = this;
 
-        return craft.data.rate + 100 * hasPt / needPt;
+        // 药水的无成功率
+        if (craft.data.type === CraftType.NORMAL && book.data.type === ItemType.FOOD) {
+            return 0;
+        }
+
+        return this.maxRate * (craft.data.rate + 100 * hasPt / needPt) || 0;
+    }
+    /** 匠师技能是否有效 */
+    @computed get skillWork(): boolean {
+        const { craft, target } = this;
+        if (!craft.data || !target.data || this.invalid) {
+            return false;
+        }
+        return craft.isGTSC && !target.accessory;
     }
     /** 算上技能后的成功率 */
     @computed get skillPercentage(): number {
         const target = this.target;
-        if (!target || !target.data) {
-            return;
+        if (!target || !target.data || this.invalid) {
+            return 0;
         }
         // 匠师技能对饰品无效
-        const addRate = target.accessory ? this.skillRate : 0;
-        return (1 + addRate) * this.percentage;
+        const addRate = this.skillWork ? this.skillRate : 0;
+        return (1 + addRate) * this.percentage || 0;
     }
-    /** 再算上服务器成功率上限后的成功率（技能已计算） */
-    @computed get finalPercentage(): number {
-        return this.skillPercentage * this.maxRate
+    /** 制作费用 */
+    @computed get cost(): number {
+        const craft = this.craft;
+        if (!craft.data) {
+            return 0;
+        }
+        // G化的费用很简单，needPt^2 * 5000
+        if (craft.isGTSC) {
+            const pt = this.target.pt;
+            return pt * pt * 5000;
+        }
+        return 0;
     }
     // ---------------- 以下为方法 ------------------
     /** 能否设置制作书物品 */
     tryBookItem(item?: Item): string {
-        if (!item || item.type !== ItemType.BOOK) {
-            return '不是制作书';
+        if (!item) {
+            return '请放置制作书';
+        }
+        // BOOK为制作书，FOOD为高级料理
+        // if(item.type === ItemType.BOOK) {
+        //     if(item.convertid <= 0){
+        //         return '无法制作';
+        //     }
+        //     return ;
+        // }
+        // if( item.type === ItemType.FOOD){
+        //     if(item.convertid <= 0){
+        //         return '不是高级料理材料';
+        //     }
+        //     return;
+        // }
+        if (item.convertid <= 0) {
+            return '不是制作书或高级料理材料';
         }
     }
     /** 设置制作书物品 */
     @action setBookItem(item?: Item): string {
-        if(!item){
+        if (!item) {
             this.book.setId(0);
             return;
         }
@@ -188,18 +280,45 @@ export class GSimulate extends Base {
     }
     /** 能否设置被强化装备 */
     tryTargetItem(item: Item): string {
-        const craft = this.craft.data;
+        const craftModel = this.craft;
+        const craft = craftModel.data;
         if (!craft) {
             return '未设置制作书';
         }
+
+
+        // 如果是G书，判断类型，以及等级是否超了
+        if (craftModel.isGTSC) {
+            const itemModel = new ItemModel();//.init();
+            itemModel.setData(item.id, item);
+            if (!itemModel.equipment) {
+                return '只能强化装备';
+            }
+            itemModel.addLevel = craft.needitemlevel;
+            if (item.level + itemModel.additional.level > craft.level) {
+                return `物品等级超出G书范围，要求不能高于${craft.level}级`;
+            }
+            // 如果没有强化产物？
+            if (
+                craft.type === CraftType.G && item.g_item <= 0 ||
+                craft.type === CraftType.T && item.t_item <= 0 ||
+                craft.type === CraftType.S && item.s_item <= 0 ||
+                craft.type === CraftType.C && item.c_item <= 0
+            ) {
+                return '没有强化产物';
+            }
+        } else if (item.id !== craft.needitem) { // 如果是其它制作书，直接限定了材料
+            return '制作书已限定主要材料';
+        }
+
     }
     /** 设置被强化装备 */
     @action setTargetItem(item?: Item): string {
-        if(!item){
+        if (!item) {
             this.target.setId(0);
             return;
         }
-        const err = this.tryTargetItem(item);
+        const err = this.targetInvalid = this.tryTargetItem(item);
         if (err) {
             return err;
         }
@@ -217,9 +336,8 @@ export class GSimulate extends Base {
         if (index >= craft.fieldnum) {
             return `此制作书只能使用${craft.fieldnum}个辅助`;
         }
-        const itemModel = new ItemModel().init();
-        itemModel.data = item;
-        itemModel.id = item.id;
+        const itemModel = new ItemModel();//.init();
+        itemModel.setData(item.id, item);
         if (!itemModel.gAssistable) {
             return `此物品不能作为辅助`;
         }
@@ -239,7 +357,7 @@ export class GSimulate extends Base {
     /** 设置辅助 */
     @action setAssistItem(index: number, item?: Item): string {
         const itemModel = this.assists[index];
-        if(!item){
+        if (!item) {
             itemModel.setId(0);
             return;
         }

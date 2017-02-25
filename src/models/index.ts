@@ -6,3 +6,4 @@ export * from './Item';
 export * from './ItemDetail';
 export * from './Craft';
 export * from './GSimulate';
+export * from './Version';

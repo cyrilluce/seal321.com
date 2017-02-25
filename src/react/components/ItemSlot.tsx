@@ -11,12 +11,16 @@ import Item from './Item';
 interface Props {
     /** 放置的物品 */
     data?: IItem;
+    onRightClick?: (item: IItem) => void;
     disabled?: boolean;
     canAccept: (item: IItem)=>boolean;
     accept: (item: IItem)=>void;
     connectDropTarget?: (...any) => any;
     isOver?: boolean;
     canDrop?: boolean;
+    className?: string;
+    title?: string;
+    onDragAway?: ()=>void;
 }
 
 interface State {
@@ -32,10 +36,11 @@ const itemTarget = {
 };
 
 function collect(connect: DropTargetConnector, monitor: DropTargetMonitor) {
+    const isOver = monitor.isOver();
     return {
         connectDropTarget: connect.dropTarget(),
         isOver: monitor.isOver(),
-        canDrop: monitor.canDrop()
+        canDrop: isOver && monitor.canDrop()
     };
 }
 
@@ -43,10 +48,11 @@ function collect(connect: DropTargetConnector, monitor: DropTargetMonitor) {
 @observer
 export default class ItemSlot extends React.Component<Props, State>{
     render() {
-        const { data, connectDropTarget, isOver, disabled, canDrop } = this.props;
+        const { data, onRightClick, onDragAway, connectDropTarget, isOver, disabled, canDrop, className, title, children } = this.props;
 
-        return connectDropTarget(<div className={classnames("item-slot", {disabled: disabled, accept: isOver && canDrop, reject: isOver && !canDrop})}>
-            {data && <Item data={data} />}
+        return connectDropTarget(<div title={title} className={classnames("item-slot", className, {disabled: disabled, accept: isOver && canDrop, reject: isOver && !canDrop})}>
+            {data && <Item data={data} onRightClick={onRightClick} onDragAway={onDragAway} />}
+            {children}
         </div>);
     }
 }

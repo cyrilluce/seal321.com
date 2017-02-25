@@ -9,6 +9,7 @@ import { Component, PropTypes } from 'react'
 import { inject, observer } from 'mobx-react';
 import {ItemDbStore} from '../../stores';
 import SearchItem from './SearchItem'
+import * as classnames from 'classnames';
 
 interface Props {
     store?: ItemDbStore,
@@ -32,6 +33,7 @@ export default class SearchList extends Component<Props, {}> {
             //message = '搜索中...';
         } else if(store.err){
             message = store.err.message;
+            cls = "alert alert-danger";
         }else if (!store.data) {
             message = store.keyword ? `未查到匹配“${store.keyword}”的物品` : '请输入关键字开始搜索物品';
         } else if(!store.data.list.length) {
@@ -63,7 +65,7 @@ export default class SearchList extends Component<Props, {}> {
                     </tr>
                 </thead>
                 <tbody>
-                    {message && <tr className="active"><td colSpan={5}><p className="text-center">{message}</p></td></tr>}
+                    {message && <tr className="active"><td colSpan={5}><p className={classnames("text-center", cls)}>{message}</p></td></tr>}
                     {content}
                 </tbody>
             </table>

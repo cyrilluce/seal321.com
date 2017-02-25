@@ -5,7 +5,7 @@ import { Item } from '../types';
 import * as query from './query';
 import { delay } from '../util';
 import { ServerId, mainDb } from '../config';
-import { ItemDetail, Loadable, GSimulate } from '../models';
+import { ItemDetail, Loadable, GSimulate, Version } from '../models';
 
 interface Param{
     loc: ServerId;
@@ -151,6 +151,9 @@ export const itemDbParamConfigs: ParamConfig<any>[] = [
 
 export class ItemDbStore extends Loadable<Param, Result> {
     protected initOptions(options?: any, restoreFromData = false){
+        this.version = new Version().init(options.version, restoreFromData);
+        delete options.version;
+
         this.itemModel = new ItemDetail();
         this.itemModel.init(options.itemModel, restoreFromData);
         delete options.itemModel;
@@ -158,11 +161,18 @@ export class ItemDbStore extends Loadable<Param, Result> {
         this.gSimulate = new GSimulate().init(options.gSimulate, restoreFromData);
         delete options.gSimulate;
 
+        // 如果G化模拟器有数据，则初始显示
+        if(this.gSimulate.book.id){
+            this.gSimulateVisible = true;
+            delete options.gSimulateVisible;
+        }
+
         super.initOptions(options, restoreFromData);
 
         autorun(() => {
             this.itemModel.loc = this.loc;
             this.gSimulate.loc = this.loc;
+            this.version.loc = this.loc;
         })
     }
     protected isParamValid(param: Param): boolean{
@@ -205,6 +215,10 @@ export class ItemDbStore extends Loadable<Param, Result> {
     @observable.ref itemModel: ItemDetail = null;
     /** G化模拟器 */
     @observable.ref gSimulate: GSimulate = null;
+    /** G化模拟器是否开启 */
+    @observable gSimulateVisible: boolean = false;
+    /** 数据库版本信息 */
+    @observable.ref version: Version = null;
 
     // ------------------- 高级属性 ----------------
     /** 物品详情面板 */
@@ -215,7 +229,7 @@ export class ItemDbStore extends Loadable<Param, Result> {
      * 是否初始化结束（用于服务端渲染判断）
      */
     @computed get initialized(): boolean {
-        return !this.loading && !this.itemModel.loading && !this.gSimulate.loading;
+        return !this.loading && !this.itemModel.loading && !this.gSimulate.loading && !this.version.loading;
     }
     /**
      * 总页数
@@ -314,6 +328,11 @@ export class ItemDbStore extends Loadable<Param, Result> {
             o.setter(this, value);
         })
     }
+    /** 切换G化模拟器显示状态 */
+    @action setGSimulateVisiblility(visible?: boolean){
+        this.gSimulateVisible = !this.gSimulateVisible;
+    }
+    /** 更换服务器 */
     @action changeServer(loc: ServerId){
         this.loc = loc;
         this.err = null;

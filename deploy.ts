@@ -165,7 +165,7 @@ var types = {
     // 流程化： 清空文件、发布文件、重启
     publish: async function () {
         const resetTasks = await types.reset();
-        const srcFileTasks = await types.file(['src/*', 'views/*', 'www/static/index.js', 'www/styles/*']);
+        const srcFileTasks = await types.file(['package.json', 'src/*', 'views/*', 'www/static/index.js', 'www/styles/*']);
         const restartTasks = await types.restart();
         return [...resetTasks, ...srcFileTasks, ...restartTasks];
     },

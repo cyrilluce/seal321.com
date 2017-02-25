@@ -8,11 +8,13 @@ import SearchBar from '../components/SearchBar';
 import SearchList from '../components/SearchList';
 import ItemDetail from '../components/ItemDetail';
 import GSimulate from '../components/GSimulate';
+import Version from '../components/Version';
 import * as ReactPaginate from 'react-paginate';
 import {ItemDbStore} from '../../stores';
 import { sendEvent } from '../../util';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+import { StickyContainer, Sticky } from 'react-sticky';
 
 // import {ReactPaginateProps} from 'react-paginate';
 
@@ -148,42 +150,32 @@ export default class ItemDb extends Component<Props, State> {
             this.props.store.paginate(page.selected + 1);
         }
 
-        return <div className="container-fluid">
+        return <StickyContainer className="container-fluid">
             {
                 // <div className="row logo">
                 //     <img src="/images/logo.jpg" />
                 // </div>
             }
-            <h1>物品数据库 v2.0 Beta</h1>
-            <SearchBar />
-            <GSimulate />
-            <ReactPaginateFix previousLabel={"«"}
-                nextLabel={"»"}
-                breakLabel={<a href="#" onClick={() => { this.setState({ paginationExpanded: true }), sendEvent('click', 'page.more'); } }>...</a>}
-                // breakLabel="..."
-                breakClassName={"break"}
-                forcePage={page-1}
-                pageCount={pageCount}
-                marginPagesDisplayed={paginationExpanded ? 999 : 2}
-                pageRangeDisplayed={paginationExpanded ? 999 : 5}
-                onPageChange={handlePageClick}
-                containerClassName={"pagination"}
-                activeClassName={"active"} />{searching && <span className="db-loading" dangerouslySetInnerHTML={{__html:loadingSvg}}></span>}
+            <h1>物品数据库 v2.0 Beta <Version version={store.version} /></h1>
+            <Sticky className="fixed-toolbar">
+                <SearchBar />
+                <GSimulate />
+                <ReactPaginateFix previousLabel={"«"}
+                    nextLabel={"»"}
+                    breakLabel={<a href="#" onClick={() => { this.setState({ paginationExpanded: true }), sendEvent('click', 'page.more'); } }>...</a>}
+                    // breakLabel="..."
+                    breakClassName={"break"}
+                    forcePage={page-1}
+                    pageCount={pageCount}
+                    marginPagesDisplayed={paginationExpanded ? 999 : 2}
+                    pageRangeDisplayed={paginationExpanded ? 999 : 5}
+                    onPageChange={handlePageClick}
+                    containerClassName={"pagination"}
+                    activeClassName={"active"} />{searching && <span className="db-loading" dangerouslySetInnerHTML={{__html:loadingSvg}}></span>}
+                {data && data.count>0 && <span className="db-count badge">{data.count}</span>}
+            </Sticky>
             <SearchList onItemClick={item=>{store.viewItem(item)}}/>
-            <ReactPaginateFix previousLabel={"«"}
-                nextLabel={"»"}
-                breakLabel={<a href="#" onClick={() => { this.setState({ paginationExpanded: true }), sendEvent('click', 'page.more') } }>...</a>}
-                // breakLabel="..."
-                breakClassName={"break"}
-                forcePage={page-1}
-                pageCount={pageCount}
-                marginPagesDisplayed={paginationExpanded ? 999 : 2}
-                pageRangeDisplayed={paginationExpanded ? 999 : 5}
-                onPageChange={handlePageClick}
-                containerClassName={"pagination"}
-                activeClassName={"active"} />{searching && <span className="db-loading" dangerouslySetInnerHTML={{__html:loadingSvg}}></span>}
-            {data && data.count>0 && <p>共{data.count}条记录</p>}
             <ItemDetail />
-        </div>
+        </StickyContainer>
     }
 }

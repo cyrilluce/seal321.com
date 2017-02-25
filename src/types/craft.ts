@@ -44,3 +44,19 @@ export interface Craft {
     /** 需求物品5数量 */
     num5: number;
 }
+
+/** 制作书类型 */
+export enum CraftType{
+    /** 普通制作书，此时needitemlevel代表数量，包含高级料理、各装备制作书 */
+    NORMAL = 0,
+    /** G、精灵G、属性石、溶解石 */
+    G = 1,
+    /** 命中增强制作书 */
+    T = 2,
+    /** 攻速增强制作书 */
+    S = 3,
+    /** 必杀增强制作书 */
+    C = 4,
+    /** 食谱？ */
+    COOKING = 5
+}

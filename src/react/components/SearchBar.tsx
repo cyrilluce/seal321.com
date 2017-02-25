@@ -10,6 +10,7 @@ import { ItemDbStore } from '../../stores';
 import { findDOMNode } from 'react-dom';
 import { dbs, ServerId } from '../../config';
 import { ServerNames } from '../../lang'
+import * as classnames from 'classnames';
 import Dropdown from './Dropdown';
 
 interface Props {
@@ -23,11 +24,11 @@ export default class SearchBar extends Component<Props, {}> {
         const {store} = this.props;
         return (
             <div className="row">
-                <div className="col-lg-6 col-md-6 col-sm-9 col-xs-12">
+                <div className="col-md-6 col-sm-9 col-xs-12">
                     <div className="input-group">
                         <Dropdown className="input-group-btn">
                             <button type="button" className="btn btn-default dropdown-toggle">
-                                {ServerNames[store.loc]}数据库<span className="caret"></span>
+                                {ServerNames[store.loc]}<span className="caret"></span>
                             </button>
                             <ul className="dropdown-menu">
                                 {Object.keys(dbs).map(loc=>
@@ -41,10 +42,12 @@ export default class SearchBar extends Component<Props, {}> {
                             <button className="btn btn-default" type="button" onClick={this.doSearch.bind(this)}>
                                 <span className="glyphicon glyphicon-search" aria-hidden="true"></span> 搜索
                             </button>
+                            <button className={classnames("btn btn-default", {active: store.gSimulateVisible})} type="button" onClick={()=>{store.setGSimulateVisiblility()}}>
+                                <span className="glyphicon glyphicon-wrench" aria-hidden="true"></span> 制作模拟
+                            </button>
                         </span>
                     </div>
                 </div>
-
             </div>
         )
     }

@@ -18,9 +18,9 @@ var parseVersionNo = require('../parsers/versionNo');
 var defaultOptions = {
     versionFile : 'version.ini',
     versionCheckInterval : 60*60*1000, // 1小时检查一次版本
-    recently : 5, // 下载最近多少个版本
+    recently : 20, // 下载最近多少个版本
     types : {
-        etc : 10,
+        etc : 20,
         root : 1,
         interface : 1,
         item : 1
@@ -154,7 +154,7 @@ module.exports = function(updateUrl, toPath, o){
             var properties = o.properties;
             Object.keys(properties).forEach(type=>{
                 const typeCount = typeCountMap[type] || 0;
-                if(type in options.types && (index < options.recently || typeCount < options.types[type])){
+                if(type in options.types && (index < options.recently && typeCount < options.types[type])){
                     //doDownload(properties[type]);
                     recentlyUpdateFiles[properties[type]] = true;
                     typeCountMap[type] = typeCount+1;

@@ -12,6 +12,12 @@ var watchingServers = Object.keys(config.servers)
 watchingServers.forEach(server=>{
     download(server.url,  path.join(config.samplesDir, `${server.id}/update/`), {
         name : server.id,
-        recently : 5
+        recently : 100,
+        types : {
+            etc : 2,
+            root : 2,
+            interface : 2,
+            item : 2
+        }
     });
 });
