@@ -66,6 +66,7 @@ export class GSimulate extends Base {
             const { loc, book } = this;
             if (dbs[loc]) {
                 this.maxRate = dbs[loc].maxRate || 1;
+                this.skillRate = dbs[loc].skillRate || 0.25;
             }
 
             if (!book.data) {
@@ -108,6 +109,7 @@ export class GSimulate extends Base {
             } else {
                 // 其它书，限定材料或無材料
                 this.target.setId(data.needitem);
+                this.target.addLevel = 0;
                 // 此时data.needitemlevel代表数量限定
             }
 
@@ -179,12 +181,19 @@ export class GSimulate extends Base {
         if (!craft || !target.data || !target.ptNeedTable) {
             return Number.MAX_VALUE;
         }
-        // 非G化的，需求PT直接在书上定义
-        // TODO 药水没有定义
-        if (craft.data.type === CraftType.NORMAL) {
-            return this.book.data.needpt;
+        // G化的，看对象
+        if(craft.isGTSC){
+            return target.ptNeedTable[target.addLevel];
+        }else{ // 其它的，看craft的rate定义
+            return craft.data.rate;
         }
-        return target.ptNeedTable[target.addLevel];
+        // TODO 需确认美服版本机率是否有误
+        // // 非G化的，需求PT直接在书上定义
+        // // TODO 药水没有定义
+        // if (craft.data.type === CraftType.NORMAL) {
+        //     return this.book.data.needpt;
+        // }
+        // return target.ptNeedTable[target.addLevel];
     }
     /** 已有PT */
     @computed get hasPt(): number {
@@ -214,20 +223,24 @@ export class GSimulate extends Base {
             return 0;
         }
 
-        return this.maxRate * (craft.data.rate + 100 * hasPt / needPt) || 0;
+        // 好像制作书不是用的craft中的rate？而是pt字段
+        // const baseRate = craft.isGTSC ? book.data.pt : craft.data.rate;
+        const baseRate = book.data.pt;
+        // 另外只有装备制作才有最高成功率限制
+        const maxRate = craft.isGTSC ? this.maxRate : 1;
+        return maxRate * (baseRate + 100 * hasPt / needPt) || 0;
     }
     /** 匠师技能是否有效 */
     @computed get skillWork(): boolean {
         const { craft, target } = this;
-        if (!craft.data || !target.data || this.invalid) {
+        if (!craft.data || this.invalid) {
             return false;
         }
-        return craft.isGTSC && !target.accessory;
+        return craft.isGTSC && (!target.data || !target.accessory);
     }
     /** 算上技能后的成功率 */
     @computed get skillPercentage(): number {
-        const target = this.target;
-        if (!target || !target.data || this.invalid) {
+        if (this.invalid) {
             return 0;
         }
         // 匠师技能对饰品无效
@@ -244,8 +257,9 @@ export class GSimulate extends Base {
         if (craft.isGTSC) {
             const pt = this.target.pt;
             return pt * pt * 5000;
+        } else {
+            return craft.data.fee;
         }
-        return 0;
     }
     // ---------------- 以下为方法 ------------------
     /** 能否设置制作书物品 */

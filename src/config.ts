@@ -8,6 +8,8 @@ export interface ServerConfig{
     monster?: any;
     /** 最高制作成功率 */
     maxRate: number;
+    /** 匠师技能加成 */
+    skillRate: number;
 }
 // export enum ServerId{
 //     cn,
@@ -35,18 +37,22 @@ export const mainDb: ServerId = "tw2";
 export const dbs:Servers = {
     "tw2" : {
         item : 1,
-        maxRate : 0.9
+        maxRate : 0.9,
+        skillRate : 0.3
     },
     "tw" : {
         item: 1,
-        maxRate : 1
+        maxRate : 1,
+        skillRate : 0.25
     },
     "cn" : {
         item : 1,
-        maxRate : 1
+        maxRate : 1,
+        skillRate : 0.25
     },
     "us" : {
         item : 1,
-        maxRate : 1
+        maxRate : 1,
+        skillRate : 0.25
     },
 }

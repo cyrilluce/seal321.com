@@ -74,7 +74,7 @@ export default class GSimulate extends Component<Props, State> {
                             <div className="row">
                                 <div className="col-xs-12">
                                     <span className="gsim-cost">制作费 {humanizeNumber(gSimulate.cost)}</span>
-                                    <span className="gsim-rate">成功率 {gSimulate.percentage.toFixed(2)}%{gSimulate.skillWork ? `(匠师:${gSimulate.skillPercentage.toFixed(2)}%)` : ''}</span>
+                                    <span className="gsim-rate">成功率 {gSimulate.percentage.toFixed(3)}%{gSimulate.skillWork ? `(匠师:${gSimulate.skillPercentage.toFixed(3)}%)` : ''}</span>
                                     <a href="javascript:;" onClick={()=>{this.setState({detailMode: !detailMode})}}>{detailMode ? '简略' : '详情'}</a>
                                 </div>
                             </div>
