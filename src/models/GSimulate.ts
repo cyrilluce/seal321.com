@@ -77,9 +77,9 @@ export class GSimulate extends Base {
 
         // 根据制作书信息加载物品需求，以及各种限定
         autorun(() => {
-            const { loc, craft } = this;
+            const { loc, craft, book } = this;
             const data = craft.data;
-            if (!data || this.loading) {
+            if (!data || book.loading || craft.loading) {
                 return;
             }
 

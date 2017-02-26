@@ -161,6 +161,9 @@ export default class GSimulate extends Component<Props, State> {
                             {detailMode && <div className="row gsim-detail">
                                 <div className="col-xs-12">
                                     <div className="well well-xs">
+                                        <p><a href={`/${store.loc}/db?gsim=${store.queryParams.gsim}`}>
+                                            https://beta.seal321.com/{store.loc}/db?gsim={store.queryParams.gsim}
+                                        </a></p>
                                         <p>希尔特国家地理 物品数据库 v2.0 Beta 制作模拟结果</p>
                                         {store.version.data && <p>
                                             版本：[{ServerNames[store.loc]}/item_{store.version.data['item'].version}/craft_{store.version.data['craft'].version}/{store.version.newest.time.toISOString().slice(0, 10)}]
