@@ -68,19 +68,18 @@ export class GSimulate extends Base {
                 this.maxRate = dbs[loc].maxRate || 1;
                 this.skillRate = dbs[loc].skillRate || 0.25;
             }
-
-            if (!book.data) {
-                return;
-            }
+            book.loc = loc;
+            this.result.loc = loc;
             this.craft.loc = loc;
-            this.craft.setId(book.data.convertid);
+
+            this.craft.setId(book.data ? book.data.convertid : 0);
         })
 
         // 根据制作书信息加载物品需求，以及各种限定
         autorun(() => {
             const { loc, craft } = this;
             const data = craft.data;
-            if (!data) {
+            if (!data || this.loading) {
                 return;
             }
 
@@ -100,10 +99,10 @@ export class GSimulate extends Base {
             this.needs[4].loc = loc;
             this.needs[4].setId(craft.data.need5);
 
-
+            this.target.loc = loc;
             // G书限定物品精练等级
             if (craft.isGTSC) {
-                if (this.target.addLevel < data.needitemlevel) {
+                if (!this.targetInvalid && this.target.addLevel < data.needitemlevel) {
                     this.target.addLevel = data.needitemlevel;
                 }
             } else {
@@ -116,6 +115,7 @@ export class GSimulate extends Base {
             // 如果限定辅助，直接清空
             this.assists.forEach((assist, index) => {
                 if (index >= data.fieldnum) {
+                    assist.loc = loc;
                     assist.setId(0);
                 }
             })
@@ -127,14 +127,12 @@ export class GSimulate extends Base {
             const craft = craftModel.data;
             const target = targetModel.data;
 
-            if (!craft) {
-                return;
-            }
-
             let resultId: number = 0;
 
-            if (craft.type === CraftType.NORMAL) {
-                if (craft.mix && craft.needitem <= 0) {
+            if (this.invalid || !craft) {
+                // 不合法或没有加载完成
+            } else if (craft.type === CraftType.NORMAL) {
+                if (this.advanceCook) {
                     resultId = craft.mix;
                 }
             } else if (!target) {
@@ -151,21 +149,35 @@ export class GSimulate extends Base {
             this.result.setId(resultId);
         });
 
-        // 初始化错误信息
-        if (this.target.data) {
-            this.targetInvalid = this.tryTargetItem(this.target.data);
-        }
-        for (let i = 0; i < maxAssist; i++) {
-            const assist = this.assists[i].data;
-            if (assist) {
-                this.assistInvalids[i] = this.tryAssistItem(i, assist);
+        // 计算错误信息
+        autorun(() => {
+            if (this.loading) {
+                return;
             }
-        }
+            const target = this.target.data;
+            this.targetInvalid = target ? this.tryTargetItem(target) : '';
+            for (let i = 0; i < maxAssist; i++) {
+                const assist = this.assists[i].data;
+                this.assistInvalids[i] = assist ? this.tryAssistItem(i, assist) : '';
+            }
+        })
     }
     // ------------- 以下为扩展计算属性 ---------------
+    /** 是否是高級料理 */
+    @computed get advanceCook(): boolean {
+        const book = this.book.data;
+        const craft = this.craft.data;
+        return !!book && !!craft && book.type === ItemType.FOOD && craft.type === CraftType.NORMAL;
+    }
+    /** 书本错误 */
+    @computed get bookInvalid(): string {
+        if (!this.book.data) {
+            return '请放置制作书';
+        }
+    }
     /** 最近的错误信息 */
     @computed get invalid(): string {
-        return this.targetInvalid || this.assistInvalids.filter(err => err)[0];
+        return this.bookInvalid || this.targetInvalid || this.assistInvalids.filter(err => err)[0];
     }
     @computed get loading(): boolean {
         return this.book && this.book.loading ||
@@ -178,14 +190,19 @@ export class GSimulate extends Base {
     /** 需要PT，不计算基础成功率 */
     @computed get needPt(): number {
         const { craft, target } = this;
-        if (!craft || !target.data || !target.ptNeedTable) {
+
+        if (!craft.data) {
             return Number.MAX_VALUE;
         }
+
         // G化的，看对象
-        if(craft.isGTSC){
-            return target.ptNeedTable[target.addLevel];
-        }else{ // 其它的，看craft的rate定义
-            return craft.data.rate;
+        if (craft.isGTSC) {
+            if (!target.data || !target.ptNeedTable) {
+                return Number.MAX_VALUE;
+            }
+            return target.ptNeedTable[target.addLevel] || Number.MAX_VALUE;
+        } else { // 其它的，看craft的rate定义
+            return craft.data.rate || Number.MAX_VALUE;
         }
         // TODO 需确认美服版本机率是否有误
         // // 非G化的，需求PT直接在书上定义
@@ -210,25 +227,29 @@ export class GSimulate extends Base {
         })
         return pt;
     }
+    /** 成功率限定系数 */
+    @computed get limitRate(): number {
+        // 只有装备制作才有最高成功率限制
+        return this.craft.isGTSC ? this.maxRate : 1;
+    }
+    /** 基础成功率 */
+    @computed get basePercentage(): number {
+        // 好像制作书不是用的craft中的rate？而是pt字段
+        return this.book.data ? this.book.data.pt : 0;
+    }
     /** 成功率 0~100 (已计算服务器总系数) */
     @computed get percentage(): number {
         const { craft, book } = this;
         if (!craft.data || !book.data || this.invalid) {
             return 0;
         }
-        const { needPt, hasPt } = this;
 
         // 药水的无成功率
-        if (craft.data.type === CraftType.NORMAL && book.data.type === ItemType.FOOD) {
+        if (this.advanceCook) {
             return 0;
         }
 
-        // 好像制作书不是用的craft中的rate？而是pt字段
-        // const baseRate = craft.isGTSC ? book.data.pt : craft.data.rate;
-        const baseRate = book.data.pt;
-        // 另外只有装备制作才有最高成功率限制
-        const maxRate = craft.isGTSC ? this.maxRate : 1;
-        return maxRate * (baseRate + 100 * hasPt / needPt) || 0;
+        return this.limitRate * (this.basePercentage + 100 * this.hasPt / this.needPt) || 0;
     }
     /** 匠师技能是否有效 */
     @computed get skillWork(): boolean {
@@ -303,6 +324,9 @@ export class GSimulate extends Base {
 
         // 如果是G书，判断类型，以及等级是否超了
         if (craftModel.isGTSC) {
+            if(this.book.data && item.res10 !== this.book.data.res10){
+                return '制作书类型不符，特别道具只能使用特别篇，战宠装备只能使用精灵篇';
+            }
             const itemModel = new ItemModel();//.init();
             itemModel.setData(item.id, item);
             if (!itemModel.equipment) {

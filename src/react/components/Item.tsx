@@ -2,11 +2,14 @@ import * as React from 'react';
 import { observer } from 'mobx-react'
 import { DragSource, DragSourceMonitor } from 'react-dnd';
 import { getIconStyle } from '../util';
+import { ServerId } from '../../config';
 import { Item as ItemModel } from '../../models'
-import { Item as IItem, SetOption, TYPE } from '../../types'
+import { Item as IItem, ItemInstance, SetOption, TYPE } from '../../types'
 import * as classnames from 'classnames';
 
 interface Props {
+	/** 服务器 */
+	loc: ServerId;
 	/** 物品 */
 	data: IItem;
 	connectDragSource?: (...any) => any;
@@ -18,8 +21,12 @@ interface Props {
 interface State {
 }
 const itemSource = {
-	beginDrag(props: Props) {
-		return props.data;
+	beginDrag(props: Props): ItemInstance {
+		return {
+			loc: props.loc,
+			data : props.data,
+			addLevel: 0
+		};
 	},
   endDrag(props: Props, monitor: DragSourceMonitor){
     if(props.onDragAway && monitor.didDrop()){

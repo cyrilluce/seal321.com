@@ -1,4 +1,4 @@
-import { Item as IItem, ItemType, GType, Job, BattlePetJob, EquipPosition, TypeRes1 } from '../types';
+import { Item as IItem, ItemInstance, ItemType, GType, Job, BattlePetJob, EquipPosition, TypeRes1 } from '../types';
 import { observable, computed, action, reaction, autorun } from 'mobx';
 import { ServerId, mainDb } from '../config';
 import * as query from '../stores/query';
@@ -411,15 +411,28 @@ interface IAdditionals {
 export class Item extends IDLoadable<IItem> {
     /** 精炼等级 */
     @observable addLevel: number = 0;
-    protected isDataMatch(param: Param, data: IItem){
-        return data && data.id === param.id && super.isDataMatch(param, data);
+    @action setAddLevel(level: number) {
+        level = Math.min(this.maxAddLevel, level);
+        level = Math.max(0, level);
+        this.addLevel = level;
     }
     // 实现父类
-    protected async query(param: Param){
+    protected isDataMatch(param: Param, data: IItem) {
+        return data && data.id === param.id && super.isDataMatch(param, data);
+    }
+    protected async query(param: Param) {
         const map = await query.item(param);
         return map[param.id];
     }
     // ------------- 以下为扩展计算属性 ---------------
+    /** 生成纯对象 */
+    @computed get plain(): ItemInstance {
+        return this.data ? {
+            loc: this.loc,
+            data: this.data,
+            addLevel: this.addLevel
+        } : null;
+    }
     /** 最高精炼等级 */
     @computed get maxAddLevel(): number {
         const item = this.data;
@@ -487,34 +500,41 @@ export class Item extends IDLoadable<IItem> {
             }
         }
     }
+    /** 是否為特別道具 */
+    @computed get specialClass(): boolean {
+        return this.data.res10 === 1;
+    }
+    @computed get battlePetClass(): boolean {
+        return this.data.res10 === 2;
+    }
     /** 是否是武器 TODO 以后改为按type判断？ */
-    @computed get weapon(){
+    @computed get weapon() {
         // 武器G书也在此类里
         return this.data.g_type === GType.WEAPON && this.data.type !== ItemType.BOOK;
     }
     /** 是否是防具 */
-    @computed get armour(){
+    @computed get armour() {
         return this.data.g_type === GType.ARMOUR && this.data.type !== ItemType.BOOK;
     }
     /** 是否为饰品 */
-    @computed get accessory(){
+    @computed get accessory() {
         return this.data.g_type === GType.ACCESSORY && this.data.type !== ItemType.BOOK;
     }
     /** 是否为装备（强化） */
-    @computed get equipment(): boolean{
+    @computed get equipment(): boolean {
         return this.weapon || this.armour || this.accessory;
-    } 
+    }
     /** 是否可以佩戴，装备+宠物 */
     @computed get equipable() {
         return UnEquipable.indexOf(this.data.type) < 0;
     }
     /** 是否可以使用，例如 锻造书 */
-    @computed get usable(){
+    @computed get usable() {
         return Usable.indexOf(this.data.type) >= 0;
     }
     /** 是否可以料理 */
-    @computed get cookable(): boolean{
-        return this.data.type === ItemType.NORMAL && this.data.g_item>0;
+    @computed get cookable(): boolean {
+        return this.data.type === ItemType.NORMAL && this.data.g_item > 0;
     }
     /** 职业 */
     @computed get jobs(): (Job | BattlePetJob)[] {
@@ -557,10 +577,10 @@ export class Item extends IDLoadable<IItem> {
         }
         const ptTable = {};
         if (item.type === ItemType.GEM) {
-            for(let i=0; i<=12; i++){
+            for (let i = 0; i <= 12; i++) {
                 ptTable[i] = item.pt;
             }
-        }else{
+        } else {
             let pt = item.pt;
             let mul = 1, increase = 1;
             let a, b;
@@ -593,9 +613,9 @@ export class Item extends IDLoadable<IItem> {
         }
         return ptTable;
     }
-    @computed get pt(): number{
+    @computed get pt(): number {
         const {ptTable, addLevel} = this;
-        if(ptTable && (addLevel in ptTable)){
+        if (ptTable && (addLevel in ptTable)) {
             return ptTable[addLevel];
         }
         return 0;

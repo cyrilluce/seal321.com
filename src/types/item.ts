@@ -1,3 +1,5 @@
+import { ServerId } from '../config'
+
 /** 物品类型 */
 export enum ItemType {
     /** 普通物品 */
@@ -424,4 +426,11 @@ export interface Item {
     vip_value: number;
     /** 持续时间？ */
     vip_time: number;
+}
+
+/** 物品实例 */
+export interface ItemInstance{
+    loc: ServerId;
+	data: Item;
+	addLevel: number;
 }

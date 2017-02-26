@@ -6,12 +6,14 @@
 import * as React from 'react';
 import {Component, PropTypes} from 'react'
 import {getIconStyle} from '../util';
+import {ServerId} from '../../config';
 import {Item} from '../../types';
 import * as lang from '../../lang';
 import ItemWidget from './Item';
 
 interface Props{
-    data: Item,
+    loc: ServerId;
+    data: Item;
     onClick: (...any)=>void;
 }
 
@@ -23,9 +25,9 @@ export default class SearchItem extends Component<Props, {}> {
         }
     }
     render() {
-        const {data} = this.props;
+        const {loc, data} = this.props;
         return <tr className="item" onClick={this.onClick.bind(this)}>
-            <td><ItemWidget data={data} /></td>
+            <td><ItemWidget loc={loc} data={data} /></td>
             <td>{data.name}</td>
             <td>{lang.ItemTypeNames[data.type]}</td>
             <td>{data.level || '-'}</td>

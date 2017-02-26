@@ -177,6 +177,9 @@ export default class ItemDb extends Component<Props, State> {
             </Sticky>
             <SearchList onItemClick={item=>{store.viewItem(item)}}/>
             <ItemDetail />
+            <div className="well well-sm contact-me">
+                通过 <a href="https://groups.google.com/d/forum/seal321" target="_blank">Google Group</a> 或 <a href="mailto:cyrilluce@gmail.com">发送邮件</a> 交流与反馈问题
+            </div>
         </StickyContainer>
     }
 }

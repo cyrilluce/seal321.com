@@ -27,6 +27,7 @@ export default class SearchList extends Component<Props, {}> {
     }
     render() {
         const {onItemClick, store} = this.props;
+        const loc = store.loc;
         let content, message: string, cls: string;
         
         if (store.dataLoading) {
@@ -41,7 +42,7 @@ export default class SearchList extends Component<Props, {}> {
         }
 
         content = store.data && store.data.list.map((data, index) =>
-            <SearchItem data={data}
+            <SearchItem loc={loc} data={data}
                 key={index}
                 onClick={this.onItemClick.bind(this, index)} />
         );

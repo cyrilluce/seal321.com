@@ -2,19 +2,19 @@ import * as React from 'react';
 import { observer } from 'mobx-react'
 import { getIconStyle } from '../util';
 import { Item as ItemModel } from '../../models'
-import { Item as IItem, SetOption, TYPE } from '../../types'
+import { Item as IItem, ItemInstance as IItemInstance, SetOption, TYPE } from '../../types'
 import * as classnames from 'classnames';
 import { DropTarget, DropTargetMonitor, DropTargetConnector } from 'react-dnd';
-import Item from './Item';
+import ItemInstance from './ItemInstance';
 
 
 interface Props {
     /** 放置的物品 */
-    data?: IItem;
+    data?: ItemModel;
     onRightClick?: (item: IItem) => void;
     disabled?: boolean;
-    canAccept: (item: IItem)=>boolean;
-    accept: (item: IItem)=>void;
+    canAccept: (item: IItemInstance)=>boolean;
+    accept: (item: IItemInstance)=>void;
     connectDropTarget?: (...any) => any;
     isOver?: boolean;
     canDrop?: boolean;
@@ -28,10 +28,18 @@ interface State {
 
 const itemTarget = {
     canDrop(props: Props, monitor: DropTargetMonitor): boolean {
-        return !props.disabled && props.canAccept(monitor.getItem() as IItem);
+        const itemInstance = monitor.getItem() as IItemInstance;
+        return !props.disabled && props.canAccept(itemInstance);
     },
-    drop(props: Props, monitor: DropTargetMonitor): void {
-        props.accept(monitor.getItem() as IItem);
+    drop(props: Props, monitor: DropTargetMonitor): IItemInstance {
+        const itemInstance = monitor.getItem() as IItemInstance;
+        const cur = props.data.plain;
+        // 原地移动，无视
+        if(cur && itemInstance.loc === cur.loc && itemInstance.data === cur.data && itemInstance.addLevel === cur.addLevel){
+            return itemInstance;
+        }
+        props.accept(itemInstance);
+        return cur || undefined;
     }
 };
 
@@ -44,14 +52,17 @@ function collect(connect: DropTargetConnector, monitor: DropTargetMonitor) {
     };
 }
 
-@DropTarget(TYPE.ITEM, itemTarget, collect)
+@DropTarget([TYPE.ITEM, TYPE.ITEM_INSTANCE], itemTarget, collect)
 @observer
 export default class ItemSlot extends React.Component<Props, State>{
     render() {
-        const { data, onRightClick, onDragAway, connectDropTarget, isOver, disabled, canDrop, className, title, children } = this.props;
+        const { data, onRightClick, onDragAway, accept, connectDropTarget, isOver, disabled, canDrop, className, title, children } = this.props;
 
         return connectDropTarget(<div title={title} className={classnames("item-slot", className, {disabled: disabled, accept: isOver && canDrop, reject: isOver && !canDrop})}>
-            {data && <Item data={data} onRightClick={onRightClick} onDragAway={onDragAway} />}
+            {data.data && <ItemInstance disabled={disabled} data={data} 
+                onRightClick={onRightClick} 
+                onSwitch={accept}
+                onDragAway={onDragAway} />}
             {children}
         </div>);
     }

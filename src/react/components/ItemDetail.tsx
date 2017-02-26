@@ -4,6 +4,7 @@ import * as Draggable from 'react-draggable';
 import { getIconStyle } from '../util';
 import { Item, ItemType, Job, BattlePetJob } from '../../types';
 import { ItemDbStore } from '../../stores';
+import { crystalPoint } from '../../config';
 import * as lang from '../../lang';
 import AddLevelTools from './AddLevelTools';
 import SetOptionRow from './SetOptionRow';
@@ -13,9 +14,6 @@ import ItemWidget from './Item';
 interface Props {
     store?: ItemDbStore
 }
-
-/** 玩家总结的是水晶=1PT，但实际上水晶的价值为2 */
-const crystalPoint = 2;
 
 @inject('store')
 @observer
@@ -59,7 +57,7 @@ export default class ItemDetail extends React.Component<Props, {}>{
                 <div className="row">
                     <div className="col-xs-2">
                         <div className="icon">
-                            <ItemWidget data={item} />
+                            <ItemWidget loc={itemModel.loc} data={item} />
                         </div>
                     </div>
                     <div className="col-xs-10">

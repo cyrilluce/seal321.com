@@ -3,6 +3,9 @@
  */
 export type Table = "item" | "monster" | "setopt" | "craft"
 
+/** 玩家总结的是水晶=1PT，但实际上水晶的价值为2 */
+export const crystalPoint = 2;
+
 export interface ServerConfig{
     item?: any;
     monster?: any;

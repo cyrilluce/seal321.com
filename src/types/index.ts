@@ -3,6 +3,8 @@ export * from './setoption';
 export * from './craft';
 
 export const TYPE = {
-    /** 物品 */
-    ITEM : 'item'
+    /** 物品 - 原型 */
+    ITEM : 'item',
+    /** 物品 - 实例（即+7之类） */
+    ITEM_INSTANCE : 'item-instance'
 }

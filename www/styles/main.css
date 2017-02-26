@@ -1,20 +1,12 @@
-@media (max-width: 500px) {
-    .container-fluid {
-      padding:5px;
-      margin:0;
-    }
-    body {
-      padding:0;
-    }
-}
-
 /*版本*/
 .version{
     font-size: 0.4em;
     white-space: pre;
     display: inline-block;
 }
-
+.contact-me{
+  margin-top: 1em;
+}
  /*-------------- 搜索 -------------- */
 /*.input-search{
     height: 23px;
@@ -97,9 +89,15 @@
 .item-prototype{
     cursor: move;
 }
+.item-prototype.disabled{
+  cursor: auto;
+}
 /* G化模拟器 */
 .gsim .panel{
     margin-bottom: 5px;
+}
+.gsim .slot-row{
+  margin-top: 0.5em;
 }
 .item-slot{
     width: 38px;
@@ -129,6 +127,16 @@
     right: 0;
     font-weight: bold;
 }
+.gsim .item-slot .add-level-tools{
+  display: none;
+  position: absolute;
+  right: -25px;
+  top: -3px;
+  z-index:1000;
+}
+.gsim .item-slot:hover .add-level-tools{
+  display: block;
+}
 .gsim-splitter{
     display: inline-block;
     margin-right: 10px;
@@ -145,8 +153,9 @@
 }
 .gsim-need{
     display: inline-block;
-    margin-right: 16px;
+    margin-right: 5px;
     position: relative;
+    padding: 3px;
 }
 .gsim-need .item-prototype{
     display: inline-block;
@@ -163,6 +172,14 @@
     /* background-color: white; */
     /* border-radius: 10px; */
     /* opacity: 0.8; */
+}
+.gsim-detail p{
+  margin: 0;
+  line-height: 1.2em;
+}
+.gsim-detail .well{
+  margin-bottom: 0;
+  padding: 0.5em;
 }
 .gsim-invalid{
     color: #c44;
