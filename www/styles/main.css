@@ -1,3 +1,13 @@
+@media (max-width: 500px) {
+    .container-fluid {
+      padding:5px;
+      margin:0;
+    }
+    body {
+      padding:0;
+    }
+}
+
 /*版本*/
 .version{
     font-size: 0.4em;

@@ -43,7 +43,7 @@ export default class SearchBar extends Component<Props, {}> {
                                 <span className="glyphicon glyphicon-search" aria-hidden="true"></span> 搜索
                             </button>
                             <button className={classnames("btn btn-default", {active: store.gSimulateVisible})} type="button" onClick={()=>{store.setGSimulateVisiblility()}}>
-                                <span className="glyphicon glyphicon-wrench" aria-hidden="true"></span> 制作模拟
+                                <span className="glyphicon glyphicon-wrench" aria-hidden="true"></span> <span className="hidden-xs">制作模拟</span>
                             </button>
                         </span>
                     </div>

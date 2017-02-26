@@ -167,12 +167,13 @@ export default class ItemDb extends Component<Props, State> {
                     breakClassName={"break"}
                     forcePage={page-1}
                     pageCount={pageCount}
-                    marginPagesDisplayed={paginationExpanded ? 999 : 2}
-                    pageRangeDisplayed={paginationExpanded ? 999 : 5}
+                    marginPagesDisplayed={paginationExpanded ? 999 : 1}
+                    pageRangeDisplayed={paginationExpanded ? 999 : 3}
                     onPageChange={handlePageClick}
                     containerClassName={"pagination"}
-                    activeClassName={"active"} />{searching && <span className="db-loading" dangerouslySetInnerHTML={{__html:loadingSvg}}></span>}
+                    activeClassName={"active"} />
                 {data && data.count>0 && <span className="db-count badge">{data.count}</span>}
+                {searching && <span className="db-loading" dangerouslySetInnerHTML={{__html:loadingSvg}}></span>}
             </Sticky>
             <SearchList onItemClick={item=>{store.viewItem(item)}}/>
             <ItemDetail />
