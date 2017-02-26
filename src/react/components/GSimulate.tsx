@@ -203,7 +203,7 @@ export default class GSimulate extends Component<Props, State> {
                                         {gSimulate.craft.data && <p>{gSimulate.needs.filter(need=>need.data).
                                             map((need, index)=>
                                                 <span key={index} className="gsim-detail-need">
-                                                    {need.data.name}*{gSimulate.craft.data[`need${index+1}`]}&nbsp;
+                                                    {need.data.name}*{gSimulate.craft.data[`num${index+1}`]}&nbsp;
                                                 </span>)}
                                             </p>
                                         }
