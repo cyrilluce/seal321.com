@@ -71,6 +71,11 @@ export default class ItemDetail extends React.Component<Props, {}>{
                         </div>
                     </div>
                 </div>
+                {itemModel.specialClass && <div className="row">
+                    <div className="col-xs-12 item-special">
+                        [特别道具]
+                    </div>
+                </div>}
                 <div className="row no-gutter item-property">
                     {item.type === ItemType.FOOD && [
                         item.cure_hp !== 0 && <div key="cure_hp" className="col-xs-6 no-wrap">恢复HP {item.cure_hp}</div>,
@@ -139,6 +144,8 @@ export default class ItemDetail extends React.Component<Props, {}>{
                     <div className="col-xs-12 item-description">喂养值 - {item.petpoint}</div>
                 </div>}
 
+                {itemModel.cookInfo && <ConvertRow name={`Lv.${itemModel.cookInfo.skill}初级料理 - ${itemModel.cookInfo.fee}s (${itemModel.cookInfo.slot})`} model={itemModel.gItem} />}
+
                 {setOptionModel && !addMode && <SetOptionRow model={setOptionModel} />}
                 
                 {item.type === ItemType.GEM && <div className="row">
@@ -159,7 +166,7 @@ export default class ItemDetail extends React.Component<Props, {}>{
                     </div>}
                 </div>}
 
-                <ConvertRow name="G化产物" model={itemModel.gItem} />
+                {itemModel.equipable && <ConvertRow name="G化产物" model={itemModel.gItem} />}
                 <ConvertRow name="命中强化产物" model={itemModel.tItem} />
                 <ConvertRow name="攻速强化产物" model={itemModel.sItem} />
                 <ConvertRow name="必杀强化产物" model={itemModel.cItem} />

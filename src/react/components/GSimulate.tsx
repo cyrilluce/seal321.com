@@ -180,7 +180,7 @@ export default class GSimulate extends Component<Props, State> {
                                         <p>{splitter}</p>
                                         
 
-                                        <p>辅助PT列表（共计{gSimulate.hasPt/crystalPoint}PT）</p>
+                                        <p>辅助列表（共计{gSimulate.hasPt/crystalPoint}PT）</p>
                                         {gSimulate.assists.filter(assist=>assist.data).
                                             map((assist, index)=>
                                                 <p key={index}>

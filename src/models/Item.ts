@@ -260,6 +260,17 @@ const res = [
     ItemType.WEAPON_FOOD_FIGHTER,
 ];
 
+interface CookInfo {
+    /** 料理产物 */
+    target: number;
+    /** 辅助格数 */
+    slot: number;
+    /** 辅助价格 */
+    fee: number;
+    /** 料理等级 */
+    skill: number;
+}
+
 interface PtTable {
     [level: number]: number;
 }
@@ -504,8 +515,21 @@ export class Item extends IDLoadable<IItem> {
     @computed get specialClass(): boolean {
         return this.data.res10 === 1;
     }
+    /** 是否为战宠道具 */
     @computed get battlePetClass(): boolean {
         return this.data.res10 === 2;
+    }
+    /** 初级料理信息 */
+    @computed get cookInfo():CookInfo {
+        const item = this.data;
+        if(item.type === ItemType.NORMAL && item.g_item>0){
+            return {
+                target: item.g_item,
+                fee: item.t_item,
+                slot: item.s_item,
+                skill: item.c_item
+            }
+        }
     }
     /** 是否是武器 TODO 以后改为按type判断？ */
     @computed get weapon() {

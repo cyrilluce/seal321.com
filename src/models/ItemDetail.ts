@@ -37,7 +37,7 @@ export class ItemDetail extends ItemModel{
             this.setOptionModel.setId(item ? item.setid : 0);
             const validEquipment = item && this.equipable;
             this.gItem.loc = this.loc;
-            this.gItem.setId(validEquipment ? item.g_item : 0);
+            this.gItem.setId(validEquipment || item && this.cookable ? item.g_item : 0);
             this.tItem.loc = this.loc;
             this.tItem.setId(validEquipment ? item.t_item : 0);
             this.sItem.loc = this.loc;

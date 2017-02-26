@@ -252,6 +252,9 @@
 [class*='col-'].no-wrap{
   white-space: nowrap;
 }
+.item-popover .item-special{
+  color: green;
+}
 .item-popover .item-description{
   color: #2e3030;
 }
