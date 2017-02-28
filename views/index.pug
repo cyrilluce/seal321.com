@@ -6,7 +6,7 @@ html
         meta(name="viewport", content="width=device-width, initial-scale=1")
         title !{title}
         link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap"+(development ? '' : '.min')+".css")
-        link(href="/styles/main.css?20170227", rel="stylesheet" type="text/css")
+        link(href="/styles/main.css"+(development ? '' : '?'+releaseTag), rel="stylesheet" type="text/css")
     body
         div#root !{html}
         script.
@@ -14,7 +14,7 @@ html
         script(src="//cdn.bootcss.com/babel-polyfill/6.20.0/polyfill"+(development ? '' : '.min')+".js")
         script(src="//cdn.bootcss.com/react/15.3.1/react"+(development ? '' : '.min')+".js")
         script(src="//cdn.bootcss.com/mobx/2.7.0/mobx.umd"+(development ? '' : '.min')+".js")
-        script(src="/static/index.js?20170227")
+        script(src="/static/index.js"+(development ? '' : '?'+releaseTag))
         //- iframe(id="forum_embed", src="javascript:void(0)", scrolling="no", frameborder="0", width="900", height="700")
         //- script(type="text/javascript").
         //-     document.getElementById('forum_embed').src =

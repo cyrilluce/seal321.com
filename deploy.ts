@@ -9,6 +9,7 @@
 var http = require('http');
 var path = require('path');
 var asyncLib = require('async');
+var crypto = require('crypto');
 var fs = require('mz/fs');
 var deployUtil = require('./src/util/deploy');
 var recursive = require('recursive-readdir');
@@ -166,6 +167,17 @@ var types = {
     publish: async function () {
         const resetTasks = await types.reset();
         const srcFileTasks = await types.file(['package.json', 'src/*', 'views/*', 'www/static/index.js', 'www/styles/*']);
+        const jsData = await fs.readFile(path.resolve(__dirname, 'www/static/index.js'));
+        const hash = crypto.createHash('sha256');
+        hash.update(jsData);
+        srcFileTasks.push({
+            title: 'js&css版本号',
+            data: {
+                type: 'file',
+                filePath: 'releaseTag.txt',
+                content: new Buffer(hash.digest('hex')).toString('hex')
+            }
+        });
         const restartTasks = await types.restart();
         return [...resetTasks, ...srcFileTasks, ...restartTasks];
     },
