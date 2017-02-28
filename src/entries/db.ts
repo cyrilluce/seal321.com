@@ -7,7 +7,7 @@ import { render } from 'react-dom'
 import { ItemDbStore } from '../stores';
 import getRoot from '../react/getRoot';
 import { autorun } from 'mobx';
-import { setPage, sendPageView, sendTiming } from '../util';
+import { setPage, sendPageView, sendTiming, delay } from '../util';
 
 // 创建新的 mobx store 实例
 const store = new ItemDbStore().init(window.__INITIAL_STATE__, true);
@@ -29,7 +29,7 @@ if (global.IS_BROWSER && window.history && history.pushState) {
     setPage(pagePath);
     // 如果关键参数有变动，计算为pv
     if(marjorChange){
-      sendPageView();
+      bufferSendPageView();
     }
   });
   window.addEventListener('popstate', (e) => {
@@ -39,14 +39,24 @@ if (global.IS_BROWSER && window.history && history.pushState) {
   })
 }
 
+let token = 1;
+async function bufferSendPageView(){
+  let myToken = ++token;
+  await delay(500);
+  if(myToken !== token){
+    return;
+  }
+  sendPageView();
+}
+
 // 测速
 window.addEventListener('load', function(){
   if(window.performance){
       let t = performance.timing;
       // 页面加载总时间 从浏览器开始访问到dom及主要js加载执行完成
       sendTiming('page', 'loadall', t.domContentLoadedEventEnd - t.navigationStart);
-      // dns解析时间
-      sendTiming('page', 'dns', t.domainLookupEnd - t.domainLookupStart);
+      // // dns解析时间
+      // sendTiming('page', 'dns', t.domainLookupEnd - t.domainLookupStart);
       // 从发起请求到请求结束的时间
       sendTiming('page', 'loadhtml', t.responseEnd - t.connectStart);
       // DOM解析、JS加载执行时间
