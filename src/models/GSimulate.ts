@@ -221,7 +221,7 @@ export class GSimulate extends Base {
         }
 
         this.assists.forEach((assist, index) => {
-            if (index < craft.data.fieldnum && assist.ptTable) {
+            if (index < craft.data.fieldnum && assist.data && assist.gAssistable && assist.ptTable) {
                 pt += assist.ptTable[assist.addLevel];
             }
         })
@@ -380,15 +380,12 @@ export class GSimulate extends Base {
             return `此物品不能作为辅助`;
         }
         if (itemModel.ptTable) {
-            for (let level = 0; level < itemModel.maxAddLevel; level++) {
+            for (let level = 0; level <= itemModel.maxAddLevel; level++) {
                 if (itemModel.ptTable[level] > 0) {
-                    itemModel.addLevel = level;
-                    break;
+                    return;
                 }
             }
-            if (itemModel.ptTable[itemModel.addLevel] <= 0) {
-                return `此物品不能作为辅助`;
-            }
+            return `此物品不能作为辅助`;
         }
 
     }
@@ -405,7 +402,7 @@ export class GSimulate extends Base {
         }
         itemModel.setData(item.id, item);
         itemModel.addLevel = 0;
-        if (itemModel.ptTable) {
+        if (itemModel.gAssistable && itemModel.ptTable) {
             for (let level = 0; level < itemModel.maxAddLevel; level++) {
                 if (itemModel.ptTable[level] > 0) {
                     itemModel.addLevel = level;

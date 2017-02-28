@@ -584,19 +584,23 @@ export class Item extends IDLoadable<IItem> {
         // }
         return jobs;
     }
-    /** 是否可以作为G辅助 */
-    @computed get gAssistable() {
+    /** 是否有PT（不一定是作为辅助，也可能是G化时用来计算费用） */
+    @computed get ptAvailable(): boolean{
         const item = this.data;
         return item.type !== ItemType.BOOK && // 不能是合成书
-            // item.type_res1 !== TypeRes1.UNKNOW0 && // 不能是？
-            item.type_res1 !== TypeRes1.ACCESSORY && // 不能是特殊配件
-            (item.type === ItemType.GEM || item.g_type === GType.ARMOUR || item.g_type === GType.WEAPON); // 可以是宝石及装备
+            (item.type === ItemType.GEM || item.g_type === GType.ACCESSORY || item.g_type === GType.ARMOUR || item.g_type === GType.WEAPON); // 可以是宝石及装备
+    }
+    /** 是否可以作为G辅助 */
+    @computed get gAssistable(): boolean {
+        const item = this.data;
+        return item.type_res1 !== TypeRes1.ACCESSORY && // 不能是特殊配件
+            this.ptAvailable // 可以有PT
 
     }
     /** PT表 */
     @computed get ptTable(): PtTable {
         const item = this.data;
-        if (!item || item.pt <= 0 || !this.gAssistable) {
+        if (!item || item.pt <= 0 || !this.ptAvailable) {
             return;
         }
         const ptTable = {};
