@@ -146,6 +146,10 @@ export default class ItemDetail extends React.Component<Props, {}>{
 
                 {itemModel.cookInfo && <ConvertRow name={`Lv.${itemModel.cookInfo.skill}初级料理 - ${itemModel.cookInfo.fee}s (${itemModel.cookInfo.slot})`} model={itemModel.gItem} />}
 
+                {itemModel.advanceCookable && <div className="row ">
+                    <div className="col-xs-12 item-property">可高级料理（提示：可使用制作模拟）</div>
+                </div>}
+
                 {setOptionModel && !addMode && <SetOptionRow model={setOptionModel} />}
                 
                 {item.type === ItemType.GEM && <div className="row">

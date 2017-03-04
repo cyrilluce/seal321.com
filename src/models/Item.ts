@@ -560,6 +560,10 @@ export class Item extends IDLoadable<IItem> {
     @computed get cookable(): boolean {
         return this.data.type === ItemType.NORMAL && this.data.g_item > 0;
     }
+    /** 是否可以高级料理 */
+    @computed get advanceCookable(): boolean {
+        return this.data.type === ItemType.FOOD && this.data.convertid>0;
+    }
     /** 职业 */
     @computed get jobs(): (Job | BattlePetJob)[] {
         const item = this.data;
@@ -641,6 +645,7 @@ export class Item extends IDLoadable<IItem> {
         }
         return ptTable;
     }
+    /** 当前物品的PT值 */
     @computed get pt(): number {
         const {ptTable, addLevel} = this;
         if (ptTable && (addLevel in ptTable)) {
