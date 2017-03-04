@@ -25,6 +25,12 @@ export interface QueryContext extends Koa.Context {
     getTableName: (table: Table)=>string;
 }
 
+/** 查询条件 */
+export interface Condition {
+    sql : string;
+    values : any[]
+}
+
 let router = new Router();
 // success与failure方法
 async function shortcutResponse(ctx: QueryContext, next) {

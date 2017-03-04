@@ -1,4 +1,4 @@
-import { ItemType } from '../../types';
+import { ItemType, HumanizeType } from '../../types';
 export const ItemTypeNames = {
     [ItemType.NORMAL] : "普通物品",
     [ItemType.FOOD] : "恢复药品",
@@ -52,3 +52,17 @@ export const ItemTypeNames = {
     [ItemType.WEAPON_CHEF] : "食神武器",
     [ItemType.WEAPON_FOOD_FIGHTER] : "美食家武器",
 };
+
+export const HumanizeTypeNames = {
+    [HumanizeType.ALL] : "全部",
+    [HumanizeType.NORMAL] : "普通物品",
+    [HumanizeType.EQUIPMENT] : "防具",
+    [HumanizeType.WEAPON] : "武器",
+    [HumanizeType.ACCESSORY] : "配件",
+    [HumanizeType.PET] : "宠物",
+    [HumanizeType.BATTLE_PET] : "战宠及装备",
+    [HumanizeType.BOOK] : "制作书",
+    [HumanizeType.GEM] : "宝石",
+    [HumanizeType.FOOD] : "恢复药水",
+    [HumanizeType.OTHER] : "其它",
+}

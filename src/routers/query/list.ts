@@ -1,10 +1,11 @@
 import { ServerId, Table, dbs } from '../../config';
 import { Item } from '../../types';
-import { QueryContext } from '.';
+import { QueryContext, Condition } from '.';
 
 export interface Query {
     loc: ServerId;
     keyword: string;
+    type?: number[];
     offset?: number;
     limit?: number;
 }
@@ -26,11 +27,49 @@ export default async function (ctx: QueryContext, next) {
     const {
         loc: db,
         keyword = "",
+        type,
         offset = 0,
         limit = 20
     } = query;
-    // 模糊搜索
-    const keywordSearch = '%' + keyword.replace(/(%_)/g, '\\$1') + '%';
+    
+    
+    const conditions: Condition[] = [];
+
+    if(keyword){
+        conditions.push({
+            // 模糊搜索
+            sql : 'name like ?',
+            values : ['%' + keyword.replace(/(%_)/g, '\\$1') + '%']
+        })
+    }
+
+    // 类型只能是数字
+    const types = [].concat(type).filter(type=>{
+        return +type>=0
+    });
+    if(types.length){
+        conditions.push({
+            sql : 'type in (?)',
+            values : [types]
+        })
+    }
+
+    let sqls: string[] = [];
+    let values: any[] = [];
+    if(conditions.length){
+        sqls.push(`WHERE ${conditions.map(cond=>cond.sql).join(' AND ')}`);
+        conditions.forEach(cond=>{
+            values = values.concat(cond.values);
+        })
+    }
+    const noLimitSql = sqls.join(' ');
+    const noLimitValues = values;
+
+    sqls.push('LIMIT ?,?');
+    values = values.concat([
+        constrain(offset, 0, 1000000),
+        constrain(limit, 0, 100)
+    ])
 
     ctx.logger.info('搜索', db, keyword, offset, limit);
 
@@ -38,11 +77,11 @@ export default async function (ctx: QueryContext, next) {
 
     const [data, countData] = await Promise.all([
         ctx.withConn((conn, query) => {
-             return query(`SELECT * FROM ${tableName} WHERE name like ? limit ?,?`,
-                 [keywordSearch, constrain(offset, 0, 1000000), constrain(limit, 0, 100)]);
+            
+             return query(`SELECT * FROM ${tableName} ${sqls.join(' ')}`, values);
         }),
         ctx.withConn((conn, query) => {
-            return query(`SELECT count(*) as count FROM ${tableName} WHERE name like ?`, [keywordSearch]);
+            return query(`SELECT count(*) as count FROM ${tableName} ${noLimitSql}`, noLimitValues);
         }),
     ]);
     // ctx.logger.info(data, countData);

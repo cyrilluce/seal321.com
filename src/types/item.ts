@@ -110,6 +110,107 @@ export enum ItemType {
     WEAPON_FOOD_FIGHTER = 53,
 }
 
+/** 按人为习惯进行物品类型分类 */
+export enum HumanizeType{
+    /** 全部 */
+    ALL=0,
+    /** 普通物品 */
+    NORMAL,
+    /** 防具 */
+    EQUIPMENT,
+    /** 武器 */
+    WEAPON,
+    /** 配件 */
+    ACCESSORY,
+    /** 宠物 */
+    PET,
+    /** 战宠及装备 */
+    BATTLE_PET,
+    /** 制作书 */
+    BOOK,
+    /** 宝石 */
+    GEM,
+    /** 恢复药水 */
+    FOOD,
+    /** 其它 */
+    OTHER
+}
+export const HumanizeTypes: {[hType:number]: number[]} = {
+    [HumanizeType.NORMAL] : [
+        ItemType.NORMAL
+    ],
+    [HumanizeType.EQUIPMENT] : [
+        ItemType.ITEM_SHEILD,
+        ItemType.ITEM_CLOTH_KNIGHT,
+        ItemType.ITEM_CLOTH,
+        ItemType.ITEM_HAT,
+        ItemType.ITEM_HAT_2,
+        ItemType.ITEM_SHOES_KNIGHT,
+        ItemType.ITEM_SHOES,
+        ItemType.ITEM_TROUSERS_KNIGHT,
+        ItemType.ITEM_TROUSERS,
+    ],
+    [HumanizeType.WEAPON] : [
+        ItemType.WEAPON_KNIGHT,
+        ItemType.WEAPON_WARRIOR,
+        ItemType.WEAPON_JESTER,
+        ItemType.WEAPON_CRAFTSMAN,
+        ItemType.WEAPON_PRIEST,
+        ItemType.WEAPON_MAGE,
+        ItemType.WEAPON_BERSERKER,
+        ItemType.WEAPON_SWORDMASTER,
+        ItemType.WEAPON_RENEGADE,
+        ItemType.WEAPON_DEFENDER,
+        ItemType.WEAPON_ASSASSIN,
+        ItemType.WEAPON_GAMBLER,
+        ItemType.WEAPON_ICEWIZARD,
+        ItemType.WEAPON_FIREWIZARD,
+        ItemType.WEAPON_TEMPLAR,
+        ItemType.WEAPON_APOSTLE,
+        ItemType.WEAPON_DEMOLITIONIST,
+        ItemType.WEAPON_ARTISAN,
+        ItemType.WEAPON_HUNTER,
+        ItemType.WEAPON_ARCHER,
+        ItemType.WEAPON_GAUNNER,
+        ItemType.WEAPON_COOK,
+        ItemType.WEAPON_CHEF,
+        ItemType.WEAPON_FOOD_FIGHTER,
+    ],
+    [HumanizeType.ACCESSORY] : [
+        ItemType.ITEM_ACCESSORY,
+        ItemType.ACCESSORY_BIND,
+    ],
+    [HumanizeType.PET] : [
+        ItemType.ITEM_PET,
+    ],
+    [HumanizeType.BATTLE_PET] : [
+        ItemType.BATTLE_PET,
+        ItemType.BATTLE_PET_EQUIPMENT,
+    ],
+    [HumanizeType.BOOK] : [
+        ItemType.BOOK,
+    ],
+    [HumanizeType.GEM] : [
+        ItemType.GEM,
+    ],
+    [HumanizeType.FOOD] : [
+        ItemType.FOOD
+    ],
+    [HumanizeType.OTHER] : [
+        ItemType.UNKNOW2,
+        ItemType.SPECIAL,
+        ItemType.TIME,
+        ItemType.CASH_EQUIPMENT,
+        ItemType.CASH_SET,
+        ItemType.TASK,
+        ItemType.UNKNOW28,
+        ItemType.CHEST,
+        ItemType.CHEST_KEY,
+        ItemType.CHEST_VIP,
+        ItemType.THROWABLE,
+    ],
+}
+
 /** G化类型 */
 export enum GType {
     /** 其它物品 */

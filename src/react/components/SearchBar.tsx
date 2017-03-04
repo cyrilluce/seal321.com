@@ -9,7 +9,7 @@ import { inject, observer } from 'mobx-react';
 import { ItemDbStore } from '../../stores';
 import { findDOMNode } from 'react-dom';
 import { dbs, ServerId } from '../../config';
-import { ServerNames } from '../../lang'
+import { ServerNames, HumanizeTypeNames } from '../../lang'
 import * as classnames from 'classnames';
 import Dropdown from './Dropdown';
 
@@ -38,9 +38,21 @@ export default class SearchBar extends Component<Props, {}> {
                         <input ref="input" type="text" className="form-control" size={50} placeholder="输入物品名称后回车搜索" defaultValue={store.keyword} aria-describedby="basic-addon1"
                             onChange={() => { } } onKeyUp={this.handleEnter.bind(this)}
                             />
+                        <Dropdown className="input-group-btn">
+                            <button type="button" className="btn btn-default dropdown-toggle">
+                                <span className="glyphicon glyphicon-filter" aria-hidden="true"></span>
+                                <span className="hidden-xs">
+                                    {HumanizeTypeNames[store.type]}<span className="caret"></span>
+                                </span>
+                            </button>
+                            <ul className="dropdown-menu">
+                                {Object.keys(HumanizeTypeNames).map(type=>
+                                    <li key={type}><a href="javascript:;" onClick={()=>store.setType(+type)}>{HumanizeTypeNames[type]}</a></li>)}
+                            </ul>
+                        </Dropdown>
                         <span className="input-group-btn">
                             <button className="btn btn-default" type="button" onClick={this.doSearch.bind(this)}>
-                                <span className="glyphicon glyphicon-search" aria-hidden="true"></span> 搜索
+                                <span className="glyphicon glyphicon-search" aria-hidden="true"></span> <span className="hidden-xs">搜索</span>
                             </button>
                             <button className={classnames("btn btn-default", {active: store.gSimulateVisible})} type="button" onClick={()=>{store.setGSimulateVisiblility()}}>
                                 <span className="glyphicon glyphicon-wrench" aria-hidden="true"></span> <span className="hidden-xs">制作模拟</span>
