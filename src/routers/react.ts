@@ -14,12 +14,8 @@ import * as config from '../config';
 import * as compose from "koa-compose";
 import * as views from "koa-views";
 import * as fs from 'mz/fs';
+import * as versions from '../../versions';
 
-const releaseTagTask = fs.readFile(join(__dirname, '../../releaseTag.txt')).then(data => {
-  return data.toString();
-}, err => {
-  return '' + Date.now();
-});
 
 // 防止mobx内存泄漏
 useStaticRendering(true);
@@ -30,11 +26,11 @@ export default compose([
     extension: 'html',
     map: {
       html: 'ejs'
-    }/*,
+    },
     options : {
       cache: process.env !== 'development',
       filename: 'ejscache'
-    }*/
+    }
   }),
   async (ctx, next) => {
     const startTime = Date.now();
@@ -45,8 +41,6 @@ export default compose([
     if (store.gSimulate.book.id) {
       store.gSimulateVisible = true;
     }
-
-    const releaseTag = await releaseTagTask;
 
     // 如果store加载完成（服务端加载），则渲染之
     await new Promise(resolve => {
@@ -68,13 +62,13 @@ export default compose([
       title: store.pageTitle,
       html,
       development: process.env.NODE_ENV === 'development',
-      releaseTag,
+      versions,
       state,
       staticPath: process.env.NODE_ENV === 'development' ? `http://127.0.0.1:${localConfig.localHotLoadPort}` : ''
     });
 
     const endTime = Date.now();
 
-    logger.info(`渲染计时，mobx ${mobxFinishedTime - startTime}ms, tojs ${mobxSerializedTime - mobxFinishedTime}ms, toStr ${reactRenderedTime - mobxSerializedTime}ms, pug ${endTime - reactRenderedTime}ms`)
+    logger.info(`渲染计时，mobx ${mobxFinishedTime - startTime}ms, tojs ${mobxSerializedTime - mobxFinishedTime}ms, toStr ${reactRenderedTime - mobxSerializedTime}ms, tpl ${endTime - reactRenderedTime}ms`)
   }
 ]);

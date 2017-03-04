@@ -167,15 +167,22 @@ var types = {
     publish: async function () {
         const resetTasks = await types.reset();
         const srcFileTasks = await types.file(['package.json', 'src/*', 'views/*', 'www/static/index.js', 'www/styles/*']);
-        const jsData = await fs.readFile(path.resolve(__dirname, 'www/static/index.js'));
-        const hash = crypto.createHash('sha256');
-        hash.update(jsData);
+        const versions = {};
+        await Promise.all([
+            {file: 'www/static/index.js', key:'js'},
+            {file: 'www/styles/main.css', key:'css'}
+        ].map(async ({file,key})=>{
+            const data = await fs.readFile(path.resolve(__dirname, file));
+            const hash = crypto.createHash('sha256');
+            hash.update(data);
+            versions[key] = hash.digest('hex');
+        }))
         srcFileTasks.push({
             title: 'js&css版本号',
             data: {
                 type: 'file',
-                filePath: 'releaseTag.txt',
-                content: new Buffer(hash.digest('hex')).toString('hex')
+                filePath: 'versions.js',
+                content: new Buffer(`module.exports=${JSON.stringify(versions)}`).toString('hex')
             }
         });
         const restartTasks = await types.restart();
