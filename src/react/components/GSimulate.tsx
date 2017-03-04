@@ -177,7 +177,6 @@ export default class GSimulate extends Component<Props, State> {
                                         <p>{splitter}</p>
 
                                         <p>基础成功率：{gSimulate.basePercentage.toFixed(3)}%</p>
-                                        <p>成功率上限：{gSimulate.limitRate * 100}%</p>
                                         <p>共需PT：{(gSimulate.needPt/crystalPoint).toFixed(2)}</p>
 
                                         <p>{splitter}</p>
@@ -192,10 +191,11 @@ export default class GSimulate extends Component<Props, State> {
 
                                         <p>{splitter}</p>
 
-                                        <p>成功率：{gSimulate.percentage.toFixed(3)}%</p>
+                                        <p>成功率：{gSimulate.percentage.toFixed(3)}% {gSimulate.percentage>gSimulate.limitRate * 100 ? '(溢出)' : ''}</p>
                                         <p>{gSimulate.skillWork ? 
-                                            `匠师：${gSimulate.skillPercentage.toFixed(3)}% (加成${gSimulate.skillRate*100}%)` :
+                                            `匠师：${gSimulate.skillPercentage.toFixed(3)}% (加成${gSimulate.skillRate*100}%) ${gSimulate.skillPercentage>gSimulate.limitRate * 100 ? '(溢出)' : ''}` :
                                             `匠师技能无加成`}</p>
+                                        <p>成功率上限：{gSimulate.limitRate * 100}%</p>
 
                                         <p>{splitter}</p>
 

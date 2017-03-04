@@ -49,15 +49,13 @@ export default class SearchBar extends Component<Props, {}> {
                                 {Object.keys(HumanizeTypeNames).map(type=>
                                     <li key={type}><a href="javascript:;" onClick={()=>store.setType(+type)}>{HumanizeTypeNames[type]}</a></li>)}
                             </ul>
-                        </Dropdown>
-                        <span className="input-group-btn">
                             <button className="btn btn-default" type="button" onClick={this.doSearch.bind(this)}>
                                 <span className="glyphicon glyphicon-search" aria-hidden="true"></span> <span className="hidden-xs">搜索</span>
                             </button>
                             <button className={classnames("btn btn-default", {active: store.gSimulateVisible})} type="button" onClick={()=>{store.setGSimulateVisiblility()}}>
                                 <span className="glyphicon glyphicon-wrench" aria-hidden="true"></span> <span className="hidden-xs">制作模拟</span>
                             </button>
-                        </span>
+                        </Dropdown>
                     </div>
                 </div>
             </div>
