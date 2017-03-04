@@ -9,15 +9,7 @@ import { sendTiming } from '.'
  */
 export async function fetch<T>(path: string, params: any) : Promise<T>{
     if(!global.IS_BROWSER){
-        let protocol = 'https';
-        let server = localConfig.deployServer;
-        let port = localConfig.nginxWebPort;
-
-        if(process.env.NODE_ENV === 'development'){
-            protocol = 'http';
-            server = '127.0.0.1';
-        }
-        path = require('url').resolve(`${protocol}://${server}`, path);
+        path = require('url').resolve(`http://127.0.0.1:${localConfig.nginxWebPort}`, path);
     }
     // 计时
     let start = new Date().getTime();
