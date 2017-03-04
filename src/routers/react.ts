@@ -27,13 +27,14 @@ useStaticRendering(true);
 // 接下来会补充这部分代码
 export default compose([
   views(join(__dirname, '../../views'), {
-    extension: 'pug',
+    extension: 'html',
     map: {
-      pug: 'pug'
-    },
+      html: 'ejs'
+    }/*,
     options : {
-      noCache: process.env === 'development'
-    }
+      cache: process.env !== 'development',
+      filename: 'ejscache'
+    }*/
   }),
   async (ctx, next) => {
     const startTime = Date.now();
