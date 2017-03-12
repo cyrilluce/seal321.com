@@ -25,9 +25,12 @@ interface INewest{
 /** 目标目录更改时完成 */
 function watchUntilChange(dir: string, match: RegExp){
     return new Promise(resolve=>{
+        // 10分钟强制检查一次？
+        const timer = setTimeout(()=>resolve(true), 10*60*1000);
         const watcher = fsWatch(dir, (event, file)=>{
             if(match.test(file)){
                 watcher.close();
+                clearTimeout(timer);
                 resolve(true);
             }
         });
@@ -53,11 +56,16 @@ async function watchType(serverId: string, type: string){
     }
 
     let firstRun = true;
+    let last: INewest;
 
     while(firstRun || (await watchUntilChange(src, regex))){
         try{
             firstRun = false;
             const newest = findNewest();
+            if(last && newest.version === last.version){
+                continue;
+            }
+            last = newest;
             // 判断最新版提取过没
             const pickedFile = join(config.samplesDir, `${serverId}_${table}_${newest.version}.json`)
             let pickedStat;
