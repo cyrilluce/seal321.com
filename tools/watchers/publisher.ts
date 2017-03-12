@@ -28,13 +28,13 @@ interface INewest{
 /** 目标目录更改时完成 */
 function watchUntilChange(dir: string, match: RegExp){
     return new Promise(resolve=>{
-        // 10分钟强制检查一次？
-        const timer = setTimeout(()=>resolve(true), 10*60*1000);
+        // 30分钟强制检查一次？
+        const timer = setTimeout(resolve, 30*60*1000);
         const watcher = fsWatch(dir, (event, file)=>{
             if(match.test(file)){
                 watcher.close();
                 clearTimeout(timer);
-                resolve(true);
+                resolve();
             }
         });
     })
@@ -61,17 +61,16 @@ async function watchType(serverId: string, type: string){
         }
     }
 
-    let firstRun = true;
     let last: INewest;
 
-    while(firstRun || (await watchUntilChange(src, regex))){
+    while(true){
         try{
-            firstRun = false;
             const newest = await findNewest();
             if(!newest){
                 continue;
             }
             if(last && newest.version === last.version){
+                await watchUntilChange(src, regex)
                 continue;
             }
             last = newest;
