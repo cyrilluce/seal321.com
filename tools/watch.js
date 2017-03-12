@@ -11,3 +11,9 @@ require('./watchers/updater');
 
 // 监听更新包，自动解压
 require('./watchers/unzipper');
+
+// 自动提取
+require('./watchers/pickuper');
+
+// 自动发布
+require('./watchers/publisher');

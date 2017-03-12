@@ -6,9 +6,8 @@ var path = require('path');
 var unpack = require('../unzipper');
 
 var config = require('../config');
-var watchingServers = require('./servers');
 
-watchingServers.forEach(server=>{
+config.getWatchingServers().forEach(server=>{
     unpack({
         name : server.id,
         src : path.join(config.samplesDir, server.id, 'update/'),

@@ -6,7 +6,18 @@ var parseVersionNo = require('./parsers/versionNo');
 var path = require("path");
 var fs = require('fs');
 
-var servers = {
+interface IServer{
+    id? : string;
+    serverId?: string;
+    url : string;
+    encoding: string;
+    /** 语言文件名，如 china/taiwan (*.edt) */
+    name?: string;
+    watching?: boolean;
+    textFile?: string;
+}
+
+export const servers: {[serverId: string]: IServer} = {
     // 昆仑
     // 配置 http://seal.download.kunlun.com/conf.kl  zip格式
     // http://seal.autopatch.kunlun.com/fullversions/200/etc/item.edp
@@ -50,30 +61,48 @@ Object.keys(servers).forEach(serverId=>{
     server.textFile = 'etc/'+server.name+'edt';
 });
 
-var config = module.exports = {
-    samplesDir : sampleDir,
-    servers : servers,
-    getResourcePath : (serverId, version, type, file)=>
-        path.join(config.samplesDir, serverId, 'source', type, file+'.'+version),
-    findNewestVersion : (serverId, type, file)=>{
-        var dir = path.dirname(config.getResourcePath(serverId, 'x', type, file));
-        var files = fs.readdirSync(dir);
-        var versions = files.filter(name=>name.indexOf(file)===0)
-            .map(name=>name.slice(file.length+1))
-            .sort((a,b)=>parseVersionNo(b)-parseVersionNo(a));
+/** 各服务器所有更新包、解析数据的存放路径 */
+export const samplesDir = sampleDir;
+/** 更新包源文件子目录 */
+export const sourceDir = 'source';
+/** 获取资源文件的路径 */
+export const getResourcePath = (serverId, version, type, file)=>
+        path.join(samplesDir, serverId, 'source', type, file+'.'+version)
+/** 获取指定类型文件的最新版本 */
+export const findNewestVersion = (serverId, type, file)=>{
+    var dir = path.dirname(getResourcePath(serverId, 'x', type, file));
+    var files = fs.readdirSync(dir);
+    var versions = files.filter(name=>name.indexOf(file)===0)
+        .map(name=>name.slice(file.length+1))
+        .sort((a,b)=>parseVersionNo(b)-parseVersionNo(a));
 
-        return versions[0];
-    },
-    getEncodingById : function(serverId){
-        var server = servers[serverId];
-        return server && server.encoding;
-    },
-    getUrlById : function(serverId){
-        var server = servers[serverId];
-        return server && server.url;
-    },
-    getTextFile : function(serverId){
-        var server = servers[serverId];
-        return server && server.name + '.edt';
-    }
-};
+    return versions[0];
+}
+/** 获取指定服务器的编码 */
+export const getEncodingById = function(serverId){
+    var server = servers[serverId];
+    return server && server.encoding;
+}
+export const getUrlById = function(serverId){
+    var server = servers[serverId];
+    return server && server.url;
+}
+export const getTextFile = function(serverId){
+    var server = servers[serverId];
+    return server && server.name + '.edt';
+}
+
+/** 获取开始了监听的服务器配置列表 */
+export const getWatchingServers = (): IServer[]=>{
+    return Object.keys(servers)
+        .map(serverId=>servers[serverId])
+        .filter(server=>server.watching)
+}
+
+/** 自动监听哪些类型的数据 */
+export const watchTypes = [
+    'item',
+    'setopt',
+    'craft',
+    'monster'
+];

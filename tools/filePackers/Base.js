@@ -20,6 +20,9 @@ class BaseFilePacker{
         this.filePath = this.getFilePath(serverId, version);
         this.edtPacker = new EdtPacker();
     }
+    static getPacker(){
+        return this.prototype.Packer
+    }
     initVersion(){
         var version = this.version;
         if(!version || version === '*'){

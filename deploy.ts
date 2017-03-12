@@ -17,9 +17,9 @@ import { promisify, delay, timeout } from './src/util';
 import * as localConfig from './src/localConfig';
 import * as semver from 'semver';
 
-const args = require('minimist')(process.argv.slice(2));
+let args: any = {_:[]};
 
-function deploy(data, cb) {
+export function deploy(data, cb) {
     var req = http.request({
         hostname: args.D ? '127.0.0.1' : localConfig.deployServer,
         port: localConfig.deployPort,
@@ -44,8 +44,8 @@ function deploy(data, cb) {
     req.on('error', cb);
 }
 
-const deployAsync = promisify<any>(deploy, null);
-const deployAsyncRetry = async (data, times = 3) => {
+export const deployAsync = promisify<any>(deploy, null);
+export const deployAsyncRetry = async (data, times = 3) => {
     let error;
     for (; times > 0; times--) {
         try {
@@ -59,11 +59,6 @@ const deployAsyncRetry = async (data, times = 3) => {
     }
     throw new Error('3次重试失败')
 }
-
-var deployer = module.exports = {
-    deploy,
-    deployAsync
-};
 
 
 let recursiveDir = promisify<string[]>(recursive);
@@ -88,7 +83,7 @@ async function resolveAll(files) {
     return fileList;
 }
 
-var types = {
+export const types = {
     // 文件发布
     file: async function (files) {
         // 开始分发
@@ -146,7 +141,8 @@ var types = {
         }]
     },
     // 发布公告
-    notice: async function(noticeType, content){
+    notice: async function(args){
+        let [noticeType, content] = args;
         if(!content){
             content = noticeType;
             noticeType = 'manual';
@@ -189,7 +185,7 @@ var types = {
         return [...resetTasks, ...srcFileTasks, ...restartTasks];
     },
     // 更新数据库
-    db: async function (argv) {
+    db: async function (argv: string[]) {
         /*
         type : "db",
         db : 'tw2',
@@ -240,22 +236,9 @@ var types = {
     }
 };
 
-const type = args._[0];
-
-if (!(type in types)) {
-    console.log('无法识别指令', type);
-    console.log(`示例：
-            ts-node deploy file src/*
-            ts-node deploy db tw2 item -D -F
-            ts-node deploy notice [manual] 测试公告
-            ts-node deploy restart
-            ts-node deploy reset
-            ts-node deploy publish`);
-    process.exit(0);
-}
 // 任务并发数
 const maxConcurrent = 3;
-async function execute() {
+async function execute(type) {
     let tasks = await types[type](args._.slice(1));
     const total = tasks.length;
     tasks.forEach((task, index) => { task.no = index + 1; })
@@ -276,8 +259,30 @@ async function execute() {
         }));
     }
 }
-execute().then(() => {
-    console.log('-------- 发布完成 ---------');
-}, err => {
-    console.log('-------- 发布失败！ ---------', err);
-});
+
+
+
+if(require.main === module){
+    args = require('minimist')(process.argv.slice(2));
+    const type = args._[0];
+    if (!(type in types)) {
+        console.log('无法识别指令', type);
+        console.log(`示例：
+                ts-node deploy file src/*
+                ts-node deploy db tw2 item -D -F
+                ts-node deploy notice [manual] 测试公告
+                ts-node deploy restart
+                ts-node deploy reset
+                ts-node deploy publish`);
+        process.exit(0);
+    }
+
+    execute(type).then(() => {
+        console.log('-------- 发布完成 ---------');
+    }, err => {
+        console.log('-------- 发布失败！ ---------', err);
+    });
+}
+
+
+
