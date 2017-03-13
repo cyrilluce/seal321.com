@@ -66,10 +66,7 @@ async function watchType(serverId: string, type: string){
     while(true){
         try{
             const newest = await findNewest();
-            if(!newest){
-                continue;
-            }
-            if(last && newest.version === last.version){
+            if(!newest || last && newest.version === last.version){
                 await watchUntilChange(src, regex)
                 continue;
             }

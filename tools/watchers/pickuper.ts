@@ -49,6 +49,9 @@ async function watchType(serverId: string, type: string){
     // 当源文件有变化时，判断最新的版本
     const findNewest = (): INewest=>{
         const version = config.findNewestVersion(serverId, path, file)
+        if(!version){
+            return;
+        }
         return {
             version,
             file: `${file}.${version}`
@@ -60,7 +63,7 @@ async function watchType(serverId: string, type: string){
     while(true){
         try{
             const newest = findNewest();
-            if(last && newest.version === last.version){
+            if(!newest || last && newest.version === last.version){
                 await watchUntilChange(src, regex)
                 continue;
             }
