@@ -108,6 +108,7 @@ module.exports = options => {
                             }));
                     });
                 })
+                .catch(err=>Rx.Observable.empty())
                 // 过滤非监听entry
                 .filter(o => {
                     const match = options.watches[o.type];
