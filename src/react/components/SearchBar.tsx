@@ -39,7 +39,7 @@ export default class SearchBar extends Component<Props, {}> {
                             onChange={() => { } } onKeyUp={this.handleEnter.bind(this)}
                             />
                         <Dropdown className="input-group-btn">
-                            <button type="button" className="btn btn-default dropdown-toggle">
+                            <button data-toggle type="button" className="btn btn-default dropdown-toggle">
                                 <span className="glyphicon glyphicon-filter" aria-hidden="true"></span>
                                 <span className="hidden-xs">
                                     {HumanizeTypeNames[store.type]}<span className="caret"></span>
@@ -49,7 +49,7 @@ export default class SearchBar extends Component<Props, {}> {
                                 {Object.keys(HumanizeTypeNames).map(type=>
                                     <li key={type}><a href="javascript:;" onClick={()=>store.setType(+type)}>{HumanizeTypeNames[type]}</a></li>)}
                             </ul>
-                            <button className="btn btn-default" type="button" onClick={this.doSearch.bind(this)}>
+                            <button className="btn btn-default" type="button" onClick={e=>{e.stopPropagation();this.doSearch()}}>
                                 <span className="glyphicon glyphicon-search" aria-hidden="true"></span> <span className="hidden-xs">搜索</span>
                             </button>
                             <button className={classnames("btn btn-default", {active: store.gSimulateVisible})} type="button" onClick={()=>{store.setGSimulateVisiblility()}}>

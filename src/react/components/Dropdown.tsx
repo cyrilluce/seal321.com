@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
+import * as onClickOutside from 'react-onclickoutside'
 
 export interface Props {
     className?: string;
@@ -7,42 +8,44 @@ export interface Props {
 export interface State {
     expanded?: boolean;
 }
+@onClickOutside
 export default class Dropdown<TProps extends Props> extends React.Component<TProps, State>{
-    /** document click监听 */
-    private handler: () => void;
-    private expanding: boolean;
-    componentWillMount() {
-        if (!global.IS_BROWSER) {
-            return
-        }
-        this.handler = this.handleOuterClick.bind(this);
-        document.addEventListener('click', this.handler, false);
+    handleClickOutside(e: MouseEvent) {
+        this.collapse();
     }
-    componentWillUnmount() {
-        if (!global.IS_BROWSER) {
-            return
-        }
-        document.removeEventListener('click', this.handler, false);
-    }
-    handleOuterClick(e: MouseEvent) {
-        if (!this.expanding) {
-            this.setState({ expanded: false });
-        }
+    protected collapse() {
+        this.setState({ expanded: false });
     }
     protected expand() {
-        if(this.state && this.state.expanded){
+        if (this.state && this.state.expanded) {
             return;
         }
-        this.expanding = true;
         this.setState({ expanded: true });
-        setTimeout(() => {
-            this.expanding = false;
-        }, 0);
+    }
+    protected toggle(){
+        this.setState({
+            expanded: !(this.state && this.state.expanded)
+        })
     }
     render() {
         const state = this.state || {};
-        const {expanded} = state;
-        return <div onClick={()=>this.expand()} className={classnames(this.props.className, { open: expanded })} role="group">
+        const { expanded } = state;
+        const onClick = (e: React.MouseEvent<HTMLDivElement>) => {
+            let target = e.target as HTMLElement;
+            let isToggle = false;
+            while(!isToggle && target !== e.currentTarget){
+                if(target.classList.contains('dropdown-toggle') || "toggle" in target.dataset){
+                    isToggle = true;
+                }
+                target = target.parentElement;
+            }
+            if (isToggle) {
+                this.toggle();
+            }else{
+                this.collapse();
+            }
+        }
+        return <div onClick={onClick} className={classnames(this.props.className, { open: expanded })} role="group">
             {this.props.children}
         </div>;
     }
