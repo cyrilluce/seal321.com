@@ -25,6 +25,12 @@ interface INewest{
     file: string;
 }
 
+function delay(ms: number = 0){
+    return new Promise(resolve=>{
+        setTimeout(resolve, ms);
+    })
+}
+
 /** 目标目录更改时完成 */
 function watchUntilChange(dir: string, match: RegExp){
     return new Promise(resolve=>{
@@ -71,7 +77,8 @@ async function watchType(serverId: string, type: string){
                 continue;
             }
             last = newest;
-
+            // 延时，有可能文件还在写入
+            await delay(10000);
             // 判断最新版发布过没
             const response = await isomorphicFetch(`https://${deployServer}/node/query/version`, {
                 method: 'POST',
