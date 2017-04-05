@@ -1,1 +1,1 @@
-require('./tools/test/pickup');
+require('./tools/test/pickup').apply(null, process.argv.slice(2));
