@@ -100,6 +100,7 @@ async function watchType(serverId: string, type: string){
             logger.info(serverId, type, `${newest.version} 发布完成`);
         }catch(e){
             logger.error(e);
+            last = null;
         }
     }
 }

@@ -94,6 +94,7 @@ async function watchType(serverId: string, type: string){
             logger.info(serverId, name, newest.version, '成功', `共${elements.length}条数据`);
         }catch(e){
             logger.error(e);
+            last = null;
         }
     }
 }
