@@ -24,7 +24,7 @@ module.exports = require('./base').extend({
         "attack",
         "defense",
         "exp",
-        "res12",
+        "dropid",
         "res13",
         "res14",
         "res15",
