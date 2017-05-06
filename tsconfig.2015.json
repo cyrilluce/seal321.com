@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es6",
+    "module": "es2015",
+    "target": "es2015",
     "moduleResolution": "node",
     "baseUrl": "src",
     "allowSyntheticDefaultImports": true,
@@ -9,7 +9,6 @@
     "noImplicitAny": false,
     "sourceMap": false,
     "allowJs": true,
-    // "rootDir": "src",
     "outDir": "ts-build",
     "jsx": "react",
     "typeRoots": [

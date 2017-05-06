@@ -1,6 +1,15 @@
 {
-  "presets": ["es2015", "react"],
-  "ignore" : [
+  "presets": [
+    [
+      "es2015",
+      {
+        "loose": true,
+        "modules": false
+      }
+    ],
+    "react"
+  ],
+  "ignore": [
     "build/**/*"
   ],
   "plugins": [

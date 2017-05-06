@@ -4,7 +4,6 @@ module.exports = {
     publicPath : '/static/',
     resolve : {
         extensions: [
-            '',
             '.js',
             '.jsx',
             '.es6',
