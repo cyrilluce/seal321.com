@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import * as onClickOutside from 'react-onclickoutside'
+import onClickOutside from 'react-onclickoutside'
 
 export interface Props {
     className?: string;
