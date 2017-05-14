@@ -294,3 +294,11 @@
   min-width: 24px;
   text-align: right;
 }
+.item-popover .howget{
+  margin-top: 10px;
+  color: #000;
+}
+.item-popover .howget span{
+  display: inline-block;
+  margin-right: 1em;
+}

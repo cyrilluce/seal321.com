@@ -6,6 +6,7 @@ import { delay } from '../util';
 import { SetOptionModel } from './SetOption';
 import { IDLoadable, Param } from './IDLoadable';
 import { Item as ItemModel } from './Item';
+import { HowGetModel } from './HowGet';
 
 export class ItemDetail extends ItemModel{
     /** 套装属性 */
@@ -15,6 +16,8 @@ export class ItemDetail extends ItemModel{
     tItem: ItemModel = null;
     sItem: ItemModel = null;
     cItem: ItemModel = null;
+    /** 掉落 */
+    drop: HowGetModel = null;
     protected initOptions(options: any = {}, restoreFromData = false){
         this.setOptionModel = new SetOptionModel();
         this.setOptionModel.init(options.setOptionModel, restoreFromData);
@@ -28,6 +31,8 @@ export class ItemDetail extends ItemModel{
         delete options.sItem;
         this.cItem = new ItemModel().init(options.cItem, restoreFromData);
         delete options.cItem;
+        this.drop = new HowGetModel().init(options.drop, restoreFromData);
+        delete options.drop;
 
         super.initOptions(options, restoreFromData);
 
@@ -44,6 +49,8 @@ export class ItemDetail extends ItemModel{
             this.sItem.setId(validEquipment ? item.s_item : 0);
             this.cItem.loc = this.loc;
             this.cItem.setId(validEquipment ? item.c_item : 0);
+            this.drop.loc = this.loc;
+            this.drop.setId(item ? item.id : 0);
         })
     }
     // ------------- 以下为扩展计算属性 ---------------
@@ -52,6 +59,7 @@ export class ItemDetail extends ItemModel{
             this.gItem && this.gItem.loading ||
             this.tItem && this.tItem.loading ||
             this.sItem && this.sItem.loading ||
-            this.cItem && this.cItem.loading;
+            this.cItem && this.cItem.loading ||
+            this.drop && this.drop.loading;
     }
 }

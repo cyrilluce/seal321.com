@@ -8,6 +8,7 @@ export interface Query{
 }
 
 export interface Result{
+    id: number;
     drop: Monster[];
 }
 
@@ -15,6 +16,7 @@ interface Monster{
     id: number;
     name: string;
     level: number;
+    property: number;
 }
 
 export default async function(ctx: QueryContext, next){
@@ -42,11 +44,12 @@ export default async function(ctx: QueryContext, next){
             // 再找出对应的怪物，并进行去重尝试
             const monsterIds = monsterRelations.map(r=>r.b)
             if(monsterIds.length){
-                monsters = await query(`SELECT min(id) as id,name,level FROM ${monsterTableName} WHERE id in (?) GROUP BY name,level ORDER BY level`, [monsterIds])
+                monsters = await query(`SELECT min(id) as id,name,level,property FROM ${monsterTableName} WHERE id in (?) GROUP BY name,level ORDER BY level LIMIT 0, 20`, [monsterIds])
             }
         }
 
         ctx.success({
+            id: numId,
             drop: monsters
         } as Result);
     });

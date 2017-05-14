@@ -39,7 +39,7 @@ export default class ItemDetail extends React.Component<Props, {}>{
         if(!itemModel || !itemModel.data){
             return <noscript />;
         }
-        const { data: item, addLevel: itemLevel, setOptionModel } = itemModel;
+        const { data: item, addLevel: itemLevel, setOptionModel, drop } = itemModel;
         // 是否为精炼模拟模式
         const addMode = itemLevel > 0;
         // 是否可以精炼，不能精炼的，不显示成长
@@ -174,6 +174,15 @@ export default class ItemDetail extends React.Component<Props, {}>{
                 <ConvertRow name="命中强化产物" model={itemModel.tItem} />
                 <ConvertRow name="攻速强化产物" model={itemModel.sItem} />
                 <ConvertRow name="必杀强化产物" model={itemModel.cItem} />
+
+                {drop && !drop.loading && drop.data && drop.data.drop.length>0 && !addMode && <div className="row howget">
+                    <div className="col-xs-12 title">物品来源</div>
+                    <div className="col-xs-12 list">
+                        {drop.data.drop.map((monster, index)=>
+                            <span key={index}>{`Lv${monster.level} ${monster.name}${monster.property ? lang.PropertyNames[monster.property] : ''}`}</span>
+                        )}
+                    </div>
+                </div>}
             </div>
         </Draggable>
     }
