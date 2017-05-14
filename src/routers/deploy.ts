@@ -10,6 +10,13 @@ import * as asyncLib from 'async';
 import { promiseCall, promisify } from '../util';
 import { ServerNames, DbNames } from '../lang'
 
+/** 公告 */
+interface Notice{
+    time?: number;
+    content: string;
+    type: string;
+}
+
 async function backupFile(filePath) {
     return new Promise((resolve, reject) => {
         fs.createReadStream(filePath)
@@ -99,7 +106,7 @@ async function processDb(data) {
         model = null;
     }
 
-    if (!model) {
+    if (!model || !model.isFullReplacable) {
         logger.error('发布工具', '错误', '没有找到对应数据类型', data.table);
         throw new Error('没有找到对应数据类型' + data.table);
     }
@@ -117,8 +124,6 @@ async function processDb(data) {
     try {
         let versionTableName = `seal_version`;
         let versionModel = require('../dbs/version');
-        let noticeTableName = `seal_notice`;
-        let noticeModel = require('../dbs/notice');
 
         conn = await promiseCall<mysql.IConnection>(mysqlPool.getConnection, mysqlPool);
         const query = promisify<any[]>(conn.query, conn);
@@ -176,11 +181,11 @@ async function processDb(data) {
 
         // 更新公告
         {
-            let fields = noticeModel.getFields().slice(1); // 排除id字段
-            const time = Math.round(Date.now() / 1000);
-            const values = [time, 'db', `${ServerNames[db]}${DbNames[table]}数据库已更新至${version}`];
-            await query(`INSERT INTO ${noticeTableName} (??) VALUES ?`,
-                [fields, [values]]);
+            await addNotices([{
+                time: Math.round(Date.now() / 1000),
+                type: 'db',
+                content: `${ServerNames[db]}${DbNames[table]}数据库已更新至${version}`
+            }])
         }
 
         // 完成
@@ -195,11 +200,7 @@ async function processDb(data) {
     }
 }
 
-async function processNotice(data){
-    const {
-        noticeType: type, content
-    } = data;
-    logger.info('发布工具', '公告', type, content);
+async function addNotices(notices: Notice[]){
     let conn: mysql.IConnection;
     let noticeTableName = `seal_notice`;
     let noticeModel = require('../dbs/notice');
@@ -220,12 +221,84 @@ async function processNotice(data){
 
         // 写入
         let fields = noticeModel.getFields().slice(1); // 排除id字段
-        const time = Math.round(Date.now() / 1000);
-        const values = [time, type, content];
-        await query(`INSERT INTO ${noticeTableName} (??) VALUES ?`,
-            [fields, [values]]);
+        await Promise.all(notices.map(async notice=>{
+            logger.info('发布工具', '公告', notice.type, notice.content);
+            const time = notice.time || Math.round(Date.now() / 1000);
+            const values = [time, notice.type, notice.content];
+            await query(`INSERT INTO ${noticeTableName} (??) VALUES ?`,
+                [fields, [values]]);
+        }))
     } catch (err) {
-        logger.error('发布工具', '公告', type, content, '失败', err);
+        logger.error('发布工具', '公告', '失败', err);
+        throw err;
+    } finally {
+        if (conn) {
+            conn.release();
+        }
+    }
+}
+
+async function processNotice(data: Notice){
+    await addNotices([data]);
+}
+
+export interface RelationUpdates{
+    /** 关系类型 */
+    relType: string;
+    /** 是否清空旧数据，如果为true，则旧数据会先删除，否则会合并更新 */
+    isFullReplace?: boolean;
+    /** 关系数据 */
+    list: Relation[];
+}
+interface Relation{
+    a: number;
+    b: number;
+    value?: number;
+    desc?: string;
+}
+/**
+ * relation表更新发布
+ */
+async function processRelation(data: RelationUpdates){
+    let conn: mysql.IConnection;
+    let tableName = `seal_relation`;
+    let model = require('../dbs/relation');
+
+    try{
+        conn = await promiseCall<mysql.IConnection>(mysqlPool.getConnection, mysqlPool);
+        const query = promisify<any[]>(conn.query, conn);
+
+        // 保证表存在
+        try {
+            await query(`SELECT count(*) from ${tableName}`);
+        } catch (err) {
+            const fieldsSql = model.getFieldsSql();
+            const indexesSql = model.getIndexesSql();
+            await query(`CREATE TABLE IF NOT EXISTS ${tableName} ( ${fieldsSql} ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci`);
+            await query(`ALTER TABLE ${tableName} ${indexesSql}`);
+        }
+
+        // 是否需要清空
+        if(data.isFullReplace){
+            await query(`DELETE * FROM ${tableName} WHERE type=?`, [data.relType]);
+        }
+
+        // 写入
+        {
+            let fields = model.getFields();
+            for(let i=0; i<data.list.length; i++){
+                const relation = data.list[i];
+                const values = [data.relType, relation.a, relation.b, relation.value, relation.desc];
+                await query(`INSERT INTO ${tableName} (??) VALUES ? ON DUPLICATE KEY UPDATE value=?, desc=? `,
+                    [fields, [values], relation.value, relation.desc]);
+            }
+            
+        }
+
+        // 完成
+        logger.info('发布工具', 'rel', data.relType, '成功');
+    } catch (err) {
+        logger.error('发布工具', 'rel', data.relType, '失败');
         throw err;
     } finally {
         if (conn) {
@@ -259,6 +332,10 @@ export default async function (ctx, next) {
             }
             case 'notice':{
                 await processNotice(data);
+                break;
+            }
+            case 'rel':{
+                await processRelation(data);
                 break;
             }
             default:

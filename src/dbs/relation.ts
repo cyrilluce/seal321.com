@@ -8,6 +8,8 @@
  */
 
 module.exports = require('./base').extend({
+    /** 不能覆盖，只能定制化操作 */
+    isFullReplacable : false,
     key : ['type', 'a', 'b'], // 主键
     indexes : [ ['type', 'a'], ['type', 'b'] ],
     properties : [

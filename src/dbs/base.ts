@@ -8,6 +8,8 @@ var base = module.exports = {
     // indexes : [], // 索引（包含联合索引 [ ['quest_id', 'node_id'] ]
     // fulltext : [], // 全文索引 [ 'name' ]
     extend : props=>Object.assign(Object.assign({}, base), props),
+    /** 表是否为整体操作（即每次更新全表），如果不是，则不允许使用deploy db方式来覆盖 */
+    isFullReplacable : true,
     getProperties : function(){
         var properties = this.properties;
 

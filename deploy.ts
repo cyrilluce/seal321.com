@@ -16,6 +16,7 @@ var recursive = require('recursive-readdir');
 import { promisify, delay, timeout } from './src/util';
 import * as localConfig from './src/localConfig';
 import * as semver from 'semver';
+import { RelationUpdates } from './src/routers/deploy';
 
 let args: any = {_:[]};
 
@@ -138,6 +139,36 @@ export const types = {
             data: {
                 type: 'reset'
             }
+        }]
+    },
+    /** 更新关系数据 */
+    rel: async function(args){
+        const type = args[0];
+        // 支持的类型，为1表示全覆盖型导入（即发布的数据本身是全量的）
+        const types = {
+            drop: 1, // 服务端收集的掉落
+            social_drop: 0, // 人工收集的掉落
+            collect: 1,
+            social_collect: 1,
+            craft: 1,
+            cook: 1,
+            g_craft: 1,
+            t_craft: 1,
+            s_craft: 1,
+            c_craft: 1,
+            index_monster: 1,
+        }
+        if(!(type in types)){
+            throw new Error(`不支持的rel类型，目前仅支持${Object.keys(types).join(', ')}`)
+        }
+        return [{
+            title : '关系更新',
+            data : {
+                type: 'rel',
+                relType: type,
+                isFullReplace: types[type] === 1,
+                list: JSON.parse(fs.readFile(path.join(localConfig.sampleDir, `rel_${type}.json`)))
+            } as RelationUpdates
         }]
     },
     // 发布公告
@@ -270,6 +301,7 @@ if(require.main === module){
         console.log(`示例：
                 ts-node deploy file src/*
                 ts-node deploy db tw2 item -D -F
+                ts-node deploy rel drop
                 ts-node deploy notice [manual] 测试公告
                 ts-node deploy restart
                 ts-node deploy reset

@@ -1,1 +1,1 @@
-// GraphiQL 通用接口
+// GraphiQL 通用接口 TODO
