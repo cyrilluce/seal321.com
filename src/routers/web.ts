@@ -26,7 +26,7 @@ let webpack = async(ctx, next)=>{
     return next();
 };
 if(process.env.NODE_ENV === 'development'){
-    webpack = require('./webpack').default;
+   // webpack = require('./webpack').default;
 }
 
 let debug = (str)=> async (ctx, next)=>{

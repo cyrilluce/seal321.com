@@ -1,7 +1,7 @@
 /**
  * Created by cyrilluce on 2016/8/7.
  */
-export type Table = "item" | "monster" | "setopt" | "craft"
+export type Table = "item" | "monster" | "setopt" | "craft" | "relation"
 
 /** 玩家总结的是水晶=1PT，但实际上水晶的价值为2 */
 export const crystalPoint = 2;

@@ -18,7 +18,7 @@ module.exports = require('./base').extend({
         "res3",
         "distance",
         "property",
-        "res6",
+        "sight",
         "evade",
         "accuracy",
         "attack",

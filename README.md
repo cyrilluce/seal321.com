@@ -26,6 +26,9 @@ cd sampleDir/tw2/source/item/noVersion
 pickupTex
 photoshop dds to png
 
+#2.2 提取服务端掉落
+ts-node tools/dropPicker/index
+
 #3. 发布数据
 ts-node deploy file www/favicon.ico
 ts-node deploy restart

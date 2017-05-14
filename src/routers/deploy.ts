@@ -9,6 +9,7 @@ import * as  deployUtil from '../util/deploy';
 import * as asyncLib from 'async';
 import { promiseCall, promisify } from '../util';
 import { ServerNames, DbNames } from '../lang'
+import { Relation } from '../types'
 
 /** 公告 */
 interface Notice{
@@ -188,6 +189,11 @@ async function processDb(data) {
             }])
         }
 
+        // 额外映射维护
+        if(db === 'tw2' && table === 'monster'){
+            await processMonsterIndexRelation();
+        }
+
         // 完成
         logger.info('发布工具', 'db', db, table, version, '成功');
     } catch (err) {
@@ -250,12 +256,6 @@ export interface RelationUpdates{
     /** 关系数据 */
     list: Relation[];
 }
-interface Relation{
-    a: number;
-    b: number;
-    value?: number;
-    desc?: string;
-}
 /**
  * relation表更新发布
  */
@@ -280,7 +280,7 @@ async function processRelation(data: RelationUpdates){
 
         // 是否需要清空
         if(data.isFullReplace){
-            await query(`DELETE * FROM ${tableName} WHERE type=?`, [data.relType]);
+            await query(`DELETE FROM ${tableName} WHERE type=?`, [data.relType]);
         }
 
         // 写入
@@ -289,7 +289,7 @@ async function processRelation(data: RelationUpdates){
             for(let i=0; i<data.list.length; i++){
                 const relation = data.list[i];
                 const values = [data.relType, relation.a, relation.b, relation.value, relation.desc];
-                await query(`INSERT INTO ${tableName} (??) VALUES ? ON DUPLICATE KEY UPDATE value=?, desc=? `,
+                await query(`INSERT INTO ${tableName} (??) VALUES ? ON DUPLICATE KEY UPDATE \`value\`=?, \`desc\`=? `,
                     [fields, [values], relation.value, relation.desc]);
             }
             
@@ -299,6 +299,37 @@ async function processRelation(data: RelationUpdates){
         logger.info('发布工具', 'rel', data.relType, '成功');
     } catch (err) {
         logger.error('发布工具', 'rel', data.relType, '失败');
+        throw err;
+    } finally {
+        if (conn) {
+            conn.release();
+        }
+    }
+}
+/**
+ * dropid => monster 自動映射生成
+ */
+async function processMonsterIndexRelation(){
+    let conn: mysql.IConnection;
+
+    try{
+        conn = await promiseCall<mysql.IConnection>(mysqlPool.getConnection, mysqlPool);
+        const query = promisify<any[]>(conn.query, conn);
+
+        // 获取
+        const list: {a:number, b:number}[] = await query(`select dropid as a,min(id) as b from seal_tw2_monster where dropid>0 and level>0 and level<10000 group by dropid`);
+
+        // 写入
+        await processRelation({
+            relType: 'drop_monster',
+            isFullReplace: true,
+            list
+        })
+
+        // 完成
+        logger.info('发布工具', 'rel', '自动drop_monster', '成功');
+    } catch (err) {
+        logger.error('发布工具', 'rel', '自动drop_monster', '失败');
         throw err;
     } finally {
         if (conn) {

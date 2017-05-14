@@ -11,6 +11,7 @@ import item from './item';
 import setopt from './setopt';
 import craft from './craft';
 import version from './version';
+import howget from './howget';
 
 interface QueryRequest extends Koa.Request {
     body: any;
@@ -94,4 +95,5 @@ router.post('/item', item);
 router.post('/setopt', setopt);
 router.post('/craft', craft);
 router.post('/version', version);
+router.post('/howget', howget);
 export default router.routes();

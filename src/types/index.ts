@@ -1,6 +1,7 @@
 export * from './item';
 export * from './setoption';
 export * from './craft';
+export * from './relation';
 
 export const TYPE = {
     /** 物品 - 原型 */

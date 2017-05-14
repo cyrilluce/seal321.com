@@ -161,13 +161,14 @@ export const types = {
         if(!(type in types)){
             throw new Error(`不支持的rel类型，目前仅支持${Object.keys(types).join(', ')}`)
         }
+        const data = await fs.readFile(path.join(localConfig.sampleDir, `rel_${type}.json`))
         return [{
             title : '关系更新',
             data : {
                 type: 'rel',
                 relType: type,
                 isFullReplace: types[type] === 1,
-                list: JSON.parse(fs.readFile(path.join(localConfig.sampleDir, `rel_${type}.json`)))
+                list: JSON.parse(data.toString())
             } as RelationUpdates
         }]
     },

@@ -31,7 +31,7 @@ module.exports = require('./CommonData').extend({
             "attack",
             "defense",
             "exp",
-            "res12",
+            "dropid",
             "res13",
             "res14",
             "res15",
@@ -64,7 +64,7 @@ module.exports = require('./CommonData').extend({
             "attack",
             "defense",
             "exp",
-            "res12",
+            "dropid",
 
             "res13",
             "res14",
@@ -102,7 +102,7 @@ module.exports = require('./CommonData').extend({
             "attack",
             "defense",
             "exp",
-            "res12",
+            "dropid",
 
             "res13",
             "res14",
