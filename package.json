@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development node dev",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && cross-env NODE_ENV=production node ./node_modules/webpack/bin/webpack -p --config webpack/webpack.browser.js --display-modules",
+    "build": "tsc && cross-env NODE_ENV=production node ./node_modules/webpack/bin/webpack --config webpack/webpack.browser.js --display-modules",
     "watch": "ts-node tools/watch",
     "publish": "ts-node deploy.ts publish"
   },

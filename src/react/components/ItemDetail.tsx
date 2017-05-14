@@ -179,7 +179,7 @@ export default class ItemDetail extends React.Component<Props, {}>{
                     <div className="col-xs-12 title">物品来源</div>
                     <div className="col-xs-12 list">
                         {drop.data.drop.map((monster, index)=>
-                            <span key={index}>{`Lv${monster.level} ${monster.name}${monster.property ? lang.PropertyNames[monster.property] : ''}`}</span>
+                            <span key={index}>{`Lv${monster.level} ${monster.name}${monster.property ? `[${lang.PropertyNames[monster.property]}]` : ''}`}</span>
                         )}
                     </div>
                 </div>}
