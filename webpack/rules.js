@@ -1,18 +1,18 @@
 module.exports = [
      {
         test : /\.tpl$/,
-        loader : 'raw-loader'
+        use : 'raw-loader'
     },
     {
         test : /\.css$/,
-        loader : 'style-loader!css-loader'
+        use : 'style-loader!css-loader'
     },
     {
         test : /\.pug$/,
-        loader : 'pug-loader'
+        use : 'pug-loader'
     },
     {
         test : /\.json$/,
-        loader : 'json-loader'
+        use : 'json-loader'
     }
 ];
