@@ -540,11 +540,14 @@ export class Item extends IDLoadable<IItem> {
     @computed get armour() {
         return this.data.g_type === GType.ARMOUR && this.data.type !== ItemType.BOOK;
     }
-    /** 是否为饰品（匠師技能無效） */
+    /** 是否为饰品 */
     @computed get accessory() {
+        return this.data.g_type === GType.ACCESSORY && this.data.type !== ItemType.BOOK;
+    }
+    /** 是否是純飾品（匠師技能無效） */
+    @computed get pureAccessory(){
         // 面具匠师技能有效，还是按type来判断吧
         return this.data.type === ItemType.ITEM_ACCESSORY || this.data.type === ItemType.ACCESSORY_BIND;
-        //return this.data.g_type === GType.ACCESSORY && this.data.type !== ItemType.BOOK;
     }
     /** 是否为装备（强化） */
     @computed get equipment(): boolean {

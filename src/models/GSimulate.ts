@@ -257,7 +257,7 @@ export class GSimulate extends Base {
         if (!craft.data || this.invalid) {
             return false;
         }
-        return craft.isGTSC && (!target.data || !target.accessory);
+        return craft.isGTSC && (!target.data || !target.pureAccessory);
     }
     /** 算上技能后的成功率 */
     @computed get skillPercentage(): number {
