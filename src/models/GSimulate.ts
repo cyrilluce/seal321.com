@@ -77,7 +77,7 @@ export class GSimulate extends Base {
 
     super.initOptions(options, restoreFromData);
 
-    // 根据制作书物品加载制作书信息
+    // 地域同步，并根据制作书物品加载制作书信息
     autorun(() => {
       const { loc, book } = this;
       if (dbs[loc]) {
@@ -85,37 +85,42 @@ export class GSimulate extends Base {
         this.skillRate = dbs[loc].skillRate || 0.25;
       }
       book.loc = loc;
-      this.result.loc = loc;
       this.craft.loc = loc;
-
       this.craft.setId(book.data ? book.data.convertid : 0);
+      this.assists.forEach((assist, index) => {
+        assist.loc = loc;
+      });
+
+      this.result.loc = loc;
+
+      this.target.loc = loc;
+
+      this.needs[0].loc = loc;
+      this.needs[1].loc = loc;
+      this.needs[2].loc = loc;
+      this.needs[3].loc = loc;
+      this.needs[4].loc = loc;
     });
 
     // 根据制作书信息加载物品需求，以及各种限定
     autorun(() => {
-      const { loc, craft, book } = this;
+      const { craft, book } = this;
       const data = craft.data;
       if (!data || book.loading || craft.loading) {
         return;
       }
 
       // 更新必需材料信息
-      this.needs[0].loc = loc;
       this.needs[0].setId(craft.data.need1);
 
-      this.needs[1].loc = loc;
       this.needs[1].setId(craft.data.need2);
 
-      this.needs[2].loc = loc;
       this.needs[2].setId(craft.data.need3);
 
-      this.needs[3].loc = loc;
       this.needs[3].setId(craft.data.need4);
 
-      this.needs[4].loc = loc;
       this.needs[4].setId(craft.data.need5);
 
-      this.target.loc = loc;
       // G书限定物品精练等级
       if (craft.isGTSC) {
         if (!this.targetInvalid && this.target.addLevel < data.needitemlevel) {
@@ -131,7 +136,6 @@ export class GSimulate extends Base {
       // 如果限定辅助，直接清空
       this.assists.forEach((assist, index) => {
         if (index >= data.fieldnum) {
-          assist.loc = loc;
           assist.setId(0);
         }
       });
