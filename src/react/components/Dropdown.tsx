@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import onClickOutside from 'react-onclickoutside'
+import * as onClickOutside from "react-onclickoutside/decorator";
 
 export interface Props {
     className?: string;

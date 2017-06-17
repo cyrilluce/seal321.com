@@ -18,7 +18,7 @@ export interface Craft {
     /** mix.edt中指定的随机合成产品 */
     mix: number;
     /** G书类型 */
-    type: number;
+    type: CraftType;
     /** HP */
     needitem: number;
     /** G化装备需要的等级 */
