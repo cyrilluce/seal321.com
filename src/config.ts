@@ -56,6 +56,6 @@ export const dbs:Servers = {
     "us" : {
         item : 1,
         maxRate : 1,
-        skillRate : 0.25
+        skillRate : 0.3
     },
 }
