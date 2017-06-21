@@ -307,7 +307,8 @@ export class GSimulate extends Base {
     if (!craft.data || this.invalid) {
       return false;
     }
-    return craft.isGTSC && (!target.data || !target.pureAccessory);
+    // 只有G书才有加成，TSC没有
+    return craft.data.type === CraftType.G && (!target.data || !target.pureAccessory);
   }
   /** 算上技能后的成功率 */
   @computed
