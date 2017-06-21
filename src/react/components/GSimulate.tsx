@@ -137,54 +137,20 @@ export default class GSimulate extends Component<Props, State> {
                     accept={item => gSimulate.setBookItem(item.data)}
                   />
                   <div className="gsim-splitter" />
-                  {gSimulate.assists.map((assist, index) =>
-                    <ItemSlot
-                      onRightClick={makeViewItem(assist)}
-                      quickSelect={() => this.setState({ quickSelectAssist: index })}
-                      key={index}
-                      onDragAway={() => assist.setId(0)}
-                      disabled={
-                        !gSimulate.craft.data ||
-                        index >= gSimulate.craft.data.fieldnum
-                      }
-                      data={assist}
-                      className={
-                        gSimulate.assistInvalids[index]
-                          ? "gsim-slot-invalid"
-                          : ""
-                      }
-                      title={gSimulate.assistInvalids[index]}
-                      canAccept={item =>
-                        !gSimulate.tryAssistItem(index, item.data)}
-                      accept={item => gSimulate.setAssistItem(index, item.data)}
-                    >
-                      {assist.data &&
-                        assist.addLevel > 0 &&
-                        <span className="gsim-slot-level">
-                          +{assist.addLevel}
-                        </span>}
-                      {assist.data &&
-                        <div className="btn-group btn-group-xs btn-group-vertical add-level-tools">
-                          <button
-                            type="button"
-                            className="btn btn-default"
-                            onClick={() => {
-                              assist.setAddLevel(assist.addLevel + 1);
-                            }}
-                          >
-                            <span className="glyphicon glyphicon-plus"> </span>
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-default"
-                            onClick={() => {
-                              assist.setAddLevel(assist.addLevel - 1);
-                            }}
-                          >
-                            <span className="glyphicon glyphicon-minus"> </span>
-                          </button>
-                        </div>}
-                    </ItemSlot>
+                  {[0, 1, 2, 3, 4].map(
+                    index =>
+                      gSimulate.needs[index].data &&
+                      <div key={index} className="gsim-need">
+                        <span className="gsim-need-num">
+                          {gSimulate.craft.data &&
+                            gSimulate.craft.data[`num${index + 1}`]}
+                        </span>
+                        <ItemWidget
+                          onRightClick={makeViewItem(gSimulate.needs[index])}
+                          loc={gSimulate.loc}
+                          data={gSimulate.needs[index].data}
+                        />
+                      </div>
                   )}
                   <div className="gsim-splitter">
                     <span className="glyphicon glyphicon-chevron-right" />
@@ -222,10 +188,11 @@ export default class GSimulate extends Component<Props, State> {
                         <button
                           type="button"
                           className="btn btn-default"
-                          onClick={() => {
+                          onClick={(e) => {
                             gSimulate.target.setAddLevel(
                               gSimulate.target.addLevel + 1
                             );
+                            e.stopPropagation()
                           }}
                         >
                           <span className="glyphicon glyphicon-plus"> </span>
@@ -233,10 +200,11 @@ export default class GSimulate extends Component<Props, State> {
                         <button
                           type="button"
                           className="btn btn-default"
-                          onClick={() => {
+                          onClick={(e) => {
                             gSimulate.target.setAddLevel(
                               gSimulate.target.addLevel - 1
                             );
+                            e.stopPropagation()
                           }}
                         >
                           <span className="glyphicon glyphicon-minus"> </span>
@@ -244,20 +212,57 @@ export default class GSimulate extends Component<Props, State> {
                       </div>}
                   </ItemSlot>
                   <div className="gsim-splitter" />
-                  {[0, 1, 2, 3, 4].map(
-                    index =>
-                      gSimulate.needs[index].data &&
-                      <div key={index} className="gsim-need">
-                        <span className="gsim-need-num">
-                          {gSimulate.craft.data &&
-                            gSimulate.craft.data[`num${index + 1}`]}
-                        </span>
-                        <ItemWidget
-                          onRightClick={makeViewItem(gSimulate.needs[index])}
-                          loc={gSimulate.loc}
-                          data={gSimulate.needs[index].data}
-                        />
-                      </div>
+                  {gSimulate.assists.map((assist, index) =>
+                    <ItemSlot
+                      onRightClick={makeViewItem(assist)}
+                      quickSelect={() =>
+                        this.setState({ quickSelectAssist: index })}
+                      key={index}
+                      onDragAway={() => assist.setId(0)}
+                      disabled={
+                        !gSimulate.craft.data ||
+                        index >= gSimulate.craft.data.fieldnum
+                      }
+                      data={assist}
+                      className={
+                        gSimulate.assistInvalids[index]
+                          ? "gsim-slot-invalid"
+                          : ""
+                      }
+                      title={gSimulate.assistInvalids[index]}
+                      canAccept={item =>
+                        !gSimulate.tryAssistItem(index, item.data)}
+                      accept={item => gSimulate.setAssistItem(index, item.data)}
+                    >
+                      {assist.data &&
+                        assist.addLevel > 0 &&
+                        <span className="gsim-slot-level">
+                          +{assist.addLevel}
+                        </span>}
+                      {assist.data &&
+                        <div className="btn-group btn-group-xs btn-group-vertical add-level-tools">
+                          <button
+                            type="button"
+                            className="btn btn-default"
+                            onClick={(e) => {
+                              assist.setAddLevel(assist.addLevel + 1);
+                              e.stopPropagation()
+                            }}
+                          >
+                            <span className="glyphicon glyphicon-plus"> </span>
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-default"
+                            onClick={(e) => {
+                              assist.setAddLevel(assist.addLevel - 1);
+                              e.stopPropagation()
+                            }}
+                          >
+                            <span className="glyphicon glyphicon-minus"> </span>
+                          </button>
+                        </div>}
+                    </ItemSlot>
                   )}
                 </div>
               </div>
