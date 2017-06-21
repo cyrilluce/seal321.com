@@ -152,18 +152,6 @@ export default class GSimulate extends Component<Props, State> {
                         />
                       </div>
                   )}
-                  <div className="gsim-splitter">
-                    <span className="glyphicon glyphicon-chevron-right" />
-                  </div>
-                  <div className="gsim-splitter gsim-result">
-                    {gSimulate.result.data
-                      ? <ItemWidget
-                          onRightClick={makeViewItem(gSimulate.result)}
-                          loc={gSimulate.loc}
-                          data={gSimulate.result.data}
-                        />
-                      : <span className="glyphicon glyphicon-question-sign" />}
-                  </div>
                 </div>
               </div>
               <div className="row slot-row">
@@ -264,6 +252,18 @@ export default class GSimulate extends Component<Props, State> {
                         </div>}
                     </ItemSlot>
                   )}
+                  <div className="gsim-splitter">
+                    <span className="glyphicon glyphicon-chevron-right" />
+                  </div>
+                  <div className="gsim-splitter gsim-result">
+                    {gSimulate.result.data
+                      ? <ItemWidget
+                          onRightClick={makeViewItem(gSimulate.result)}
+                          loc={gSimulate.loc}
+                          data={gSimulate.result.data}
+                        />
+                      : <span className="glyphicon glyphicon-question-sign" />}
+                  </div>
                 </div>
               </div>
               <div className="row slot-row">
