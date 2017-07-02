@@ -41,5 +41,9 @@ export function sendEvent(eventCategory: string, eventAction: string, eventLabel
  * @param timingLabel 可用于提高报告中显示用户计时数据灵活性的字符串（例如 'Google CDN'）。
  */
 export function sendTiming(timingCategory: string, timingVar: string, timingValue: number, timingLabel?: string): void{
+    // 大于1小时的应该是脏数据，无视
+    if(timingValue > 60 * 60 * 1000){
+        return
+    }
     ga('send', 'timing', ...arguments)
 }

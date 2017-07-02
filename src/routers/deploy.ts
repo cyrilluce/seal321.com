@@ -338,6 +338,40 @@ async function processMonsterIndexRelation(){
     }
 }
 
+/**
+ * 站点初始化
+ */
+async function init(){
+    let conn: mysql.IConnection;
+    let tableName = `account`;
+    let model = require('../dbs/account');
+
+    try{
+        conn = await promiseCall<mysql.IConnection>(mysqlPool.getConnection, mysqlPool);
+        const query = promisify<any[]>(conn.query, conn);
+
+        // 保证表存在
+        try {
+            await query(`SELECT count(*) from ${tableName}`);
+        } catch (err) {
+            const fieldsSql = model.getFieldsSql();
+            const indexesSql = model.getIndexesSql();
+            await query(`CREATE TABLE IF NOT EXISTS ${tableName} ( ${fieldsSql} ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci`);
+            await query(`ALTER TABLE ${tableName} ${indexesSql}`);
+        }
+
+        // 完成
+        logger.info('发布工具', '初始化', '成功');
+    } catch (err) {
+        logger.error('发布工具', '初始化', '失败');
+        throw err;
+    } finally {
+        if (conn) {
+            conn.release();
+        }
+    }
+}
+
 export default async function (ctx, next) {
     try {
         let data = await deployUtil.unpackAsync(ctx.req);
@@ -348,6 +382,9 @@ export default async function (ctx, next) {
             throw new Error('数据解析失败');
         }
         switch (data.type) {
+            case 'init':
+                await init();
+                break;
             case 'reset':
                 await processReset(data);
                 break;

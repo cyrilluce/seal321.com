@@ -9,6 +9,8 @@ import getRoot from '../react/getRoot';
 import { autorun } from 'mobx';
 import { setPage, sendPageView, sendTiming, delay } from '../util';
 
+let token = 1;
+
 // 创建新的 mobx store 实例
 const store = new ItemDbStore().init(window.__INITIAL_STATE__, true);
 
@@ -39,7 +41,6 @@ if (global.IS_BROWSER && window.history && history.pushState) {
   })
 }
 
-let token = 1;
 async function bufferSendPageView(){
   let myToken = ++token;
   await delay(500);

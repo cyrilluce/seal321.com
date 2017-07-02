@@ -4,6 +4,10 @@ import logger from '../logger';
 
 let webpack = require('webpack');
 let webpackConfig = require('../../webpack/webpack.dev');
+
+if(process.env.NODE_ENV === 'development' && /\.js$/.test(__filename)){
+    webpackConfig = require('../../webpack/webpack.jsdev');
+}
 let compiler = webpack(webpackConfig);
 
 logger.info('热替换功能启用');

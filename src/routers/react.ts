@@ -20,9 +20,14 @@ import * as versions from '../../versions';
 // 防止mobx内存泄漏
 useStaticRendering(true);
 
+let viewPath = '../../views'
+if(process.env.NODE_ENV === 'development' && /\.js$/.test(__filename)){
+    viewPath = '../'+viewPath
+}
+
 // 接下来会补充这部分代码
 export default compose([
-  views(join(__dirname, '../../views'), {
+  views(join(__dirname, viewPath), {
     extension: 'html',
     map: {
       html: 'ejs'

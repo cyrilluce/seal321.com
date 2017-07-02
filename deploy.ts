@@ -85,6 +85,15 @@ async function resolveAll(files) {
 }
 
 export const types = {
+    // 初始化建表
+    init: async function () {
+        return [{
+            title: '初始建表',
+            data: {
+                type: 'init'
+            }
+        }]
+    },
     // 文件发布
     file: async function (files) {
         // 开始分发

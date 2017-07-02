@@ -1,18 +1,42 @@
 {
-  "presets": [
-    [
-      "es2015",
-      {
-        "loose": true,
-        "modules": false
-      }
-    ],
-    "react"
-  ],
-  "ignore": [
-    "build/**/*"
-  ],
-  "plugins": [
-    // "transform-async-to-generator"
-  ]
+  "env": {
+    "production": {
+      "presets": [
+        [
+          "es2015",
+          {
+            "loose": true,
+            "modules": false
+          }
+        ],
+        "react"
+      ],
+      "ignore": [
+        "build/**/*"
+      ]
+    },
+    "development": {
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "chrome": 59
+            }
+          }
+        ],
+        [
+          "es2015",
+          {
+            "loose": true,
+            "modules": false
+          }
+        ],
+        "react"
+      ],
+      "ignore": [
+        "build/**/*"
+      ]
+    }
+  }
 }

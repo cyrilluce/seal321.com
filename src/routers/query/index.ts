@@ -3,6 +3,7 @@ import * as Koa from "koa"
 import * as Router from "koa-router";
 import * as compose from "koa-compose";
 import * as mysql from 'mysql';
+import withConn, { QueryContext as BaseQueryContext } from '../util/koa-mysql';
 import { getConnectionAsync } from '../../lib/mysql';
 import { promisify, promiseCall } from '../../util';
 import logger from '../../logger';
@@ -17,9 +18,7 @@ interface QueryRequest extends Koa.Request {
     body: any;
 }
 
-export interface QueryContext extends Koa.Context {
-    withConn: IWithConn;
-    logger: typeof logger;
+export interface QueryContext extends BaseQueryContext {
     success: (data: any) => void;
     failure: (msg: string) => void;
     request: QueryRequest;
@@ -35,7 +34,6 @@ export interface Condition {
 let router = new Router();
 // success与failure方法
 async function shortcutResponse(ctx: QueryContext, next) {
-    ctx.logger = logger;
     ctx.success = function (data) {
         ctx.body = {
             success: true,
@@ -64,23 +62,6 @@ async function ensureDb(ctx: QueryContext, next) {
 
     ctx.getTableName = (name)=>`seal_${loc}_${name}`;
 
-    ctx.withConn = async (asyncTask: IWithConnTask) => {
-        let conn: mysql.IConnection;
-        let data;
-        try {
-            conn = await getConnectionAsync();
-            let query = promisify<any[]>(conn.query, conn);
-            data = await asyncTask(conn, query);
-        } catch (err) {
-            throw err;
-        } finally {
-            if (conn) {
-                conn.release();
-            }
-        }
-        return data;
-    };
-
     try{
         await next();
     }catch(err){
@@ -89,7 +70,7 @@ async function ensureDb(ctx: QueryContext, next) {
     }
 };
 
-router.use(shortcutResponse).use(ensureDb);
+router.use(withConn).use(shortcutResponse).use(ensureDb);
 router.post('/list', list);
 router.post('/item', item);
 router.post('/setopt', setopt);
