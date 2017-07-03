@@ -12,9 +12,6 @@ async function fetchJson(url, headers) {
     options.agent = new HttpProxyAgent("http://127.0.0.1:1080");
   }
   const response = await fetch(url, options);
-  console.log(url)
-  console.log(response.status, response.statusText, response.headers)
-  console.log(await response.text())
   const json = await response.json();
   if (json.error) {
     throw json;
@@ -25,10 +22,7 @@ async function cacheFetch(url: string, params: {}, headers: {} = {}) {
   const fullUrl = url + "?" + stringify(params);
   const key = fullUrl + "#" + JSON.stringify(headers);
   if (!cached[key]) {
-    cached[key] = fetchJson(fullUrl, {
-        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        ...headers
-    });
+    cached[key] = fetchJson(fullUrl, headers);
   }
   cached[key].then(() => {
     delete cached[key];
