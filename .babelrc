@@ -3,9 +3,8 @@
     "production": {
       "presets": [
         [
-          "es2015",
+          "env",
           {
-            "loose": true,
             "modules": false
           }
         ],
@@ -22,13 +21,7 @@
           {
             "targets": {
               "chrome": 59
-            }
-          }
-        ],
-        [
-          "es2015",
-          {
-            "loose": true,
+            },
             "modules": false
           }
         ],

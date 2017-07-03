@@ -30,9 +30,11 @@ module.exports = {
                     'babel-loader', 
                     {
                         loader : 'ts-loader',
-                        // options : {
-                        //     configFileName : 'tsconfig.2015.json'
-                        // }
+                        options : {
+                            compilerOptions : {
+                                module : 'es2015'
+                            }
+                        }
                     }
                 ]
             }

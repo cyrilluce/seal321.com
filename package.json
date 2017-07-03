@@ -7,9 +7,9 @@
     "dev": "cross-env NODE_ENV=development node dev",
     "jsdev": "cross-env NODE_ENV=development node ts-build/dev",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && cross-env NODE_ENV=production node ./node_modules/webpack/bin/webpack --config webpack/webpack.browser.js --display-modules",
+    "build": "cross-env NODE_ENV=production webpack --config webpack/webpack.browser.js --display-modules",
     "watch": "ts-node tools/watch",
-    "publish": "ts-node deploy.ts publish"
+    "publish": "tsc -m commonjs && ts-node deploy.ts publish"
   },
   "author": "",
   "license": "ISC",
@@ -67,7 +67,6 @@
     "babel-cli": "^6.11.4",
     "babel-loader": "^6.2.4",
     "babel-preset-env": "^1.5.2",
-    "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "cross-env": "^4.0.0",
     "eslint": "^3.11.1",

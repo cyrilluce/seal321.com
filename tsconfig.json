@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es6",
+    "target": "es2017",
     "moduleResolution": "node",
     "baseUrl": "src",
     "allowSyntheticDefaultImports": true,
@@ -15,6 +15,10 @@
     "typeRoots": [
       "./node_modules/@types",
       "src/types"
+    ],
+    "lib":[
+      "dom",
+      "es2017"
     ],
     "types": [
       "node"
