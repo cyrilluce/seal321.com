@@ -3,11 +3,12 @@
  * id | rol | name | email | google | facebook
  */
 
+import { oAuthList } from '../config'
 module.exports = require('./base').extend({
     /** 不能覆盖，只能定制化操作 */
     isFullReplacable : false,
     // key : [], // 主键
-    indexes : [ ['weibo'], ['google'], ['facebook'] ],
+    indexes : oAuthList.map(type=>[type]),
     properties : [
         // 本站点的唯一ID
         {
@@ -39,20 +40,10 @@ module.exports = require('./base').extend({
             type : "string",
             max : 255
         },
-        {
-            name : "weibo",
+        ...oAuthList.map(type=>({
+            name : type,
             type : "string",
             max : 255
-        },
-        {
-            name : "google",
-            type : "string",
-            max : 255
-        },
-        {
-            name : "facebook",
-            type : "string",
-            max : 255
-        }
+        }))
     ]
 });

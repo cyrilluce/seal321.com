@@ -59,3 +59,11 @@ export const dbs:Servers = {
         skillRate : 0.3
     },
 }
+
+export const oAuthList = [
+    'weibo',
+    'baidu',
+    'google',
+    'facebook',
+    'twitter'
+]

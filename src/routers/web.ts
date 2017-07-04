@@ -2,6 +2,7 @@
  *
  * Created by cyrilluce on 2016/8/8.
  */
+import { parse } from 'url';
 import reactRouter from "./react";
 import Koa from "koa";
 import { koaLogger } from "./util";
@@ -15,7 +16,7 @@ import * as path from "path";
 import * as fs from "fs";
 import * as mount from "koa-mount";
 import * as Grant from "grant-koa";
-import * as config from "../config";
+import { oAuthList } from "../config";
 import { grantConfig as baseGrantConfig } from "../localConfig";
 import { grantConfig } from "../securityConfig";
 import logger from "../logger";
@@ -23,7 +24,8 @@ import * as cookieParser from "cookie-parser";
 import query from "./query";
 import react from "./react";
 import withConn, { QueryContext } from "./util/koa-mysql";
-import { weibo, google, facebook, GrantAPI } from "./util/grants";
+import { GrantAPI } from "./util/grants";
+import * as grantAPIs from "./util/grants";
 
 const accountTable = "account";
 
@@ -58,6 +60,10 @@ router.get(
   })
 );
 
+const oAuthAPIs: {[provider: string]: GrantAPI} = {};
+oAuthList.forEach(type=>{
+  oAuthAPIs[type] = grantAPIs[type]
+})
 router.use(
   "/oauth/callback/:provider",
   compose([
@@ -67,20 +73,12 @@ router.use(
       console.log(ctx.session.grant);
 
       const grant = ctx.session.grant;
+      // 信息只使用一次
+      delete ctx.session.grant;
+      
       const type = grant.provider;
       let id;
-      let api: GrantAPI;
-      switch (type) {
-        case "weibo":
-          api = weibo;
-          break;
-        case "google":
-          api = google;
-          break;
-        case "facebook":
-          api = facebook;
-          break;
-      }
+      let api: GrantAPI = oAuthAPIs[type];
       if (!api || !grant || !grant.response || !grant.response.access_token) {
         ctx.body = `登录失败`;
         return next();
@@ -163,6 +161,15 @@ router.use(
         ctx.session.user = user;
 
         ctx.logger.info("用户登录", type, user);
+
+        const url = grant.dynamic && grant.dynamic.url
+        if(url){
+          const urlObj = parse(url);
+          if(urlObj.host === baseGrantConfig.server.host){
+            ctx.redirect(url);
+            return next();
+          }
+        }
 
         ctx.body = `登录成功！${JSON.stringify(user)}`
 
