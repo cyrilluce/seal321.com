@@ -1,5 +1,6 @@
 import * as fetch from "isomorphic-fetch";
 import { stringify } from "qs";
+import logger from '../../logger';
 
 const cached = {};
 async function fetchJson(url, headers) {
@@ -14,7 +15,9 @@ async function fetchJson(url, headers) {
   const response = await fetch(url, options);
   const json = await response.json();
   if (json.error) {
-    throw json;
+    logger.error('Grant fetch error', json)
+    //throw json;
+    return {}
   }
   return json;
 }
