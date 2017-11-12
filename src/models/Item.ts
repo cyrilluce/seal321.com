@@ -469,8 +469,8 @@ export class Item extends IDLoadable<IItem> {
         // 属性成长通常是1234，但武器类的属性成长是1246
         const propertyFactor = this.weapon ? weaponPropertyFactors[addLevel] : propertyFactors[addLevel];
         const limitFactor = limitFactors[addLevel];
-        // 武器类、战宠装备、宠物的增减伤增长快，其它的4 7 10才+1
-        const percentFactor = (this.weapon || type === ItemType.BATTLE_PET_EQUIPMENT || type === ItemType.ITEM_PET) ? weaponPercentFactors[addLevel] : percentFactors[addLevel];
+        // 武器类（非盾牌）、战宠装备、宠物的增减伤增长快，其它的4 7 10才+1
+        const percentFactor = (this.weapon && type !== ItemType.ITEM_SHEILD || type === ItemType.BATTLE_PET_EQUIPMENT || type === ItemType.ITEM_PET) ? weaponPercentFactors[addLevel] : percentFactors[addLevel];
         // 价格是比例加的
         const priceFactor = priceFactors[addLevel];
         // 所需喂养值也是按比例加的
