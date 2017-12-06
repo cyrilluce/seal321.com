@@ -22,9 +22,16 @@ ts-node pickup cn setopt
 
 #2.1 批量提取物品图标
 ts-node tools/findNewer tw2 item
-cd sampleDir/tw2/source/item/noVersion
+cd F:/seal-samples/tw2/source/item/noVersion
 pickupTex
-photoshop dds to png
+DDS Convertor
+
+有时tw的更新
+cd F:/webwork/seal321
+ts-node tools/findNewer t2 item
+cd F:/seal-samples/tw2/source/item/noVersion
+pickupTex
+DDS Convertor
 
 #2.2 提取服务端掉落
 ts-node tools/dropPicker/index
