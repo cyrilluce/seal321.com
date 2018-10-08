@@ -1,4 +1,4 @@
-import { Item as IItem, ItemInstance, ItemType, GType, Job, BattlePetJob, EquipPosition, TypeRes1 } from '../types';
+import { Item as IItem, ItemInstance, ItemType, GType, Job, BattlePetJob, EquipPosition, TypeRes1, HumanizeTypes, HumanizeType } from '../types';
 import { observable, computed, action, reaction, autorun } from 'mobx';
 import { ServerId, mainDb } from '../config';
 import * as query from '../stores/query';
@@ -18,6 +18,8 @@ import { IDLoadable, Param } from './IDLoadable';
  * 鞋子类
  * 
  */
+
+ const weaponSet = new Set<ItemType>(HumanizeTypes[HumanizeType.WEAPON]);
 
 /** 不可以装备的 */
 const UnEquipable = [
@@ -533,8 +535,9 @@ export class Item extends IDLoadable<IItem> {
     }
     /** 是否是武器 TODO 以后改为按type判断？ */
     @computed get weapon() {
+        return weaponSet.has(this.data.type)
         // 武器G书也在此类里
-        return this.data.g_type === GType.WEAPON && this.data.type !== ItemType.BOOK;
+        // return this.data.g_type === GType.WEAPON && this.data.type !== ItemType.BOOK;
     }
     /** 是否是防具 */
     @computed get armour() {
