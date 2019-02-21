@@ -90,7 +90,7 @@
 
 "@types/isomorphic-fetch@^0.0.35":
   version "0.0.35"
-  resolved "https://registry.yarnpkg.com/@types/isomorphic-fetch/download/@types/isomorphic-fetch-0.0.35.tgz#c1c0d402daac324582b6186b91f8905340ea3361"
+  resolved "https://registry.yarnpkg.com/@types/isomorphic-fetch/-/@types/isomorphic-fetch-0.0.35.tgz#c1c0d402daac324582b6186b91f8905340ea3361"
   integrity sha1-wcDUAtqsMkWCthhrkfiQU0DqM2E=
 
 "@types/keygrip@*":
@@ -142,7 +142,7 @@
 
 "@types/node@^11.9.4":
   version "11.9.4"
-  resolved "https://registry.yarnpkg.com/@types/node/download/@types/node-11.9.4.tgz#ceb0048a546db453f6248f2d1d95e937a6f00a14"
+  resolved "https://registry.yarnpkg.com/@types/node/-/@types/node-11.9.4.tgz#ceb0048a546db453f6248f2d1d95e937a6f00a14"
   integrity sha1-zrAEilRttFP2JI8tHZXpN6bwChQ=
 
 "@types/qs@^6.4.0":
@@ -171,7 +171,7 @@
 
 "@types/react@*", "@types/react@^15.6.22":
   version "15.6.22"
-  resolved "https://registry.yarnpkg.com/@types/react/download/@types/react-15.6.22.tgz#4adc49efc3bf503fa209281f4b94d0dfd8e4a90d"
+  resolved "https://registry.yarnpkg.com/@types/react/-/@types/react-15.6.22.tgz#4adc49efc3bf503fa209281f4b94d0dfd8e4a90d"
   integrity sha1-StxJ78O/UD+iCSgfS5TQ39jkqQ0=
 
 "@types/rx-core-binding@*":
@@ -435,7 +435,7 @@ are-we-there-yet@~1.1.2:
 
 arg@^4.1.0:
   version "4.1.0"
-  resolved "https://registry.yarnpkg.com/arg/download/arg-4.1.0.tgz#583c518199419e0037abb74062c37f8519e575f0"
+  resolved "https://registry.yarnpkg.com/arg/-/arg-4.1.0.tgz#583c518199419e0037abb74062c37f8519e575f0"
   integrity sha1-WDxRgZlBngA3q7dAYsN/hRnldfA=
 
 argparse@^1.0.7:
@@ -3513,7 +3513,7 @@ isobject@^3.0.0, isobject@^3.0.1:
 
 isomorphic-fetch@^2.1.1, isomorphic-fetch@^2.2.1:
   version "2.2.1"
-  resolved "https://registry.yarnpkg.com/isomorphic-fetch/download/isomorphic-fetch-2.2.1.tgz#611ae1acf14f5e81f729507472819fe9733558a9"
+  resolved "https://registry.yarnpkg.com/isomorphic-fetch/-/isomorphic-fetch-2.2.1.tgz#611ae1acf14f5e81f729507472819fe9733558a9"
   integrity sha1-YRrhrPFPXoH3KVB0coGf6XM1WKk=
   dependencies:
     node-fetch "^1.0.1"
@@ -4644,7 +4644,7 @@ prop-types@^15.5.0, prop-types@^15.5.10, prop-types@^15.5.7, prop-types@^15.5.8:
 
 prop-types@^15.5.4, prop-types@^15.6.0:
   version "15.7.2"
-  resolved "https://registry.yarnpkg.com/prop-types/download/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha1-UsQedbjIfnK52TYOAga5ncv/psU=
   dependencies:
     loose-envify "^1.4.0"
@@ -4690,7 +4690,7 @@ punycode@^1.2.4, punycode@^1.4.1:
 
 punycode@^2.1.1:
   version "2.1.1"
-  resolved "https://registry.yarnpkg.com/punycode/download/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
+  resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha1-tYsBCsQMIsVldhbI0sLALHv0eew=
 
 q@^1.1.2:
@@ -4821,7 +4821,7 @@ react-dom@^15.3.0:
 
 react-draggable@^3.1.1:
   version "3.1.1"
-  resolved "https://registry.yarnpkg.com/react-draggable/download/react-draggable-3.1.1.tgz#ed1db43e09b146805f6d158296e58eae4f768d36"
+  resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-3.1.1.tgz#ed1db43e09b146805f6d158296e58eae4f768d36"
   integrity sha1-7R20PgmxRoBfbRWCluWOrk92jTY=
   dependencies:
     classnames "^2.2.5"
@@ -4829,7 +4829,7 @@ react-draggable@^3.1.1:
 
 react-gateway@^3.0.0:
   version "3.0.0"
-  resolved "https://registry.yarnpkg.com/react-gateway/download/react-gateway-3.0.0.tgz#95872a3cbadca8e6dc631d8276389c7ef39777e5"
+  resolved "https://registry.yarnpkg.com/react-gateway/-/react-gateway-3.0.0.tgz#95872a3cbadca8e6dc631d8276389c7ef39777e5"
   integrity sha1-lYcqPLrcqObcYx2CdjicfvOXd+U=
   dependencies:
     prop-types "^15.5.0"
@@ -4850,7 +4850,7 @@ react-hot-loader@^1.3.1:
 
 react-is@^16.8.1:
   version "16.8.2"
-  resolved "https://registry.yarnpkg.com/react-is/download/react-is-16.8.2.tgz#09891d324cad1cb0c1f2d91f70a71a4bee34df0f"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.2.tgz#09891d324cad1cb0c1f2d91f70a71a4bee34df0f"
   integrity sha1-CYkdMkytHLDB8tkfcKcaS+403w8=
 
 react-onclickoutside@^4.9.0:
@@ -4878,7 +4878,7 @@ react-prop-types@^0.4.0:
 
 react-redux@4:
   version "4.4.9"
-  resolved "https://registry.yarnpkg.com/react-redux/download/react-redux-4.4.9.tgz#8ca6d4670925a454ce67086c2305e9630670909a"
+  resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-4.4.9.tgz#8ca6d4670925a454ce67086c2305e9630670909a"
   integrity sha1-jKbUZwklpFTOZwhsIwXpYwZwkJo=
   dependencies:
     create-react-class "^15.5.1"
@@ -5100,14 +5100,14 @@ repeating@^2.0.0:
 
 request-promise-core@1.1.2:
   version "1.1.2"
-  resolved "https://registry.yarnpkg.com/request-promise-core/download/request-promise-core-1.1.2.tgz#339f6aababcafdb31c799ff158700336301d3346"
+  resolved "https://registry.yarnpkg.com/request-promise-core/-/request-promise-core-1.1.2.tgz#339f6aababcafdb31c799ff158700336301d3346"
   integrity sha1-M59qq6vK/bMceZ/xWHADNjAdM0Y=
   dependencies:
     lodash "^4.17.11"
 
 request-promise-native@^1.0.7:
   version "1.0.7"
-  resolved "https://registry.yarnpkg.com/request-promise-native/download/request-promise-native-1.0.7.tgz#a49868a624bdea5069f1251d0a836e0d89aa2c59"
+  resolved "https://registry.yarnpkg.com/request-promise-native/-/request-promise-native-1.0.7.tgz#a49868a624bdea5069f1251d0a836e0d89aa2c59"
   integrity sha1-pJhopiS96lBp8SUdCoNuDYmqLFk=
   dependencies:
     request-promise-core "1.1.2"
@@ -5431,7 +5431,7 @@ source-map-support@^0.4.15:
 
 source-map-support@^0.5.6:
   version "0.5.10"
-  resolved "https://registry.yarnpkg.com/source-map-support/download/source-map-support-0.5.10.tgz#2214080bc9d51832511ee2bab96e3c2f9353120c"
+  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.10.tgz#2214080bc9d51832511ee2bab96e3c2f9353120c"
   integrity sha1-IhQIC8nVGDJRHuK6uW48L5NTEgw=
   dependencies:
     buffer-from "^1.0.0"
@@ -5533,7 +5533,7 @@ static-extend@^0.1.1:
 
 stealthy-require@^1.1.1:
   version "1.1.1"
-  resolved "https://registry.yarnpkg.com/stealthy-require/download/stealthy-require-1.1.1.tgz#35b09875b4ff49f26a777e509b3090a3226bf24b"
+  resolved "https://registry.yarnpkg.com/stealthy-require/-/stealthy-require-1.1.1.tgz#35b09875b4ff49f26a777e509b3090a3226bf24b"
   integrity sha1-NbCYdbT/SfJqd35QmzCQoyJr8ks=
 
 stream-browserify@^2.0.1:
@@ -5757,7 +5757,7 @@ toidentifier@1.0.0:
 
 tough-cookie@^2.3.3:
   version "2.5.0"
-  resolved "https://registry.yarnpkg.com/tough-cookie/download/tough-cookie-2.5.0.tgz#cd9fb2a0aa1d5a12b473bd9fb96fa3dcff65ade2"
+  resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.5.0.tgz#cd9fb2a0aa1d5a12b473bd9fb96fa3dcff65ade2"
   integrity sha1-zZ+yoKodWhK0c72fuW+j3P9lreI=
   dependencies:
     psl "^1.1.28"
@@ -5811,7 +5811,7 @@ ts-loader@^1.3.0:
 
 ts-node@^8.0.2:
   version "8.0.2"
-  resolved "https://registry.yarnpkg.com/ts-node/download/ts-node-8.0.2.tgz#9ecdf8d782a0ca4c80d1d641cbb236af4ac1b756"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.0.2.tgz#9ecdf8d782a0ca4c80d1d641cbb236af4ac1b756"
   integrity sha1-ns3414KgykyA0dZBy7I2r0rBt1Y=
   dependencies:
     arg "^4.1.0"
@@ -5859,7 +5859,7 @@ typedarray@^0.0.6:
 
 typescript@^3.3.3:
   version "3.3.3"
-  resolved "https://registry.yarnpkg.com/typescript/download/typescript-3.3.3.tgz#f1657fc7daa27e1a8930758ace9ae8da31403221"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.3.3.tgz#f1657fc7daa27e1a8930758ace9ae8da31403221"
   integrity sha1-8WV/x9qifhqJMHWKzpro2jFAMiE=
 
 ua-parser-js@^0.7.18, ua-parser-js@^0.7.9:
@@ -6234,5 +6234,5 @@ ylru@^1.2.0:
 
 yn@^3.0.0:
   version "3.0.0"
-  resolved "https://registry.yarnpkg.com/yn/download/yn-3.0.0.tgz#0073c6b56e92aed652fbdfd62431f2d6b9a7a091"
+  resolved "https://registry.yarnpkg.com/yn/-/yn-3.0.0.tgz#0073c6b56e92aed652fbdfd62431f2d6b9a7a091"
   integrity sha1-AHPGtW6SrtZS+9/WJDHy1rmnoJE=
