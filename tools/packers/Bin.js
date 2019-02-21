@@ -199,7 +199,7 @@ var Packer = Base.extend({
 
                 // 过滤 \0 后的字符，防止错误
                 var endIndex = findStrEndIndex(value, 0, charSize);
-                var buffer = Buffer.from(endIndex*charSize);
+                var buffer = Buffer.alloc(endIndex*charSize);
                 value.copy(buffer);
                 value = buffer;
 
