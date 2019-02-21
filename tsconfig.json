@@ -26,9 +26,7 @@
   },
   "exclude": [
     "www",
-    "ts-build",
-    "node_modules",
-    "!node_modules/@types"
+    "ts-build"
   ],
   "compileOnSave": false
 }

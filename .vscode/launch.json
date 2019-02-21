@@ -8,7 +8,10 @@
             "type": "ts-node",
             "request": "launch",
             "name": "启动程序",
-            "program": "tools/dropPicker/index.ts",
+            "program": "tools/watch",
+            "env": {
+                "http_proxy": "http://web-proxy.oa.com:8080"
+            },
             "outFiles": [
                 "${workspaceRoot}/out/**/*.js"
             ]

@@ -4,8 +4,7 @@
  * @date 2013-6-29
  */
 var Base = require('../util').Base;
-
-var Iconv = require("iconv").Iconv;
+var iconv = require('iconv-lite');
 
 var findStrEndIndex = function(buffer, offset, charSize){ // 只支持charSize為1或2
     offset = offset || 0;
@@ -206,7 +205,7 @@ var Packer = Base.extend({
 
                 if(!config.noEncoding){
                     try{
-                        value = this._getReadIconv().convert(value);
+                        value = iconv.decode(value, this._basicEncoding);
                     }catch(e){
                         logger.error("try to convert string error:"+value.toString()+" "+this._encoding + "->" + this._basicEncoding);
                         value = new Buffer("[Seal321]convert string fail...");
@@ -219,7 +218,7 @@ var Packer = Base.extend({
                 value = new Buffer(value);
                 if(!config.noEncoding){
                     try{
-                        value = this._getWriteIconv().convert(value);
+                        value = iconv.encode(value, this._encoding);
                     }catch(e){
                         logger.error("try to convert string error:"+value.toString()+" "+this._basicEncoding + "->" + this._encoding);
                         value = new Buffer("[Seal321]convert string fail...");
@@ -340,23 +339,7 @@ var Packer = Base.extend({
     setEncoding : function(encoding){
         if(encoding){
             this._encoding = encoding;
-            this._writeIconv = null;
-            this._readIconv = null;
         }
-    },
-    _getReadIconv : function(){
-        var iconv = this._readIconv;
-        if(!iconv){
-            iconv = this._readIconv = new Iconv(this._encoding, this._basicEncoding+'//IGNORE//TRANSLIT');
-        }
-        return iconv;
-    },
-    _getWriteIconv : function(){
-        var iconv = this._writeIconv;
-        if(!iconv){
-            iconv = this._writeIconv = new Iconv(this._basicEncoding, this._encoding+'//IGNORE//TRANSLIT');
-        }
-        return iconv;
     },
     /**
      * 用于读取时设定数据源
