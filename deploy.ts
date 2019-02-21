@@ -31,7 +31,6 @@ export function deploy(data, cb) {
         if(err){
             return cb(err)
         }
-        fs.writeFileSync('E:/test.txt', body)
         cb(body === 'success' ? null : '服务器返回错误：' + body);
     });
 }
