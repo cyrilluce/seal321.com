@@ -4690,7 +4690,7 @@ punycode@^1.2.4, punycode@^1.4.1:
 
 punycode@^2.1.1:
   version "2.1.1"
-  resolved "http://r.tnpm.oa.com/punycode/download/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
+  resolved "https://registry.yarnpkg.com/punycode/download/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha1-tYsBCsQMIsVldhbI0sLALHv0eew=
 
 q@^1.1.2:
@@ -4829,7 +4829,7 @@ react-draggable@^3.1.1:
 
 react-gateway@^3.0.0:
   version "3.0.0"
-  resolved "http://r.tnpm.oa.com/react-gateway/download/react-gateway-3.0.0.tgz#95872a3cbadca8e6dc631d8276389c7ef39777e5"
+  resolved "https://registry.yarnpkg.com/react-gateway/download/react-gateway-3.0.0.tgz#95872a3cbadca8e6dc631d8276389c7ef39777e5"
   integrity sha1-lYcqPLrcqObcYx2CdjicfvOXd+U=
   dependencies:
     prop-types "^15.5.0"
@@ -5100,14 +5100,14 @@ repeating@^2.0.0:
 
 request-promise-core@1.1.2:
   version "1.1.2"
-  resolved "http://r.tnpm.oa.com/request-promise-core/download/request-promise-core-1.1.2.tgz#339f6aababcafdb31c799ff158700336301d3346"
+  resolved "https://registry.yarnpkg.com/request-promise-core/download/request-promise-core-1.1.2.tgz#339f6aababcafdb31c799ff158700336301d3346"
   integrity sha1-M59qq6vK/bMceZ/xWHADNjAdM0Y=
   dependencies:
     lodash "^4.17.11"
 
 request-promise-native@^1.0.7:
   version "1.0.7"
-  resolved "http://r.tnpm.oa.com/request-promise-native/download/request-promise-native-1.0.7.tgz#a49868a624bdea5069f1251d0a836e0d89aa2c59"
+  resolved "https://registry.yarnpkg.com/request-promise-native/download/request-promise-native-1.0.7.tgz#a49868a624bdea5069f1251d0a836e0d89aa2c59"
   integrity sha1-pJhopiS96lBp8SUdCoNuDYmqLFk=
   dependencies:
     request-promise-core "1.1.2"
@@ -5533,7 +5533,7 @@ static-extend@^0.1.1:
 
 stealthy-require@^1.1.1:
   version "1.1.1"
-  resolved "http://r.tnpm.oa.com/stealthy-require/download/stealthy-require-1.1.1.tgz#35b09875b4ff49f26a777e509b3090a3226bf24b"
+  resolved "https://registry.yarnpkg.com/stealthy-require/download/stealthy-require-1.1.1.tgz#35b09875b4ff49f26a777e509b3090a3226bf24b"
   integrity sha1-NbCYdbT/SfJqd35QmzCQoyJr8ks=
 
 stream-browserify@^2.0.1:
@@ -5757,7 +5757,7 @@ toidentifier@1.0.0:
 
 tough-cookie@^2.3.3:
   version "2.5.0"
-  resolved "http://r.tnpm.oa.com/tough-cookie/download/tough-cookie-2.5.0.tgz#cd9fb2a0aa1d5a12b473bd9fb96fa3dcff65ade2"
+  resolved "https://registry.yarnpkg.com/tough-cookie/download/tough-cookie-2.5.0.tgz#cd9fb2a0aa1d5a12b473bd9fb96fa3dcff65ade2"
   integrity sha1-zZ+yoKodWhK0c72fuW+j3P9lreI=
   dependencies:
     psl "^1.1.28"
