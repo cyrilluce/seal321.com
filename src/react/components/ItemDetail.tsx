@@ -1,6 +1,6 @@
 import * as React from "react";
 import { inject, observer } from "mobx-react";
-import * as Draggable from "react-draggable";
+import Draggable from "react-draggable";
 import { getIconStyle } from "../util";
 import { Item, ItemType, Job, BattlePetJob } from "../../types";
 import { ItemDbStore } from "../../stores";

@@ -11,7 +11,7 @@ import deploy from "./routers/deploy";
 import * as session from "koa-session";
 import * as localConfig from "./localConfig";
 
-process.on("unhandledrejection", (reason, p) => {
+process.on("unhandledRejection", (reason, p) => {
   logger.error("Unhandled Rejection at: Promise ", p, " reason: ", reason);
   throw reason;
 });

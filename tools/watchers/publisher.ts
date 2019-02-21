@@ -7,7 +7,7 @@ import { watch as fsWatch } from 'fs';
 import { readdir, stat, writeFile } from 'mz/fs'
 import { join } from 'path'
 import * as semver from 'semver';
-import * as isomorphicFetch from 'isomorphic-fetch';
+import * as request from 'request-promise-native'
 import * as config from '../config';
 import { deployServer } from '../../config';
 import { Result } from '../../src/routers/query/version'
@@ -80,16 +80,13 @@ async function watchType(serverId: string, type: string){
             // 延时，有可能文件还在写入
             await delay(10000);
             // 判断最新版发布过没
-            const response = await isomorphicFetch(`https://${deployServer}/node/query/version`, {
+            const result = await request(`https://${deployServer}/node/query/version`, {
                 method: 'POST',
-                headers : {
-                    "Content-Type": "application/json"
-                },
-                body : JSON.stringify({
+                body : {
                     loc : serverId
-                })
+                },
+                json: true
             })
-            const result = await response.json();
             const versions: Result = result.data;
             const serverVersion = versions[type].version;
 

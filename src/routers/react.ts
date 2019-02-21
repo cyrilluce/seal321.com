@@ -1,7 +1,7 @@
 /**
  * Created by cyrilluce on 2016/8/14.
  */
-import React from 'react';
+import * as React from 'react';
 import { renderToString } from 'react-dom/server';
 import { useStaticRendering } from 'mobx-react';
 import { when, toJS } from 'mobx';
@@ -33,11 +33,11 @@ export default compose([
       html: 'ejs'
     },
     options : {
-      cache: process.env !== 'development',
+      cache: process.env.NODE_ENV !== 'development',
       filename: 'ejscache'
     }
   }),
-  async (ctx, next) => {
+  async (ctx: any, next) => {
     const startTime = Date.now();
     const store = new ItemDbStore().init();
     store.navigateParams(ctx.params, ctx.request.query);

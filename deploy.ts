@@ -6,12 +6,12 @@
  * Created by cyrilluce on 2016/8/6.
  */
 
-var http = require('http');
 var path = require('path');
 var asyncLib = require('async');
 var crypto = require('crypto');
 var fs = require('mz/fs');
-var deployUtil = require('./src/util/deploy');
+import * as deployUtil from './src/util/deploy';
+import * as request from 'request'
 var recursive = require('recursive-readdir');
 import { promisify, delay, timeout } from './src/util';
 import * as localConfig from './src/localConfig';
@@ -21,28 +21,19 @@ import { RelationUpdates } from './src/routers/deploy';
 let args: any = {_:[]};
 
 export function deploy(data, cb) {
-    var req = http.request({
-        hostname: args.D ? '127.0.0.1' : localConfig.deployServer,
-        port: localConfig.deployPort,
-        path: '/',
+    request(`http://${args.D ? '127.0.0.1' : localConfig.deployServer}:${localConfig.deployPort}/`, {
         method: 'POST',
-        timeout: 15000
-    }, res => {
-        var bufs = [];
-        res.on('data', function (d) { bufs.push(d); });
-        res.on('end', function () {
-            var buf = Buffer.concat(bufs);
-            var body = buf.toString();
-
-            cb(body === 'success' ? null : '服务器返回错误：' + body);
-        });
+        timeout: 30000,
+        body: deployUtil.pack(Object.assign({
+            timestamp: Date.now()
+        }, data))
+    }, (err, response, body) => {
+        if(err){
+            return cb(err)
+        }
+        fs.writeFileSync('E:/test.txt', body)
+        cb(body === 'success' ? null : '服务器返回错误：' + body);
     });
-
-    deployUtil.pack(Object.assign({
-        timestamp: Date.now()
-    }, data)).pipe(req);
-
-    req.on('error', cb);
 }
 
 export const deployAsync = promisify<any>(deploy, null);
