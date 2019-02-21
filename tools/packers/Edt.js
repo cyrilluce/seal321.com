@@ -14,7 +14,7 @@ module.exports = Base.extend({
         var buffer, encrypted;
         if(key && (key.imul || key.add || key.orig)){
             encrypted = SealUtil.encrypt(data, key.imul, key.add, key.orig);
-            buffer = new Buffer(encrypted.length + 0x10);
+            buffer = Buffer.from(encrypted.length + 0x10);
             buffer.writeUInt32LE(this.CUSTOM_KEY_SIGN, 0);
             buffer.writeUInt32LE(key.imul, 0x4);
             buffer.writeUInt32LE(key.add, 0x8);

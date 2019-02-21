@@ -31,7 +31,7 @@ var DEFAULT_SIZE = 512,
 var DynamicBuffer = module.exports = function(_size, _factor)
 {
 	this.length = 0;
-	this.buffer = new Buffer(_size || DEFAULT_SIZE);
+	this.buffer = Buffer.from(_size || DEFAULT_SIZE);
 	this.resizeFactor = _factor || DEFAULT_FACTOR;
 };
 
@@ -94,7 +94,7 @@ DynamicBuffer.prototype.clone = function(_newBufferSize, _newResizeFactor)
 DynamicBuffer.prototype.resizeUnderlyingBuffer = function(_size)
 {
 	var oldBuffer = this.buffer;
-	this.buffer = new Buffer(_size || this.length);
+	this.buffer = Buffer.from(_size || this.length);
 	oldBuffer.copy(this.buffer);
 	return this;
 };
@@ -123,7 +123,7 @@ function ensureSize(_additionalDataSize)
 		/* other possibility: take the current buffer length and multiply
 		 * it with resizeFactor until it is large enough
 		 */
-		this.buffer = new Buffer(~~(neededSize * this.resizeFactor));
+		this.buffer = Buffer.from(~~(neededSize * this.resizeFactor));
 		oldBuffer.copy(this.buffer);
 	}
 }

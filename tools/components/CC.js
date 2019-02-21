@@ -9,7 +9,7 @@ for(i=0; i<simple.length; i++){
 
 module.exports = {
 	toSimple : function(str){
-		var i, c, buffer = new Buffer(str);
+		var i, c, buffer = Buffer.from(str);
 		for(i=0; i<str.length; i++){
 			c = str.charAt(i);
 			if(reverseMap.hasOwnProperty(c)){

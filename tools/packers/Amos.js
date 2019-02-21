@@ -120,12 +120,12 @@ module.exports = Base.extend({
             indexWriter.batchWrite(this.subHeaderStructure, fileHeader);
             fileListBuffer.concat(file.data);
             // 4字节对齐
-            var zeroPadBuffer = new Buffer(alignedSize - size);
+            var zeroPadBuffer = Buffer.from(alignedSize - size);
             zeroPadBuffer.fill(0);
 //				console.log(fileListBuffer.length, zeroPadBuffer.length);
             fileListBuffer.concat(zeroPadBuffer);
         });
-        var headerRes2 = new Buffer(0x20);
+        var headerRes2 = Buffer.from(0x20);
         headerRes2.fill(0);
         header = {
             name : "Amos Resource File;",

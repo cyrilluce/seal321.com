@@ -33,10 +33,10 @@ var Packer = Base.extend({
             write : function(value, config){
                 var data;
                 if(!(value instanceof Buffer)){
-                    value = new Buffer(value, 'ascii');
+                    value = Buffer.from(value, 'ascii');
                 }
                 if(config.length){
-                    data = new Buffer(config.length);
+                    data = Buffer.from(config.length);
                     data.fill(0);
                     value.copy(data);
                 }else{
@@ -176,13 +176,13 @@ var Packer = Base.extend({
             write : function(value, config){
                 var lengthSize = config.lengthSize || 4,
                     charSize = config.charSize || 1;
-                value = new Buffer(value);
+                value = Buffer.from(value);
                 if(!config.noEncoding){
                     try{
                         value = this._getWriteIconv().convert(value);
                     }catch(e){
                         logger.error("try to convert string error:"+value.toString()+" "+this._encoding + "->" + this._basicEncoding);
-                        value = new Buffer("[Seal321]convert string fail...");
+                        value = Buffer.from("[Seal321]convert string fail...");
                     }
                 }
                 var length = (value.length / charSize);//  || 1; // 不让出现为0的字串
@@ -199,7 +199,7 @@ var Packer = Base.extend({
 
                 // 过滤 \0 后的字符，防止错误
                 var endIndex = findStrEndIndex(value, 0, charSize);
-                var buffer = new Buffer(endIndex*charSize);
+                var buffer = Buffer.from(endIndex*charSize);
                 value.copy(buffer);
                 value = buffer;
 
@@ -208,24 +208,24 @@ var Packer = Base.extend({
                         value = iconv.decode(value, this._basicEncoding);
                     }catch(e){
                         logger.error("try to convert string error:"+value.toString()+" "+this._encoding + "->" + this._basicEncoding);
-                        value = new Buffer("[Seal321]convert string fail...");
+                        value = Buffer.from("[Seal321]convert string fail...");
                     }
                 }
                 this.offset += length;
                 return value.toString();
             },
             write : function(value, config){ // 如果没有指定length，则按当前字串转码后的长度来计算
-                value = new Buffer(value);
+                value = Buffer.from(value);
                 if(!config.noEncoding){
                     try{
                         value = iconv.encode(value, this._encoding);
                     }catch(e){
                         logger.error("try to convert string error:"+value.toString()+" "+this._basicEncoding + "->" + this._encoding);
-                        value = new Buffer("[Seal321]convert string fail...");
+                        value = Buffer.from("[Seal321]convert string fail...");
                     }
                 }
                 var length = config.length || value.length;
-                var buffer = new Buffer(length);
+                var buffer = Buffer.from(length);
                 buffer.fill(0);
                 value.copy(buffer);
                 this.dest.concat(buffer);

@@ -59,7 +59,7 @@ require("../../framework/cy");
 			}else{
 				this.data[key] = value;
 			}
-			this.writer.write(new Buffer(JSON.stringify(this.data)), callback, scope);
+			this.writer.write(Buffer.from(JSON.stringify(this.data)), callback, scope);
 		}
 	});
 	module.exports = Provider;

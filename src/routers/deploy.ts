@@ -28,7 +28,7 @@ async function backupFile(filePath) {
 }
 
 async function processFile(data) {
-    let content = new Buffer(data.content, 'hex');
+    let content = Buffer.from(data.content, 'hex');
     let filePath = path.resolve(__dirname, '../..', data.filePath);
 
     // 保证目录存在

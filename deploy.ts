@@ -219,7 +219,7 @@ export const types = {
             data: {
                 type: 'file',
                 filePath: 'versions.js',
-                content: new Buffer(`module.exports=${JSON.stringify(versions)}`).toString('hex')
+                content: Buffer.from(`module.exports=${JSON.stringify(versions)}`).toString('hex')
             }
         });
         const restartTasks = await types.restart();

@@ -14,7 +14,7 @@
 				/* other possibility: take the current buffer length and multiply
 				 * it with resizeFactor until it is large enough
 				 */
-				this.buffer = new Buffer(~~(neededSize * this.resizeFactor));
+				this.buffer = Buffer.from(~~(neededSize * this.resizeFactor));
 				oldBuffer.copy(this.buffer);
 			}
 		}
