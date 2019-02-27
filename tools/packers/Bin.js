@@ -179,7 +179,7 @@ var Packer = Base.extend({
                 value = Buffer.from(value);
                 if(!config.noEncoding){
                     try{
-                        value = this._getWriteIconv().convert(value);
+                        value = iconv.encode(value, this._basicEncoding);
                     }catch(e){
                         logger.error("try to convert string error:"+value.toString()+" "+this._encoding + "->" + this._basicEncoding);
                         value = Buffer.from("[Seal321]convert string fail...");
@@ -205,7 +205,7 @@ var Packer = Base.extend({
 
                 if(!config.noEncoding){
                     try{
-                        value = iconv.decode(value, this._basicEncoding);
+                        value = iconv.decode(value, this._encoding);
                     }catch(e){
                         logger.error("try to convert string error:"+value.toString()+" "+this._encoding + "->" + this._basicEncoding);
                         value = Buffer.from("[Seal321]convert string fail...");
@@ -218,7 +218,7 @@ var Packer = Base.extend({
                 value = Buffer.from(value);
                 if(!config.noEncoding){
                     try{
-                        value = iconv.encode(value, this._encoding);
+                        value = iconv.encode(value, this._basicEncoding);
                     }catch(e){
                         logger.error("try to convert string error:"+value.toString()+" "+this._basicEncoding + "->" + this._encoding);
                         value = Buffer.from("[Seal321]convert string fail...");
