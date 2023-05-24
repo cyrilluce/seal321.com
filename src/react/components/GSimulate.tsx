@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Component, PropTypes } from "react";
 import { autorun } from "mobx";
 import { inject, observer } from "mobx-react";

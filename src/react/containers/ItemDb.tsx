@@ -1,7 +1,7 @@
 /**
  * Created by cyrilluce on 2016/8/14.
  */
-import * as React from "react";
+import React from "react";
 import { Component, PropTypes, ComponentClass } from "react";
 import { observer, inject } from "mobx-react";
 import { GatewayProvider, GatewayDest } from "react-gateway";
@@ -10,7 +10,7 @@ import SearchList from "../components/SearchList";
 import ItemDetail from "../components/ItemDetail";
 import GSimulate from "../components/GSimulate";
 import Version from "../components/Version";
-import * as ReactPaginate from "react-paginate";
+import ReactPaginate from "react-paginate";
 import { ItemDbStore } from "../../stores";
 import { sendEvent } from "../../util";
 import { DragDropContext } from "react-dnd";

@@ -2,12 +2,12 @@
  * 自动发布
  * 对比现网版本，如果本地更新，则自动更新之（deploy db server type）
  */
-import * as Rx from 'rx';
+import Rx from 'rx';
 import { watch as fsWatch } from 'fs';
 import { readdir, stat, writeFile } from 'mz/fs'
 import { join } from 'path'
-import * as semver from 'semver';
-import * as request from 'request-promise-native'
+import semver from 'semver';
+import request from 'request-promise-native'
 import * as config from '../config';
 import { deployServer } from '../../config';
 import { Result } from '../../src/routers/query/version'

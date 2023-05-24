@@ -4,12 +4,12 @@
  */
 "use strict";
 
-import * as React from 'react';
+import React from 'react';
 import { Component, PropTypes } from 'react'
 import { inject, observer } from 'mobx-react';
 import {ItemDbStore} from '../../stores';
 import SearchItem from './SearchItem'
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 
 interface Props {
     store?: ItemDbStore,

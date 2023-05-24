@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 import { observer } from 'mobx-react'
 import { SetOptions, SetOptionModel } from '../../models'
 import { SetOption } from '../../types'
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 
 interface Props {
     /** 套装属性 */

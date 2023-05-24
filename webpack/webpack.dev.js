@@ -21,19 +21,24 @@ module.exports = {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
                 //include: path.join(__dirname, '../src'),
-                use: ['react-hot-loader', 'babel-loader']
+                use: ['babel-loader']
             },
             {
                 test : /\.tsx?$/,
                 exclude: /node_modules/,
                 //include: path.join(__dirname, '../src'),
-                use : ['react-hot-loader', 'babel-loader', 'ts-loader']
+                use : ['babel-loader', {
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true,
+                    }
+                }]
             }
         ]
     },
     entry : [
         //`webpack-hot-middleware/client?path=http://localhost:${config.localHotLoadPort}`,
-        `webpack-hot-middleware/client`, // WebpackDevServer host and port
+        // `webpack-hot-middleware/client`, // WebpackDevServer host and port
         // 'webpack/hot/only-dev-server',
         './src/entries/db.ts'
     ],
@@ -47,7 +52,7 @@ module.exports = {
         new webpack.LoaderOptionsPlugin({
             debug: true
         }),
-        new webpack.HotModuleReplacementPlugin(),
+        // new webpack.HotModuleReplacementPlugin(),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('development'),
             "global.IS_BROWSER" : true // webpack仅用于前端代码生成，所以一定是在浏览器端

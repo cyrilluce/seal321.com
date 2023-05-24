@@ -1,5 +1,5 @@
 import * as localConfig from '../localConfig';
-import * as isomorphicFetch from 'isomorphic-fetch';
+import isomorphicFetch from 'isomorphic-fetch';
 import { sendTiming } from '.'
 
 /**

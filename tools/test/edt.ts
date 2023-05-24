@@ -1,4 +1,4 @@
-import * as fs from 'mz/fs';
+import fs from 'mz/fs';
 import { join as pathJoin } from 'path';
 import * as localConfig from '../../src/localConfig';
 const EdtPacker = require('../packers/Edt');

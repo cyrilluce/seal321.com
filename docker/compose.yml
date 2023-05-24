@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  # Refer to: https://hub.docker.com/_/mysql
+  mysql:
+    image: mysql:8.0
+    container_name: seal321-mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: ${SEAL321_MYSQL_USERNAME}
+      MYSQL_PASSWORD: ${SEAL321_MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${SEAL321_MYSQL_DATABASE}
+    ports:
+      - 3306
+    volumes:
+      - "./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
+      - "./mysql/data:/var/lib/mysql"
+  server:
+    image: hkccr.ccs.tencentyun.com/cyrilluce/seal321-server
+    container_name: seal321-server
+    restart: always
+    environment:
+      SEAL321_MYSQL_HOST: seal321-mysql
+      SEAL321_MYSQL_PORT: 3306
+      SEAL321_MYSQL_USERNAME: ${SEAL321_MYSQL_USERNAME}
+      SEAL321_MYSQL_PASSWORD: ${SEAL321_MYSQL_PASSWORD}
+      SEAL321_MYSQL_DATABASE: ${SEAL321_MYSQL_DATABASE}
+    ports:
+      - 8080
+  nginx:
+    image: nginx
+    container_name: seal321-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # - "./nginx/nginx.conf:/etc/nginx/nginx.conf"
+      - "./nginx/vhost:/etc/nginx/conf.d"
+      - "./nginx/www:/etc/nginx/www"
+      # TODO 以后要换
+      - "${LETS_ENCRYPT_CERT_DIR}:/etc/nginx/ssl"
+  fpm:
+    image: php:fpm
+    ports:
+        - 9000
+
+    # seems like fpm receives the full path from nginx
+    # and tries to find the files in this dock, so it must
+    # be the same as nginx.root
+    volumes:
+        - "./nginx/www:/etc/nginx/www"

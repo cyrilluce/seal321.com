@@ -1,4 +1,4 @@
-import * as fetch from "isomorphic-fetch";
+import fetch from "isomorphic-fetch";
 import { stringify } from "qs";
 import logger from '../../logger';
 

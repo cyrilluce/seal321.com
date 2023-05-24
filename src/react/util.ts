@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 
 const xSize = 16, ySize = 16, iconWidth = 32, iconHeight = 32;
 /*

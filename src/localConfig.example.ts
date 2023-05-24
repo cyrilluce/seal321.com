@@ -25,3 +25,13 @@ export const mysql: MySQLConfig = {
 }
 /** 更新包监控等，工作目录 */
 export const sampleDir: string = "D:\\seal-samples";
+
+/** oauth接入 */
+export const grantConfig = {
+    "server": {
+        "protocol": "https",
+        "host": "beta.seal321.com",
+        "transport": "session",
+        "state": true
+    }
+};

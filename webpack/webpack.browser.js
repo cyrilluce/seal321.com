@@ -31,6 +31,7 @@ module.exports = {
                     {
                         loader : 'ts-loader',
                         options : {
+                            transpileOnly: true,
                             compilerOptions : {
                                 module : 'es2015'
                             }

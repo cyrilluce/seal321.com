@@ -6,6 +6,7 @@
     "baseUrl": "src",
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
+    "esModuleInterop": true,
     "noImplicitAny": false,
     "sourceMap": false,
     "allowJs": true,
@@ -16,6 +17,7 @@
       "./node_modules/@types",
       "src/types"
     ],
+    "skipLibCheck": true,
     "lib":[
       "dom",
       "es2017"

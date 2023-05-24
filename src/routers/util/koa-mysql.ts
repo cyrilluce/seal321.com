@@ -6,7 +6,7 @@ import { promisify, promiseCall } from "../../util";
 
 type IWithConnTask = (
   conn?: IConnection,
-  query?: (...args: any[]) => Promise<any[]>
+  query?: <T = any>(...args: any[]) => Promise<T[]>
 ) => Promise<any>;
 type IWithConn = (task: IWithConnTask) => Promise<any>;
 

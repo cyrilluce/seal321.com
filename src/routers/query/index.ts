@@ -1,7 +1,6 @@
 import { dbs, ServerId, mainDb, Table } from '../../config';
-import * as Koa from "koa"
-import * as Router from "koa-router";
-import * as compose from "koa-compose";
+import Koa from "koa"
+import Router from "koa-router";
 import * as mysql from 'mysql';
 import withConn, { QueryContext as BaseQueryContext } from '../util/koa-mysql';
 import { getConnectionAsync } from '../../lib/mysql';

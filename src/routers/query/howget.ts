@@ -44,7 +44,8 @@ export default async function(ctx: QueryContext, next){
             // 再找出对应的怪物，并进行去重尝试
             const monsterIds = monsterRelations.map(r=>r.b)
             if(monsterIds.length){
-                monsters = await query(`SELECT min(id) as id,name,level,property FROM ${monsterTableName} WHERE id in (?) GROUP BY name,level ORDER BY level LIMIT 0, 20`, [monsterIds])
+                const trimed = await query<Monster>(`SELECT min(id) as id,name,level FROM ${monsterTableName} WHERE id in (?) GROUP BY name,level ORDER BY level LIMIT 0, 20`, [monsterIds])
+                monsters = await query(`SELECT id,name,level,property FROM ${monsterTableName} WHERE id in (?)`, trimed.map(o => o.id))
             }
         }
 

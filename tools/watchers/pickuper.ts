@@ -3,11 +3,11 @@
  * 还有下一步，自动更新到服务器（deployer）
  * Created by cyrilluce on 2016/8/8.
  */
-import * as Rx from 'rx';
+import Rx from 'rx';
 import { readdir, watch as fsWatch } from 'fs';
 import { stat, writeFile } from 'mz/fs'
 import { join } from 'path'
-import * as semver from 'semver';
+import semver from 'semver';
 import * as config from '../config';
 
 /** 自动提取哪些类型 */

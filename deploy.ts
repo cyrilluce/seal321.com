@@ -11,11 +11,11 @@ var asyncLib = require('async');
 var crypto = require('crypto');
 var fs = require('mz/fs');
 import * as deployUtil from './src/util/deploy';
-import * as request from 'request'
+import request from 'request'
 var recursive = require('recursive-readdir');
 import { promisify, delay, timeout } from './src/util';
 import * as localConfig from './src/localConfig';
-import * as semver from 'semver';
+import semver from 'semver';
 import { RelationUpdates } from './src/routers/deploy';
 
 let args: any = {_:[]};

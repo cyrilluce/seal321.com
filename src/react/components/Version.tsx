@@ -3,12 +3,12 @@
  * Created by cyrilluce on 2016/8/14.
  */
 "use strict";
-import * as React from 'react';
+import React from 'react';
 import { Component, PropTypes } from 'react'
 import { inject, observer } from 'mobx-react';
 import { Version as VersionModel } from '../../models';
 import { dbs, ServerId } from '../../config';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 
 interface Props {
     version: VersionModel;

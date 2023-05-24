@@ -51,3 +51,4 @@ ts-build
 localConfig.ts
 
 .vscode
+.DS_Store

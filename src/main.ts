@@ -2,13 +2,10 @@
  * Created by cyrilluce on 2016/8/7.
  */
 import logger from "./logger";
-import * as http from "http";
-import * as net from "net";
-import * as fs from "fs";
-import * as Koa from "koa";
+import Koa from "koa";
 import web from "./routers/web";
-import deploy from "./routers/deploy";
-import * as session from "koa-session";
+// import deploy from "./routers/deploy";
+import session from "koa-session";
 import * as localConfig from "./localConfig";
 
 process.on("unhandledRejection", (reason, p) => {
@@ -20,10 +17,10 @@ process.on("uncaughtException", function(e) {
   logger.error(e);
   logger.error(e.stack);
 });
-// 发布工具
-new Koa().use(deploy).listen(localConfig.deployPort, "0.0.0.0", function() {
-  logger.info("远程发布服务监听于 ", localConfig.deployPort);
-});
+// // 发布工具
+// new Koa().use(deploy).listen(localConfig.deployPort, "0.0.0.0", function() {
+//   logger.info("远程发布服务监听于 ", localConfig.deployPort);
+// });
 
 // web服务
 const app = new Koa();

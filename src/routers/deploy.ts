@@ -1,12 +1,12 @@
-import * as fs from 'mz/fs';
-import * as mkdirp from 'mkdirp';
+import fs from 'mz/fs';
+import mkdirp from 'mkdirp';
 import * as path from 'path';
 import mysqlPool from '../lib/mysql';
 import * as mysql from 'mysql';
 import * as config from '../config';
 import logger from '../logger';
 import * as  deployUtil from '../util/deploy';
-import * as asyncLib from 'async';
+import asyncLib from 'async';
 import { promiseCall, promisify } from '../util';
 import { ServerNames, DbNames } from '../lang'
 import { Relation } from '../types'
@@ -22,7 +22,7 @@ async function backupFile(filePath) {
     return new Promise((resolve, reject) => {
         fs.createReadStream(filePath)
             .pipe(fs.createWriteStream(filePath + '.bak'))
-            .on('close', () => { resolve() })
+            .on('close', () => { resolve(null) })
             .on('error', reject);
     });
 }

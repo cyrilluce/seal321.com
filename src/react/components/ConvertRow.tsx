@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 import { observer, inject } from 'mobx-react'
 import { Item as ItemModel } from '../../models'
 import { SetOption } from '../../types'
 import { ItemDbStore } from '../../stores'
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 
 interface Props {
     /** 转换后的物品 */

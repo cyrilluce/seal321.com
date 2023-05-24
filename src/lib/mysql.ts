@@ -1,7 +1,7 @@
 /**
  * Created by cyrilluce on 2016/8/7.
  */
-import * as mysql from 'mysql';
+import mysql from 'mysql';
 import {mysql as mysqlConfig} from '../localConfig';
 import {promisify} from '../util';
 const pool  = mysql.createPool(Object.assign({

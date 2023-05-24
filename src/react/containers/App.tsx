@@ -1,7 +1,7 @@
 /**
  * Created by cyrilluce on 2016/8/14.
  */
-import * as React from 'react';
+import React from 'react';
 import { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 

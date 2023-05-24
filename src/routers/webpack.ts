@@ -1,5 +1,5 @@
-import * as compose from 'koa-compose';
-import * as koaConnect from 'koa2-connect';
+import compose from 'koa-compose';
+import koaConnect from 'koa2-connect';
 import logger from '../logger';
 
 let webpack = require('webpack');

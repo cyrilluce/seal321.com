@@ -8,7 +8,7 @@
  * Created by cyrilluce on 2016/7/24.
  */
 import { createCipher, createDecipher } from 'crypto';
-import * as zlib from 'zlib';
+import zlib from 'zlib';
 import * as securityConfig from '../securityConfig';
 import {promisify} from "./promisify";
 const key = securityConfig.deployKey;

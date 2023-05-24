@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 // import {findDOMNode} from 'react-dom';
-import * as classnames from 'classnames';
+import classnames from 'classnames';
 import Dropdown, {Props as DropdownProps} from './Dropdown'
 import { sendEvent } from '../../util'
 

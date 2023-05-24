@@ -1,7 +1,7 @@
 /**
  * Created by cyrilluce on 2016/8/14.
  */
-import * as React from 'react';
+import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { useStaticRendering } from 'mobx-react';
 import { when, toJS } from 'mobx';
@@ -11,9 +11,9 @@ import { ItemDbStore, itemDbParamConfigs } from '../stores';
 import logger from '../logger';
 import { join } from 'path';
 import * as config from '../config';
-import * as compose from "koa-compose";
-import * as views from "koa-views";
-import * as fs from 'mz/fs';
+import compose from "koa-compose";
+import views from "koa-views";
+import fs from 'mz/fs';
 import * as versions from '../../versions';
 
 
