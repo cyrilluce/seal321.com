@@ -1,0 +1,1 @@
+GRANT ALL PRIVILEGES on *.* TO seal321@`%`;

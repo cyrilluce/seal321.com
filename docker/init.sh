@@ -4,6 +4,7 @@ rm -rf temp/.git
 rm -r nginx/www
 mv temp/www nginx/www
 
+rm -rf mysql/data/*
 rm -f ./mysql/docker-entrypoint-initdb.d/*.sql
 mkdir -p ./mysql/docker-entrypoint-initdb.d
 tar -zxf ./temp/mysql/dump.tar.gz -C ./mysql/docker-entrypoint-initdb.d
