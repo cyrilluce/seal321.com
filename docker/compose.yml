@@ -5,10 +5,10 @@ services:
   mysql:
     image: mysql:8.0
     container_name: seal321-mysql
-    command: --default-authentication-plugin=mysql_native_password
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: 123456
       MYSQL_USER: ${SEAL321_MYSQL_USERNAME}
       MYSQL_PASSWORD: ${SEAL321_MYSQL_PASSWORD}
       MYSQL_DATABASE: ${SEAL321_MYSQL_DATABASE}
@@ -43,7 +43,15 @@ services:
       # TODO 以后要换
       - "${LETS_ENCRYPT_CERT_DIR}:/etc/nginx/ssl"
   fpm:
-    image: php:fpm
+    # image: php:5.6-fpm
+    image: hkccr.ccs.tencentyun.com/cyrilluce/seal321-php
+    container_name: seal321-php-fpm
+    environment:
+      SEAL321_MYSQL_HOST: seal321-mysql
+      SEAL321_MYSQL_PORT: 3306
+      SEAL321_MYSQL_USERNAME: ${SEAL321_MYSQL_USERNAME}
+      SEAL321_MYSQL_PASSWORD: ${SEAL321_MYSQL_PASSWORD}
+      SEAL321_MYSQL_DATABASE: seal
     ports:
         - 9000
 
@@ -52,3 +60,5 @@ services:
     # be the same as nginx.root
     volumes:
         - "./nginx/www:/etc/nginx/www"
+        - "./php/php.ini:/usr/local/etc/php/php.ini"
+        - "./php/conf.d:/usr/local/etc/php/conf.d"
