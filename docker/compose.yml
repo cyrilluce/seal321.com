@@ -39,8 +39,7 @@ services:
       # - "./nginx/nginx.conf:/etc/nginx/nginx.conf"
       - "./nginx/vhost:/etc/nginx/conf.d"
       - "./nginx/www:/etc/nginx/www"
-      # TODO 以后要换
-      - "${LETS_ENCRYPT_CERT_DIR}:/etc/nginx/ssl"
+      - "/etc/letsencrypt/:/etc/letsencrypt/"
   fpm:
     # image: php:5.6-fpm
     image: hkccr.ccs.tencentyun.com/cyrilluce/seal321-php
