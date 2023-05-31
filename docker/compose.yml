@@ -40,6 +40,7 @@ services:
       - "./nginx/vhost:/etc/nginx/conf.d"
       - "./nginx/www:/etc/nginx/www"
       - "/etc/letsencrypt/:/etc/letsencrypt/"
+      - "./nginx/docker-entrypoint.d:/docker-entrypoint.d"
   fpm:
     # image: php:5.6-fpm
     image: hkccr.ccs.tencentyun.com/cyrilluce/seal321-php
