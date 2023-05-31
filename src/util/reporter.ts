@@ -1,25 +1,28 @@
-const ga = function(...any){
+const gtag = function(...any){
     if(!global.IS_BROWSER){
         return;
     }
-    const ga = window.ga;
-    if(!ga){
+    const gtag = window.gtag;
+    if(!gtag){
         return;
     }
-    ga(...arguments);
+    gtag(...arguments);
 }
 /**
  * 设置页面
+ * 
+ * @deprecated GA4自动收集，不需要了
  */
 export function setPage(path: string): void{
-    ga('set', 'page', path);
+    // ga('set', 'page', path);
 }
 
 /**
  * 发送PV
+ * @deprecated GA4自动收集，不需要了
  */
 export function sendPageView(): void{
-    ga('send', 'pageview');
+    // ga('send', 'pageview');
 }
 
 /**
@@ -29,8 +32,12 @@ export function sendPageView(): void{
  * @param eventLabel 用于对事件进行分类（例如 'Fall Campaign'）
  * @param eventValue 与事件相关的数值（例如 42）
  */
-export function sendEvent(eventCategory: string, eventAction: string, eventLabel?: string, eventValue?: number): void{
-    ga('send', 'event', ...arguments)
+export function sendEvent(event_category: string, event_action: string, event_label?: string, eventValue?: number): void{
+    gtag('event', {
+        event_category,
+        event_action,
+        event_label
+    })
 }
 
 /**
@@ -45,5 +52,10 @@ export function sendTiming(timingCategory: string, timingVar: string, timingValu
     if(timingValue > 60 * 60 * 1000){
         return
     }
-    ga('send', 'timing', ...arguments)
+    gtag('event', 'timing_complete', {
+        'name': timingVar,
+        'value': timingValue,
+        'event_category': timingCategory,
+        'event_label': timingLabel
+      })
 }
