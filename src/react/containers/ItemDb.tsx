@@ -163,6 +163,15 @@ export default class ItemDb extends Component<Props, State> {
     return (
       <GatewayProvider>
         <StickyContainer className="container-fluid">
+          <div className="site-shutdown-notice">
+            <strong>因服务器资源即将到期，以及站长无精力继续维护，本站将于 2025-05-27 停止服务</strong>
+            <p>特别感谢 明媚jj 一直以来的赞助，以及曾经提供数据的用户</p>
+            <p>网站相关源码已开源，勿用于不法用途：
+              <a href="https://github.com/cyrilluce/seal321.com">
+                https://github.com/cyrilluce/seal321.com
+              </a>
+            </p>
+          </div>
           <h1>物品数据库 v2.0 Beta <Version version={store.version} /></h1>
           <Sticky className="fixed-toolbar">
             <SearchBar />
